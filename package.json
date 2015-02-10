@@ -1,0 +1,16 @@
+{
+  "name": "flowxo-sdk",
+  "version": "0.0.1",
+  "description": "An SDK for developing FlowXO Services",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Joe Woodhouse <joewoodhouse30@gmail.com>",
+  "dependencies": {
+    "chalk": "^0.5.1",
+    "inquirer": "^0.8.0",
+    "meow": "^3.0.0",
+    "replay": "^1.12.0"
+  }
+}
