@@ -8,11 +8,8 @@
   },
   "author": "Joe Woodhouse <joewoodhouse30@gmail.com>",
   "dependencies": {
-    "chalk": "^0.5.1",
-    "inquirer": "^0.8.0",
-    "meow": "^3.0.0",
-    "replay": "^1.12.0",
-    "lodash": "^3.1.0"
+    "lodash": "^3.1.0",
+    "replay": "^1.12.0"
   },
   "devDependencies": {
     "chai": "^1.10.0",
