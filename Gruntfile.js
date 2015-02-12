@@ -21,8 +21,20 @@ module.exports = function(grunt){
         },
         src: ['tests/**/*.spec.js']
       }
+    },
+    watch:{
+      js:{
+        options:{
+          spawn: true,
+          interrupt: true,
+          debounceDelay: 250
+        },
+        files: ['lib/**/*.js','tests/**/*.spec.js'],
+        tasks: ['test']
+      }
     }
   });
 
-  grunt.registerTask('default',['mochaTest']);
+  grunt.registerTask('test',['mochaTest']);
+  grunt.registerTask('default',['test','watch']);
 };
