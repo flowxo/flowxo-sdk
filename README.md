@@ -1,5 +1,5 @@
 Introduction
-=========
+============
 
 [Flow XO](https://flowxo.com) is a platform that lets users build automated sales & marketing workflows on top of their existing cloud apps.
 
@@ -10,7 +10,7 @@ We've opened up our SDK so that anyone can build support for their service into 
 If you get stuck, just send us an email at [support@flowxo.com](mailto:support@flowxo.com) and we'll try our best to guide you.
 
 Prerequisites
-==========
+=============
 
 Flow XO runs on [Node.js](https://nodejs.org/).  Make sure you're using Node.js [v0.12.0](https://nodejs.org/docs/v0.12.0/api/) as that's the version we run.  If you don't have Node.js, you can [download it here](http://nodejs.org/dist/v0.12.0/docs/download/).
 
@@ -21,7 +21,7 @@ As most modules will be fairly thin wrappers around HTTP API's, you should under
 That's all.  The other tools that the SDK calls on will be installed locally with the `npm install`.
 
 Scaffolding Your Service
-===================
+========================
 
 You should start your service using our [Yoeman](http://yeoman.io/) generator. As this is not publicly available, you can't `npm install` it, so you need to follow these steps:
 
@@ -32,14 +32,14 @@ You should start your service using our [Yoeman](http://yeoman.io/) generator. A
 
 You should now be able to run `yo flowxo` to generate a service.
 
-If you select a _Credentials_ service, you will be asked to define the fields that the user must complete. Normally this would be a username, password, API key, token, account name, etc.  Just define all the fields you'll need to collect in order to access and authorize against your service's API.  See the _Authorization > Credentials_ section for more information.
+If you select a _Credentials_ service, you'll be asked to define the fields that the user must complete. Normally this would be a username, password, API key, token, account name, etc.  Just define all the fields you'll need to collect in order to access and authorize against your service's API.  See the _Authorization > Credentials_ section for more information.
 
 If you select an _OAuth_ service, a skeleton `oauth.js` file will be created for you.  See the _Authorization > OAuth_ section for how to do this.
 
 You should now have a populated directory with some scripts.  Next, we'll take a look at what we've generated.
 
 Code Structure
-============
+==============
 
 A service is a collection of JS files, with scripts relating to the service as a whole at the root, and a directory for each method beneath that.
 
@@ -57,8 +57,10 @@ This is how your service will eventually be structured (although you won't have 
     |-- another_method
         |-- ...
 
+There's a few other files you might also have in your root, such as `oauth.js`, `auth.json` and `.gitignore`.
+
 Scripts
---------
+-------
 
 `ping.js`, `run.js`, `input.js` and `output.js` all work in a similar way.
 
@@ -69,7 +71,7 @@ They're passed an `input` object along with a `callback` function that accepts e
       callback(error, output);
     }
 
-Your script receives the input and does whatever work is necessary.  If all is well, the script should call `callback(null, object)`.  If there's a problem, tell the core about it by returning `callback(error)`.
+Your script receives the input and does whatever work is necessary.  If all is well, the script should call `callback(null, object)`.  If there's a problem, tell the core about it by returning `callback(error)` (see the section on _Handling Errors_ to find out how to do that).
 
 config.js
 ----------
@@ -525,6 +527,70 @@ Once it's passed through `helper.flatten()` it's converted to:
 
 You'll see that we try and give array items sensible, readable keys.  The first item of an array or a single object with the same properties will always have the same keys, that helps in situations where an API returns either an object or array depending on the number of items.
 
+Handling Errors
+--------------------
+
+The callback for your script expects either an error (if the request failed) or an object (on success).  This section will help you to understand how to construct your errors.
+
+** Service Errors **
+
+ServiceErrors are where a request to the API succeeded (in technical terms) but the user's request can't be completed for operational reasons.  They include authorisation problems, validation errors and quotas being exceeded.
+
+The platform does not make any attempt to retry after a 'regular' error, and these types of errors are not logged or monitored by the platform, only written to the workflow log.
+
+If you run into an error, create a `ServiceError` object and return it as the error argument in your callback:
+
+    cb(new ServiceError("You must provide a value."))
+
+Take care with the tone and style of your errors, as they'll be displayed directly to the user.  You should follow our style guide.
+
+For common/recognised errors, it's normally best to extract the error message and create your own error object from the original message.  The objective here is to present a friendly, useful and readable message to user.  To help with this, you can create a `ServiceError` object with a friendlier message and the original error like so:
+
+    cb(new ServiceError({ err: [object],
+                          message: "Please provide a value." }))
+
+Make sure you include a `message` or the message from `err` will be used instead.
+
+Each other error listed below inherits from `ServiceError`. This is so we can perform a single `instanceof ServiceError` check to match them all.
+
+** OAuth Errors **
+
+A special case is where the API returns an error relating to the OAuth token.
+
+Use an instance of `OAuthError`, which works the same as `Error`.  The platform will attempt to refresh the OAuth token and retry the request once.  If that doesn't succeed, the error will be written to the workflow log.
+
+** Retryable Errors **
+
+These occur when you can't access a service or you get a response back in a format that you don't recognise.  They're usually recoverable, and so the platform will retry the request later.
+
+When you encounter a retryable error, create an instance of the `RetryableServiceError` object and return it as the error argument in your callback.
+
+The `RetryableServiceError` expects an object containing any debug information you think is relevant.  It might include:
+
+- An error object `err`.
+- The HTTP status code received `status`.
+- The response body of the HTTP request `body`.
+
+For example:
+
+    cb(new RetryableServiceError({ err: [object] }))
+    cb(new RetryableServiceError({ status: 504,
+                                   body: "Gateway Timeout" }))
+    cb(new RetryableServiceError({ err: [object], status: 500,
+                                   body: "Server Error" }))
+    cb(new RetryableServiceError({ err: [object], foo: "bar" }))
+
+Always provide as much information as you can (for debug purposes).  You should use a `RetryableServiceError` in situations like these:
+
+- HTTP requests fail.  For example, where you use `request.post()` to call the API and your callback receives an error object.  Pass the error object directly into `RetryableServiceError`.  No need to send a status code or body, as the HTTP request failed.
+- Where you receive a 500 status code from the API, and you were expecting 200.  Pass the status code and body you receive into the error object.
+- If you receive a 200 status code (as expected) and test for the presence of a `result` JSON key in the body, but find that it's not there, then pass the status and body into the error.
+- A `JSON.parse` of the API's response throws an error.  Pass in the caught error from `JSON.parse` along with the status and body from the API.
+
+The platform will retry the request up to 5 times (with exponential back-off), and if after the 5th attempt a retryable error still occurs, it will be written to the workflow log as "The request failed because something unexpected happened.".
+
+Retryable errors are logged and monitored by the platform.
+
 Authorized Libraries
 --------------------------
 
@@ -600,67 +666,3 @@ TODO: Needs work!
 When your module is ready, you should publish your repo to [Bitbucket](https://bitbucket.org/) (you'll usually want to keep it private!) and open a pull request to our main [services](https://bitbucket.org/) repository on Bitbucket.
 
 We'll then review your work, and all being well, make it live!
-
-Handling Errors
---------------------
-
-The callback for your script expects either an error (if the request failed) or an object (on success).  This section will help you to understand how to construct your errors.
-
-** Service Errors **
-
-ServiceErrors are where a request to the API succeeded (in technical terms) but the user's request can't be completed for operational reasons.  They include authorisation problems, validation errors and quotas being exceeded.
-
-The platform does not make any attempt to retry after a 'regular' error, and these types of errors are not logged or monitored by the platform, only written to the workflow log.
-
-If you run into an error, create a `ServiceError` object and return it as the error argument in your callback:
-
-    cb(new ServiceError("You must provide a value."))
-
-Take care with the tone and style of your errors, as they'll be displayed directly to the user.  You should follow our style guide.
-
-For common/recognised errors, it's normally best to extract the error message and create your own error object from the original message.  The objective here is to present a friendly, useful and readable message to user.  To help with this, you can create a `ServiceError` object with a friendlier message and the original error like so:
-
-    cb(new ServiceError({ err: [object],
-                          message: "Please provide a value." }))
-
-Make sure you include a `message` or the message from `err` will be used instead.
-
-Each other error listed below inherits from `ServiceError`. This is so we can perform a single `instanceof ServiceError` check to match them all.
-
-** OAuth Errors **
-
-A special case is where the API returns an error relating to the OAuth token.
-
-Use an instance of `OAuthError`, which works the same as `Error`.  The platform will attempt to refresh the OAuth token and retry the request once.  If that doesn't succeed, the error will be written to the workflow log.
-
-** Retryable Errors **
-
-These occur when you can't access a service or you get a response back in a format that you don't recognise.  They're usually recoverable, and so the platform will retry the request later.
-
-When you encounter a retryable error, create an instance of the `RetryableServiceError` object and return it as the error argument in your callback.
-
-The `RetryableServiceError` expects an object containing any debug information you think is relevant.  It might include:
-
-- An error object `err`.
-- The HTTP status code received `status`.
-- The response body of the HTTP request `body`.
-
-For example:
-
-    cb(new RetryableServiceError({ err: [object] }))
-    cb(new RetryableServiceError({ status: 504,
-                                   body: "Gateway Timeout" }))
-    cb(new RetryableServiceError({ err: [object], status: 500,
-                                   body: "Server Error" }))
-    cb(new RetryableServiceError({ err: [object], foo: "bar" }))
-
-Always provide as much information as you can (for debug purposes).  You should use a `RetryableServiceError` in situations like these:
-
-- HTTP requests fail.  For example, where you use `request.post()` to call the API and your callback receives an error object.  Pass the error object directly into `RetryableServiceError`.  No need to send a status code or body, as the HTTP request failed.
-- Where you receive a 500 status code from the API, and you were expecting 200.  Pass the status code and body you receive into the error object.
-- If you receive a 200 status code (as expected) and test for the presence of a `result` JSON key in the body, but find that it's not there, then pass the status and body into the error.
-- A `JSON.parse` of the API's response throws an error.  Pass in the caught error from `JSON.parse` along with the status and body from the API.
-
-The platform will retry the request up to 5 times (with exponential back-off), and if after the 5th attempt a retryable error still occurs, it will be written to the workflow log as "The request failed because something unexpected happened.".
-
-Retryable errors are logged and monitored by the platform.
