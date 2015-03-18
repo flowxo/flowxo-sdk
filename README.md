@@ -635,9 +635,9 @@ Tests are standard Node.js [mocha](http://mochajs.org/) tests. Some important gl
 - `service` - the main/shared functions for your service (in `index.js`).
 - `runner` - an instance of `ScriptRunner` which allows you to easily run your methods. The `ScriptRunner` has one main function:
 
-
-    runner.run(slug, script, options, callback)
-
+```
+runner.run(slug, script, options, callback)
+```
 
 - `slug` - the slug of the method to run.
 - `script` - the script to run, either 'run', 'input' or 'output'.
