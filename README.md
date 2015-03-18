@@ -64,9 +64,9 @@ Scripts
 
 `ping.js`, `run.js`, `input.js` and `output.js` all work in a similar way.
 
-They're passed an `input` object along with a `callback` function that accepts either an `error` or an `output` object:
+They're passed a `data` object along with a `callback` function that accepts either an `error` or an `output` object:
 
-    module.exports = function(input, callback) {
+    module.exports = function(data, callback) {
       /* Do something here with input */
       callback(error, output);
     }
@@ -93,9 +93,9 @@ ping.js
 
 The core sometimes needs to check whether it's able to connect to your service.  For example, after the user has provided their credentials to connect a new account, the core will call `ping.js` to check those credentials work.
 
-You'll be passed an `input` object containing the credentials that the user supplied, and should return either `true` or `false` as the output:
+You'll be passed a `data` object containing the credentials that the user supplied (in `data.auth`), and should return either `true` or `false` as the output:
 
-    module.exports = function(input, callback) {
+    module.exports = function(data, callback) {
       /* Check the credentials */
       callback(null, true);
     }
@@ -235,14 +235,14 @@ Note that `data.input` will hold the input values that the user has given to the
 run.js
 ------
 
-You'll be passed an `input` object and a callback.  The script should do its work and either call `callback(err)` or `callback(null, output)`.
+You'll be passed a `data` object and a callback.  The script should do its work and either call `callback(err)` or `callback(null, output)`.
 
-    module.exports = function(input, callback) {
+    module.exports = function(data, callback) {
       /* Do some stuff */
       callback(null, [Object]);
     }
 
-The `input` object contains the auth credentials and the input values:
+The `data` object contains the auth credentials and the input values:
 
     {
       auth: {
@@ -545,8 +545,7 @@ Take care with the tone and style of your errors, as they'll be displayed direct
 
 For common/recognised errors, it's normally best to extract the error message and create your own error object from the original message.  The objective here is to present a friendly, useful and readable message to user.  To help with this, you can create a `ServiceError` object with a friendlier message and the original error like so:
 
-    cb(new ServiceError({ err: [object],
-                          message: "Please provide a value." }))
+    cb(new ServiceError({ err: [object], message: "Please provide a value." }))
 
 Make sure you include a `message` or the message from `err` will be used instead.
 
@@ -573,10 +572,8 @@ The `RetryableServiceError` expects an object containing any debug information y
 For example:
 
     cb(new RetryableServiceError({ err: [object] }))
-    cb(new RetryableServiceError({ status: 504,
-                                   body: "Gateway Timeout" }))
-    cb(new RetryableServiceError({ err: [object], status: 500,
-                                   body: "Server Error" }))
+    cb(new RetryableServiceError({ status: 504, body: "Gateway Timeout" }))
+    cb(new RetryableServiceError({ err: [object], status: 500, body: "Server Error" }))
     cb(new RetryableServiceError({ err: [object], foo: "bar" }))
 
 Always provide as much information as you can (for debug purposes).  You should use a `RetryableServiceError` in situations like these:
@@ -638,7 +635,9 @@ Tests are standard Node.js [mocha](http://mochajs.org/) tests. Some important gl
 - `service` - the main/shared functions for your service (in `index.js`).
 - `runner` - an instance of `ScriptRunner` which allows you to easily run your methods. The `ScriptRunner` has one main function:
 
+
     runner.run(slug, script, options, callback)
+
 
 - `slug` - the slug of the method to run.
 - `script` - the script to run, either 'run', 'input' or 'output'.
