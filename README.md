@@ -462,6 +462,8 @@ You should provide a `help` property to tell the user how to configure the webho
 Helper Functions
 ----------------
 
+### helper.polling() ###
+
     helper.polling(data, key, callback)
 
 `helper.polling` helps you to look for and deal with new items that you see in an array of items.
@@ -475,6 +477,8 @@ It's useful when you need to poll services, look for new records and then hand a
 - `callback(err, items)` - The callback function is called with either an error, or if successful, an array containing the new items found (those with a key that hasn't been seen before).  The array might be empty if no new items are found.
 
 Internally, the function asks the core whether each key has been seen before (is it 'cached'), and if not, adds it to the array of items it returns.  The core will then update the cache of items once it's handed the list of new items.
+
+### helper.flatten() ###
 
     helper.flatten(data)
 
