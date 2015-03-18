@@ -71,10 +71,12 @@ They're passed an `input` object along with a `callback` function that accepts e
       callback(error, output);
     }
 
-Your script receives the input and does whatever work is necessary.  If all is well, the script should call `callback(null, object)`.  If there's a problem, tell the core about it by returning `callback(error)` (see the section on _Handling Errors_ to find out how to do that).
+Your script receives the input and does whatever work is necessary.  If all is well, the script should call `callback(null, object)`.  If there's a problem, tell the core about it by returning `callback(error)` (see the section on _Creating Methods > Handling Errors_).
+
+Each type of script will be explained in more detail later.
 
 config.js
-----------
+---------
 
 The `config.js` file at the root of your module defines the service name and its auth settings.  It looks something like this:
 
@@ -87,7 +89,7 @@ The `config.js` file at the root of your module defines the service name and its
     }
 
 ping.js
---------
+-------
 
 The core sometimes needs to check whether it's able to connect to your service.  For example, after the user has provided their credentials to connect a new account, the core will call `ping.js` to check those credentials work.
 
@@ -98,26 +100,26 @@ You'll be passed an `input` object containing the credentials that the user supp
       callback(null, true);
     }
 
-In this script, an authorization error returned by the API (such as `401 Unauthorized`) shouldn't be treated as an error, and instead you should set the output to `false`.  This differs from the other script types, where a `401` __should__ usually be treated as an error
+In this script, an authorization error returned by the API (such as `401 Unauthorized`) shouldn't be treated as an error, and instead you should set the output to `false`.  This differs from the other script types, where a `401` __should__ usually be considered an error.
 
 index.js
----------
+--------
 
 This script is a place to hold your shared code.  It's common to create a function that abstracts the handling of HTTP requests, and perhaps a function that handles errors.
 
 Take a look at the example modules to see what kind of code you should be centralising here.
 
 Authorization
-==========
+=============
 
 Flow XO supports credential based auth (where the user provides some kind of secret that can be used for authorization) or the [OAuth](http://oauth.net/) protocol, where the user grants access directly through the service being accessed.
 
 Credentials
---------------
+-----------
 
 We support authorization with credentials (an API key, token, username/password or actually any combination of fields) which are passed into your scripts at runtime and can then be used to authorize requests.
 
-Usually that means sending credentials in the request headers or query string, or perhaps exchanging the credentials for a token before using that token in requests.
+Usually that means sending credentials in the request headers or query string, or perhaps exchanging the credentials for a token before using that in requests.
 
 To configure credentials based auth, you'll need to edit the `auth` property in the `config.js` file at the root of your service.
 
@@ -148,7 +150,7 @@ See the section _Creating Methods > Input Field Types_ for a list of the field t
 When your scripts are run, you'll get the credentials in `data.auth`.
 
 OAuth
---------
+-----
 
 Alternatively, we support [OAuth](http://oauth.net/) (versions [1.0](http://oauth.net/core/1.0/), [1.0a](http://oauth.net/core/1.0a/) and [2.0](http://oauth.net/2/)).
 
@@ -160,7 +162,7 @@ Once you have a valid `oauth.js` file, the service can be declared as OAuth in y
 
     auth: {
       type: 'oauth',
-      params: { // Optional, declare any extra strategy params
+      params: { // Optionally declare any extra strategy params
         scope: ['read', 'write']
       }
     }
@@ -170,7 +172,7 @@ When your scripts are run, you'll get an `access_key` in `data.auth`, which you 
 You'll also need to take special care to use an _OAuth Error_ when the API reports an authorization problem.  That way, the core knows to try and refresh the access token and try your script again (when possible).  See the section _Handling Errors > OAuth Errors_ for details.
 
 Local Testing
------------------
+-------------
 
 The SDK contains a Grunt task:
 
@@ -178,19 +180,18 @@ The SDK contains a Grunt task:
 
 This will take you through generating a set of auth credentials that you can use locally to test your scripts.
 
-If your service uses credentials, you'll simply be asked to complete the required fields e.g. API Key.
-
-For OAuth, a browser window will open up asking you to authorize.
+- If your service uses credentials, you'll simply be asked to complete the required fields e.g. API Key.
+- If you're using OAuth, a browser window will open asking you to authorize.
 
 Credentials are stored in an `auth.json` in the root of your service.  Of course, this file should **not** be committed to version control.  The default `.gitignore` takes care of this.
 
 Creating Methods
-==============
+================
 
 config.js
-----------
+---------
 
-Each method has it's own `config.js` file, which defines the method's name, what type of method it is, and describes its input/output fields.
+Each method has its own `config.js` file, which defines the method's name, what type of method it is, and describes its input/output fields.
 
 A typical config file looks like this:
 
@@ -208,20 +209,20 @@ A typical config file looks like this:
       }
     }
 
-- `scripts` - You can reference an `input.js` and/or an `output.js` script (in this method's directory).  Use input/output scripts to dynamically define fields that are generated at runtime and show alongside the static fields you define in the `fields` property.  See the _input.js_ and _output.js_sections for more details.
+- `scripts` - You can reference an `input.js` and/or an `output.js` script (in this method's directory).  Use input/output scripts to dynamically define fields that are generated at runtime and show alongside the static fields you define in the `fields` property.  See the _input.js_ and _output.js_ sections for more details.
 - `type` - Accepts values of `poller` (see the section _Polling_), `webhook` (see the section _Webhooks_) or `action` (anything else).
 - `kind` - Defines the method as either a `trigger` or `task`.
 - `fields` - Contains `input` and `output` objects which hold arrays of fields that define the fields that will be available for input to the script, and the properties that your script will output (on success).  See the sections on _Input Fields_ and _Output Fields_.
 
 input.js
----------
+--------
 
-Sometimes it's necessary to generate fields at runtime.  As an example, if our method has an input _User_, then it's usually best to load up a list of users into a select box rather than expect a user ID.  We won't know who those users are until the account has been authorized, and that list might change from time to time.  
+Sometimes it's necessary to generate fields at runtime.  As an example, if our method has an input _User_, then it's usually best to load up a list of users into a select box rather than expect a user ID.  We won't know who those users are until the account has been authorized, and that list might change from time to time.
 
 So the way forward is to use an `input.js` script.  The script is very similar to `run.js`, except it either returns an error, or an array of input fields on success.  See the section _Input Fields_ for the format of the array you should return.
 
 output.js
------------
+---------
 
 `output.js` scripts are executed at runtime and augment the static output fields defined in the `config.js`.
 
@@ -232,7 +233,7 @@ The script is very similar to `run.js`, except it either returns an error, or an
 Note that `data.input` will hold the input values that the user has given to the method (TODO - does it?).
 
 run.js
--------
+------
 
 You'll be passed an `input` object and a callback.  The script should do its work and either call `callback(err)` or `callback(null, output)`.
 
@@ -262,7 +263,7 @@ The `output` object should be a dictionary of key/values (the data returned by t
 All the keys that your script might output should be included in the output fields described in the method's `config.js` (or `output.js`).
 
 Input Fields
----------------
+------------
 
 Input fields should be provided as an array of objects that describe what type of data the input field accepts and how it is to behave in the UI.
 
@@ -308,7 +309,7 @@ The description is displayed underneath the field.
 
 You can also use text areas, select boxes, special date/time fields and boolean fields.
 
-** Text Areas **
+### Text Areas ###
 
     {
       key: 'description',
@@ -316,7 +317,7 @@ You can also use text areas, select boxes, special date/time fields and boolean 
       type: 'textarea'
     }
 
-** Select Boxes **
+### Select Boxes ###
 
     {
       key: 'priority',
@@ -335,7 +336,7 @@ You can also use text areas, select boxes, special date/time fields and boolean 
       ]
     }
 
-** Date/Time Fields **
+### Date/Time Fields ###
 
     {
       key: 'due',
@@ -356,9 +357,9 @@ The value of a date/time field will always be passed into your script as an obje
 
 You'll find the original value in `string`, a flag to say whether the date is `valid`, and `parsed` which will either contain `null` or a valid date object.
 
-To make it easy to deal with date/time fields, there's a helper function `helpers.dateTime`.  Just run the date through this helper to either return an error callback if there are problems with it or otherwise convert it into any format you need for your request.  See the section _Helper Functions_ for a reference.
+TODO: Explain how to format dates for moment
 
-** Boolean Fields **
+### Boolean Fields ###
 
     {
       key: 'active',
@@ -374,7 +375,7 @@ If you don't specify `input_options`, the options will default to _Yes_ and _No_
 
 A boolean field type will attempt to coerce a select box value into `true` or `false`.  It can handle the values `true`, `false`, `yes`, `no`, `1` or `0`.
 
-It's similar to date/time in that then value passed to your script will always be an object:
+It's similar to date/time in that the value passed to your script will always be an object:
 
     {
       type: 'boolean',
@@ -385,12 +386,10 @@ It's similar to date/time in that then value passed to your script will always b
 
 You'll find the original value in `string`, a flag to say whether the boolean is `valid`, and `parsed` which will either contain `null`, `true` or `false`.
 
-Just like the date/time field, you can use `helpers.boolean` handle this field.  See the section _Helper Functions_.
-
 Output Fields
------------------
+-------------
 
-Output fields should be provided as an array of objects that describe what data the script will output (it's output 'properties').
+Output fields should be provided as an array of objects that describe what data the script will output (its output 'properties').
 
 Each property is described like so:
 
@@ -402,7 +401,7 @@ Each property is described like so:
 You should describe all properties that your script _might_ output.
 
 Polling
---------
+-------
 
 Flow XO supports 2 trigger mechanisms, polling and webhooks.  Polling involves hitting an API periodically to check for new items, and is the most popular way of building a trigger.  Polling is more resource intensive than webhooks, but they're much easier for users to set up (currently users have to manually configure webhooks).
 
@@ -427,7 +426,7 @@ You can define your method as a polling trigger in `config.js`:
 To learn more about polling triggers, study the examples and take a look at the reference for `helper.polling()` in the _Helper Functions_ section.
 
 Webhooks
--------------
+--------
 
 Flow XO has general [webhooks support](http://support.flowxo.com/article/22-webhooks), but methods within services can be triggered by webhooks too.
 
@@ -461,7 +460,7 @@ To define your method as a webhook trigger, set your `config.js` up like this:
 You should provide a `help` property to tell the user how to configure the webhook in your service.  `help.webhook.config` and `help.webhook.test` accept an array of paragraphs to display to the user.
 
 Helper Functions
----------------------
+----------------
 
     helper.polling(data, key, callback)
 
@@ -528,11 +527,11 @@ Once it's passed through `helper.flatten()` it's converted to:
 You'll see that we try and give array items sensible, readable keys.  The first item of an array or a single object with the same properties will always have the same keys, that helps in situations where an API returns either an object or array depending on the number of items.
 
 Handling Errors
---------------------
+---------------
 
 The callback for your script expects either an error (if the request failed) or an object (on success).  This section will help you to understand how to construct your errors.
 
-** Service Errors **
+### Service Errors ###
 
 ServiceErrors are where a request to the API succeeded (in technical terms) but the user's request can't be completed for operational reasons.  They include authorisation problems, validation errors and quotas being exceeded.
 
@@ -553,13 +552,13 @@ Make sure you include a `message` or the message from `err` will be used instead
 
 Each other error listed below inherits from `ServiceError`. This is so we can perform a single `instanceof ServiceError` check to match them all.
 
-** OAuth Errors **
+### OAuth Errors ###
 
 A special case is where the API returns an error relating to the OAuth token.
 
 Use an instance of `OAuthError`, which works the same as `Error`.  The platform will attempt to refresh the OAuth token and retry the request once.  If that doesn't succeed, the error will be written to the workflow log.
 
-** Retryable Errors **
+### Retryable Errors ###
 
 These occur when you can't access a service or you get a response back in a format that you don't recognise.  They're usually recoverable, and so the platform will retry the request later.
 
@@ -592,7 +591,7 @@ The platform will retry the request up to 5 times (with exponential back-off), a
 Retryable errors are logged and monitored by the platform.
 
 Authorized Libraries
---------------------------
+--------------------
 
 Each service is manually reviewed before we make it available in Flow XO, and part of that process is making sure that only authorised libraries are used in your scripts.
 
@@ -600,7 +599,7 @@ We do this for security and stability reasons, and also so that we can help deve
 
 If you need a library that isn't on this list, please get in touch so we can review it.
 
-**Authorized Libraries**
+### Authorized Libraries ###
 
 - [Async.js](https://github.com/caolan/async) - Async utilities
 - [Moment.js](http://momentjs.com/) - Parse, validate, manipulate and display dates
@@ -608,7 +607,7 @@ If you need a library that isn't on this list, please get in touch so we can rev
 - [xml2js](https://github.com/Leonidas-from-XIV/node-xml2js) - XML to object conversion
 
 Updating a Method
-------------------------
+-----------------
 
 Once a method is made available, it can't be changed or deleted, only deprecated (and usually replaced with a newer version).
 
@@ -617,7 +616,7 @@ To deprecate a method, simply set `{ hidden: true }` in the `config.js`.  You ca
 Of course, you'll need to resubmit your service to us to have the changes made live.
 
 Running Methods
-==============
+===============
 
     grunt run
 
@@ -626,7 +625,7 @@ Will present you with a menu system where you can choose a method, select a scri
 You'll then be given the option to update the inputs and run again. This functionality is particularly useful for testing a polling trigger, where you can run the script once, do something in your service, then run it again to check that your new record is found.
 
 Writing Tests
-==========
+=============
 
 Tests can be run with the task:
 
@@ -639,16 +638,14 @@ Tests are standard Node.js [mocha](http://mochajs.org/) tests. Some important gl
 - `service` - the main/shared functions for your service (in `index.js`).
 - `runner` - an instance of `ScriptRunner` which allows you to easily run your methods. The `ScriptRunner` has one main function:
 
-
     runner.run(slug, script, options, callback)
-
 
 - `slug` - the slug of the method to run.
 - `script` - the script to run, either 'run', 'input' or 'output'.
 - `options` - the options to be passed into the script.  Normally you would define `options.input` as the input parameters.
 - `callback` - callback function expecting the arguments `err` and `output`.
 
-**Request Replay**
+### Request Replay ###
 
 By default, tests are run live, connecting to real API's and making real requests. Whilst this is obviously an important part of the test process, there can be times when this can make testing slow. 
 
@@ -659,7 +656,7 @@ Running in this mode will use [Node Replay](https://github.com/assaf/node-replay
 In `record` mode, it will record any requests it hasn't seen before (these get stored in the `tests/fixtures` folder of your service). In future test runs where a request is recognised, Node Replay returns the cached response instead of calling the real API. See [Node Replay](https://github.com/assaf/node-replay) for more information.
 
 Submitting your Service
-===================
+=======================
 
 TODO: Needs work!
 
