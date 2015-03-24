@@ -227,7 +227,7 @@ Use an output script where the service supports 'custom fields'.  For example, m
 
 The script is very similar to `run.js`, except it either returns an error, or an array of output fields on success.  See the section _Output Fields_ for the format of the array you should return.
 
-Note that `data.input` will hold the input values that the user has given to the method (TODO - does it?) ([TS] Yes, it does - but if any of the values are {{ interpolated }} ones, it will convert the interpolation to an empty string).
+Note that `data.input` will hold the input values that the user has given to the method.  Note that if any of the values are {{ interpolated }} ones, it will convert the interpolation to an empty string.
 
 run.js
 ------
