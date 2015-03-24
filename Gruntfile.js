@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(grunt){
 
   // Add the grunt-mocha-test tasks.
@@ -22,6 +24,18 @@ module.exports = function(grunt){
         src: ['tests/**/*.spec.js']
       }
     },
+    jshint:{
+      options:{
+        jshintrc: true,
+        reporter: require('jshint-stylish')
+      },
+      source:{
+        src: ['Gruntfile.js','index.js','lib/**/*.js']
+      },
+      tests:{
+        src: ['tests/**/*.spec.js'],
+      }
+    },
     watch:{
       js:{
         options:{
@@ -29,8 +43,8 @@ module.exports = function(grunt){
           interrupt: true,
           debounceDelay: 250
         },
-        files: ['lib/**/*.js','tests/**/*.spec.js'],
-        tasks: ['test']
+        files: ['index.js','lib/**/*.js','tests/**/*.spec.js'],
+        tasks: ['jshint','test']
       }
     }
   });

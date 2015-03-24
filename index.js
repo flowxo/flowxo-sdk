@@ -1,15 +1,13 @@
-var ConfigUtils = require('./lib/configUtils');
 var Service = require('./lib/service');
 var ScriptRunner = require('./lib/scriptRunner');
 var MockScriptStore = require('./lib/mockScriptStore');
 var Utils = require('./lib/utils');
-var PollManager = require('./lib/pollManager');
+var FXOError = require('./lib/error');
 
-var FlowXOSDK = module.exports = {
-  ConfigUtils: ConfigUtils,
+module.exports = {
   Service: Service,
   ScriptRunner: ScriptRunner,
-  PollManager: PollManager,
   MockScriptStore: MockScriptStore,
-  Utils: Utils
+  Utils: Utils,
+  Error: FXOError
 };
