@@ -227,7 +227,7 @@ Use an output script where the service supports 'custom fields'.  For example, m
 
 The script is very similar to `run.js`, except it either returns an error, or an array of output fields on success.  See the section _Output Fields_ for the format of the array you should return.
 
-Note that `data.input` will hold the input values that the user has given to the method.  Note that if any of the values are {{ interpolated }} ones, it will convert the interpolation to an empty string.
+Note that `data.input` will hold the input values that the user has given to the method.  Note that any `{{outputs}}` from other tasks in those values will be replaced with empty strings.
 
 run.js
 ------
@@ -397,6 +397,57 @@ Each property is described like so:
 
 You should describe all properties that your script _might_ output.
 
+Output Flattening
+-----------------
+
+Output data in Flow XO will be converted to un-nested key/value pairs by the core.  For example, take this object:
+
+    {
+      name: 'My deal',
+      people: [
+        {
+          name: 'John Doe',
+          phone: '0207 000 0000',
+          email: 'john.doe@example.com'
+        },
+        {
+          name: 'Jane Doe',
+          phone: '0208 000 0000',
+          email: 'jane.doe@example.com'
+        },
+        {
+          name: 'Jim Smith',
+          phone: '0800 000 000',
+          email: 'jim.smith@example.com'
+        }
+      ],
+      meta: {
+        status: 'Open',
+        assigned: true
+      }
+    }
+
+Once it's passed to the core, it's converted to:
+
+    {
+      name: 'My deal',
+      people_name: 'John Doe',
+      people_phone: '0207 000 0000',
+      people_email: 'john.doe@example.com',
+      people_2_name: 'Jane Doe',
+      people_2_phone: '0208 000 0000',
+      people_2_email: 'jane.doe@example.com',
+      people_3_name: 'Jim Smith',
+      people_3_phone: '0800 000 0000',
+      people_3_email: 'jim.smith@example.com',
+      meta_status: 'Open',
+      meta_assigned: true
+    }
+
+You'll see that we try and give array items sensible, readable keys.  The first item of an array or a single object with the same properties will always have the same keys, that helps in situations where an API returns either an object or array depending on the number of items.
+
+When you name your output keys, you should use their 'flattened' key.
+
 Polling
 -------
 
@@ -456,76 +507,25 @@ To define your method as a webhook trigger, set your `config.js` up like this:
 
 You should provide a `help` property to tell the user how to configure the webhook in your service.  `help.webhook.config` and `help.webhook.test` accept an array of paragraphs to display to the user.
 
-Helper Functions
+Utility Functions
 ----------------
 
-### helper.polling() ###
+### Utils.polling() ###
 
-    helper.polling(data, key, callback)
+    Utils.polling(data, key, cache, callback)
 
-`helper.polling` helps you to look for and deal with new items that you see in an array of items.
+`Utils.polling` helps you to look for and deal with new items that you see in an array of items.
 
 It's useful when you need to poll services, look for new records and then hand an array of new items back as the result if the script (see the section on _Polling_).
 
-`helper.polling` handles much of this for you, all you need to do is give it a list and tell it what property within each list item holds the ID. A callback is fired with an array of new items.
+`Utils.polling` handles much of this for you, all you need to do is give it a list and tell it what property within each list item holds the ID. A callback is fired with an array of new items.
 
 - `data` (Array) - An array that is to be check for new items.  This will often come directly from an API, but you may need to pick out the property containing the list of items.
 - `key` (String) - The property that holds the unique ID for each item in the list.  For example, on Twitter's `timelines.user` endpoint, each tweet that's returned contains an `id_str` property which is the unique ID for the tweet. In this case, set the key to `id_str`.  You can use double underscore notation here to reference a nested key (such as `meta__ids__id`).
+- `cache` (Function) - Always expects the `options.cache` function passed into the script.
 - `callback(err, items)` - The callback function is called with either an error, or if successful, an array containing the new items found (those with a key that hasn't been seen before).  The array might be empty if no new items are found.
 
-Internally, the function asks the core whether each key has been seen before (is it 'cached'), and if not, adds it to the array of items it returns.  The core will then update the cache of items once it's handed the list of new items.
-
-### helper.flatten() ###
-
-    helper.flatten(data)
-
-Output data in Flow XO should be an object containing simple, un-nested key/value pairs.  To help with this, `helper.flatten()` can flatten and normalize a nested object for you to make it more suitable for output.
-
-For example, take this object:
-
-    {
-      name: 'My deal',
-      people: [
-        {
-          name: 'John Doe',
-          phone: '0207 000 0000',
-          email: 'john.doe@example.com'
-        },
-        {
-          name: 'Jane Doe',
-          phone: '0208 000 0000',
-          email: 'jane.doe@example.com'
-        },
-        {
-          name: 'Jim Smith',
-          phone: '0800 000 000',
-          email: 'jim.smith@example.com'
-        }
-      ],
-      meta: {
-        status: 'Open',
-        assigned: true
-      }
-    }
-
-Once it's passed through `helper.flatten()` it's converted to:
-
-    {
-      name: 'My deal',
-      people_name: 'John Doe',
-      people_phone: '0207 000 0000',
-      people_email: 'john.doe@example.com',
-      people_2_name: 'Jane Doe',
-      people_2_phone: '0208 000 0000',
-      people_2_email: 'jane.doe@example.com',
-      people_3_name: 'Jim Smith',
-      people_3_phone: '0800 000 0000',
-      people_3_email: 'jim.smith@example.com',
-      meta_status: 'Open',
-      meta_assigned: true
-    }
-
-You'll see that we try and give array items sensible, readable keys.  The first item of an array or a single object with the same properties will always have the same keys, that helps in situations where an API returns either an object or array depending on the number of items.
+Internally, the function asks the cache whether each key has been seen before (is it 'cached'), and if not, adds it to the array of items it returns.  The core will then update the cache of items once it's handed the list of new items.
 
 Handling Errors
 ---------------
@@ -603,6 +603,7 @@ If you need a library that isn't on this list, please get in touch so we can rev
 - [Moment.js](http://momentjs.com/) - Parse, validate, manipulate and display dates
 - [Request](https://github.com/request/request) - Simplified HTTP request client
 - [xml2js](https://github.com/Leonidas-from-XIV/node-xml2js) - XML to object conversion
+- [validate.js](http://validatejs.org/) - Validating javascript objects (commonly the input data)
 
 Updating a Method
 -----------------
