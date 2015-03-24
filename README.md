@@ -3,7 +3,7 @@ Introduction
 
 [Flow XO](https://flowxo.com) is a platform that lets users build automated sales & marketing workflows on top of their existing cloud apps.
 
-Each supported service is built as a 'module' which is called on by the Flow XO 'core'.  A service is split into separate _methods_, and each method is either a _trigger_ (looks for new records) or an _action_ (creates, updates or deletes records).
+Each supported service is built as a 'module' which is called by the Flow XO 'core'.  A service is split into separate _methods_, and each method is either a _trigger_ (looks for new records) or an _action_ (creates, updates or deletes records).
 
 We've opened up our SDK so that anyone can build support for their service into Flow XO.  The SDK gives you scaffolding for your service, a command-line tool to run your methods locally, tools to write tests and some examples of working services.  Not forgetting these docs which should hopefully guide you through the process.
 
@@ -23,12 +23,9 @@ That's all.  The other tools that the SDK calls on will be installed locally wit
 Scaffolding Your Service
 ========================
 
-You should start your service using our [Yoeman](http://yeoman.io/) generator. As this is not publicly available, you can't `npm install` it, so you need to follow these steps:
+You should start your service using our [Yeoman](http://yeoman.io/) generator. This can be installed using [npm](https://npmjs.org), but as the generator is not publicly available, you need to specify the github user and repo when installing:
 
-    git clone git@github.com:flowxo/flowxo-generator.git
-    cd flowxo-generator
-    npm install
-    npm link
+    npm install flowxo/flowxo-generator
 
 You should now be able to run `yo flowxo` to generate a service.
 
@@ -230,7 +227,7 @@ Use an output script where the service supports 'custom fields'.  For example, m
 
 The script is very similar to `run.js`, except it either returns an error, or an array of output fields on success.  See the section _Output Fields_ for the format of the array you should return.
 
-Note that `data.input` will hold the input values that the user has given to the method (TODO - does it?).
+Note that `data.input` will hold the input values that the user has given to the method (TODO - does it?) ([TS] Yes, it does - but if any of the values are {{ interpolated }} ones, it will convert the interpolation to an empty string).
 
 run.js
 ------
