@@ -471,7 +471,26 @@ You can define your method as a polling trigger in `config.js`:
       ...
     }
 
-To learn more about polling triggers, study the examples and take a look at the reference for `helper.polling()` in the _Helper Functions_ section.
+To help you with polling, there's a `Utils.polling` function that will take care of a lot of the work.
+
+### Utils.polling() ###
+
+    Utils.polling(data, key, cache, callback)
+
+`Utils.polling` helps you to look for and deal with new items that you see in an array of items.
+
+It's useful when you need to poll services, look for new records and then hand an array of new items back as the result if the script (see the section on _Polling_).
+
+`Utils.polling` handles much of this for you, all you need to do is give it a list and tell it what property within each list item holds the ID. A callback is fired with an array of new items.
+
+- `data` (Array) - An array that is to be check for new items.  This will often come directly from an API, but you may need to pick out the property containing the list of items.
+- `key` (String) - The property that holds the unique ID for each item in the list.  For example, on Twitter's `timelines.user` endpoint, each tweet that's returned contains an `id_str` property which is the unique ID for the tweet. In this case, set the key to `id_str`.  You can use double underscore notation here to reference a nested key (such as `meta__ids__id`).
+- `cache` (Function) - Always expects the `options.cache` function passed into the script.
+- `callback(err, items)` - The callback function is called with either an error, or if successful, an array containing the new items found (those with a key that hasn't been seen before).  The array might be empty if no new items are found.
+
+Internally, the function asks the cache whether each key has been seen before (is it 'cached'), and if not, adds it to the array of items it returns.  The core will then update the cache of items once it's handed the list of new items.
+
+To see polling triggers in action, study the examples included in the SDK.
 
 Webhooks
 --------
@@ -506,26 +525,6 @@ To define your method as a webhook trigger, set your `config.js` up like this:
     }
 
 You should provide a `help` property to tell the user how to configure the webhook in your service.  `help.webhook.config` and `help.webhook.test` accept an array of paragraphs to display to the user.
-
-Utility Functions
-----------------
-
-### Utils.polling() ###
-
-    Utils.polling(data, key, cache, callback)
-
-`Utils.polling` helps you to look for and deal with new items that you see in an array of items.
-
-It's useful when you need to poll services, look for new records and then hand an array of new items back as the result if the script (see the section on _Polling_).
-
-`Utils.polling` handles much of this for you, all you need to do is give it a list and tell it what property within each list item holds the ID. A callback is fired with an array of new items.
-
-- `data` (Array) - An array that is to be check for new items.  This will often come directly from an API, but you may need to pick out the property containing the list of items.
-- `key` (String) - The property that holds the unique ID for each item in the list.  For example, on Twitter's `timelines.user` endpoint, each tweet that's returned contains an `id_str` property which is the unique ID for the tweet. In this case, set the key to `id_str`.  You can use double underscore notation here to reference a nested key (such as `meta__ids__id`).
-- `cache` (Function) - Always expects the `options.cache` function passed into the script.
-- `callback(err, items)` - The callback function is called with either an error, or if successful, an array containing the new items found (those with a key that hasn't been seen before).  The array might be empty if no new items are found.
-
-Internally, the function asks the cache whether each key has been seen before (is it 'cached'), and if not, adds it to the array of items it returns.  The core will then update the cache of items once it's handed the list of new items.
 
 Handling Errors
 ---------------
