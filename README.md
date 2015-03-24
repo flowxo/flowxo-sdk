@@ -446,7 +446,7 @@ Once it's passed to the core, it's converted to:
 
 You'll see that we try and give array items sensible, readable keys.  The first item of an array or a single object with the same properties will always have the same keys, that helps in situations where an API returns either an object or array depending on the number of items.
 
-When you name your output keys, you should use their 'flattened' key.
+When you name your output keys, you should use their 'flattened' key.  TODO: Check if the core's flatten function treats objects and arrays with a single item the same?
 
 Polling
 -------
