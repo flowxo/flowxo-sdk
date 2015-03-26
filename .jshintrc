@@ -32,6 +32,7 @@
     "rootPath": false,
     "requireLocal": false,
     "rootPath": false,
-    "spyOn": false
+    "spyOn": false,
+    "should": false
   }
 }

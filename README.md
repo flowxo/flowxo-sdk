@@ -471,9 +471,10 @@ You can define your method as a polling trigger in `config.js`:
       ...
     }
 
-To help you with polling, there's a `Utils.polling` function that will take care of a lot of the work:
+To help you with polling, there's a `polling` function inside the SDK that will take care of a lot of the work:
 
-    Utils.polling(data, key, cache, callback)
+    var sdk = require('flowxo-sdk');
+    sdk.Utils.polling(data, key, cache, callback);
 
 All you need to do is give it a list and tell it what property within each list item holds the ID. A callback is fired with an array of new items.
 
@@ -533,17 +534,15 @@ The platform does not make any attempt to retry after a 'regular' error, and the
 
 If you run into an error, create a `ServiceError` object and return it as the error argument in your callback:
 
-    cb(new ServiceError("You must provide a value."))
+    cb(new sdk.Error.ServiceError("You must provide a value."))
 
 Take care with the tone and style of your errors, as they'll be displayed directly to the user.  You should follow our style guide.
 
 For common/recognised errors, it's normally best to extract the error message and create your own error object from the original message.  The objective here is to present a friendly, useful and readable message to user.  To help with this, you can create a `ServiceError` object with a friendlier message and the original error like so:
 
-    cb(new ServiceError({ err: [object], message: "Please provide a value." }))
+    cb(new sdk.Error.ServiceError({ err: [object], message: "Please provide a value." }))
 
 Make sure you include a `message` or the message from `err` will be used instead.
-
-Each other error listed below inherits from `ServiceError`. This is so we can perform a single `instanceof ServiceError` check to match them all.
 
 ### OAuth Errors ###
 
