@@ -547,7 +547,7 @@ The callback for your script expects either an error (if the request failed) or 
 
 These occur when you can't access a service or you get a response back in a format that you don't recognise.  They're usually recoverable, and so the platform will retry the request later.
 
-This is the default error type.  If you return a standard error object (not from sdk.Error), it will be treated as a `RetryableServiceError`.
+This is the default error type.  If you return a standard error object (not from `sdk.Error`), it will be treated as a `RetryableServiceError`.
 
 When you encounter a retryable error, create an instance of the `RetryableServiceError` object and return it as the error argument in your callback.
 
