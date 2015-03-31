@@ -43,8 +43,7 @@ A service is a collection of JS files, with scripts relating to the service as a
 This is how your service will eventually be structured (although you won't have any methods yet):
 
     service_name
-    |-- config.js - describes the service & authorization fields
-    |-- index.js - a place for shared code
+    |-- index.js - describes the service & authorization fields, and holds shared functions
     |-- ping.js - the core runs this to check authorization
     |-- methods
         |-- method_name
@@ -55,21 +54,32 @@ This is how your service will eventually be structured (although you won't have 
         |-- another_method
             |-- ...
 
-There's a few other files you might also have in your root, such as `oauth.js`, `auth.json` and `.gitignore`.
+There's a few other files you might also have in your root, including `oauth.js`, `auth.json` and `.gitignore`.
+
+Requiring the SDK
+-----------------
+
+    var sdk = require('flowxo-sdk');
+
+The SDK exposes these functions:
+
+- `Service`: The main service object, return an instance of this in `index.js`.
+- `Error`: Contains a set of Flow XO error objects (see _Creating Methods > Handling Errors_).
+- `Utils`: Utility functions, such as `Utils.polling`.
 
 Scripts
 -------
 
 `ping.js`, `run.js`, `input.js` and `output.js` all work in a similar way.
 
-They're passed an `options` object along with a `done` callback function that accepts either an `error` or an `output` object:
+They're passed an `options` object along with a callback function `done` that accepts either an `err` or an `output` object:
 
     module.exports = function(options, done) {
       /* Do something here */
-      done(error, output);
+      done(err, output);
     }
 
-Your script receives the input and does whatever work is necessary.  If all is well, the script should call `done(null, object)`.  If there's a problem, tell the core about it by returning `done(error)` (see the section on _Creating Methods > Handling Errors_).
+Your script receives the input and does whatever work is necessary.  If all is well, the script should call `done(null, object)`.  If there's a problem, tell the core about it by returning `done(err)` (see the section on _Creating Methods > Handling Errors_).
 
 Each type of script will be explained in more detail later.
 
@@ -78,8 +88,6 @@ index.js
 
 The `index.js` file at the root of your module defines the service name and its auth settings.  It looks something like this:
 
-    var sdk = require('flowxo-sdk');
-    
     var service = new sdk.Service({
       name: 'Your Service',
       slug: 'your_service',
@@ -200,8 +208,8 @@ A typical config file looks like this:
       type: 'poller',
       kind: 'trigger',
       scripts: {
-        input: require('./input'),
-        run: require('./run')
+        run: require('./run'),
+        input: require('./input')
       },
       fields: {
         input: [...],
@@ -209,8 +217,8 @@ A typical config file looks like this:
       }
     }
     
-    module.exports = function(service){
-	  service.registerMethod(config);
+    module.exports = function(service) {
+      service.registerMethod(config);
     };
 
 - `scripts` - All methods should have a `run` script.  You can reference an `input` and/or an `output` script too.  Use input/output scripts to dynamically define fields that are generated at runtime and show alongside the static fields you define in the `fields` property.  See the _input.js_ and _output.js_ sections for more details.
@@ -246,7 +254,7 @@ You'll be passed an `options` object and `done` (a callback).  The script should
       done(null, [Object]);
     }
 
-The `options` object contains the auth credentials and the input values:
+The `options` object contains the auth credentials and the input values (plus a `scriptStore` function that you'll only need when using `sdk.Utils.polling`):
 
     {
       credentials: {
@@ -254,10 +262,11 @@ The `options` object contains the auth credentials and the input values:
       },
       input: {
         /* input values */
-      }
+      },
+      scriptStore: [Function] /* For use with sdk.Utils.polling */
     }
 
-The `output` object should be a dictionary of key/values (the data returned by the method):
+The `output` object should be the data returned by the method:
 
     {
       key: 'Some Value',
@@ -467,7 +476,7 @@ At present, polling triggers are checked every minute.  Sometimes your method wi
 The polling process is actually quite straightforward:
 
 1. Fetch a time ordered list of items from the API (newest first).  Set a sensible limit on the number of results, 10, 25 or 50 results is usually enough.
-2. Pass the array of items to `sdk.Utils.polling()`, along with a string referencing the property that holds the unique ID for each item in the list, and finally a callback.
+2. Pass the array of items to `sdk.Utils.polling()`, along with a string referencing the property that holds the unique ID for each item in the list, `options.scriptStore` and finally a callback.
 3. Your callback will be passed an array of new items (or an empty array), which can then be processed further and passed back as the result.
 
 You can define your method as a polling trigger in `config.js`:
@@ -480,13 +489,13 @@ You can define your method as a polling trigger in `config.js`:
       ...
     }
 
-The `polling` function inside the SDK will take care of a lot of the work:
+The `Utils.polling` function inside the SDK will take care of a lot of the work:
 
     sdk.Utils.polling(data, key, scriptStore, callback);
 
 All you need to do is give it a list and tell it what property within each list item holds the ID. A callback is fired with an array of new items.
 
-- `data` (Array) - An array that is to be check for new items.  This will often come directly from an API, but you may need to pick out the property containing the list of items.
+- `data` (Array) - An array that is to be checked for new items.  This will often come directly from an API, but you may need to pick out the property containing the list of items.
 - `key` (String) - The property that holds the unique ID for each item in the list.  For example, on Twitter's `timelines.user` endpoint, each tweet that's returned contains an `id_str` property which is the unique ID for the tweet. In this case, set the key to `id_str`.  You can use double underscore notation here to reference a nested key (such as `meta__ids__id`).
 - `scriptStore` (Function) - Always expects the `options.scriptStore` function passed into the script.
 - `callback(err, items)` - The callback function is called with either an error, or if successful, an array containing the new items found (those with a key that hasn't been seen before).  The array might be empty if no new items are found.
@@ -536,7 +545,7 @@ The callback for your script expects either an error (if the request failed) or 
 
 ### Service Errors ###
 
-ServiceErrors are where a request to the API succeeded (in technical terms) but the user's request can't be completed for operational reasons.  They include authorisation problems, validation errors and quotas being exceeded.
+ServiceErrors are where a request to the API succeeded (in technical terms) but the user's request can't be completed for operational reasons.  They include authorisation problems (except OAuth, see below), validation errors and quotas being exceeded.
 
 The platform does not make any attempt to retry after a `ServiceError`, and these types of errors are not logged or monitored by the platform, only written to the workflow log.
 
@@ -562,6 +571,8 @@ Use an instance of `AuthServiceError`, which works the same as `Error`.  The pla
 
 These occur when you can't access a service or you get a response back in a format that you don't recognise.  They're usually recoverable, and so the platform will retry the request later.
 
+This is the default error type.  If you return a standard error object (not from sdk.Error), it will be treated as a `RetryableServiceError`.
+
 When you encounter a retryable error, create an instance of the `RetryableServiceError` object and return it as the error argument in your callback.
 
 The `RetryableServiceError` expects an object containing any debug information you think is relevant.  It might include:
@@ -572,10 +583,10 @@ The `RetryableServiceError` expects an object containing any debug information y
 
 For example:
 
-    cb(new RetryableServiceError({ err: [object] }))
-    cb(new RetryableServiceError({ status: 504, body: "Gateway Timeout" }))
-    cb(new RetryableServiceError({ err: [object], status: 500, body: "Server Error" }))
-    cb(new RetryableServiceError({ err: [object], foo: "bar" }))
+    cb(new sdk.Error.RetryableServiceError({ err: [object] }))
+    cb(new sdk.Error.RetryableServiceError({ status: 504, body: "Gateway Timeout" }))
+    cb(new sdk.Error.RetryableServiceError({ err: [object], status: 500, body: "Server Error" }))
+    cb(new sdk.Error.RetryableServiceError({ err: [object], foo: "bar" }))
 
 Always provide as much information as you can (for debug purposes).  You should use a `RetryableServiceError` in situations like these:
 
@@ -610,7 +621,7 @@ Updating a Method
 
 Once a method is made available, it can't be changed or deleted, only deprecated (and usually replaced with a newer version).
 
-To deprecate a method, simply set `{ hidden: true }` in the `config.js`.  You can then create a replacement method with a versioned slug `{ slug: 'a_method_v2' }` (it's OK to use the exact same `name` in your new version, only the `slug` needs to be unique).
+To deprecate a method, simply set `{ deprecated: true }` in the `config.js`.  You can then create a replacement method with a versioned slug `{ slug: 'a_method_v2' }` (it's OK to use the exact same `name` in your new version, only the `slug` needs to be unique).
 
 Of course, you'll need to resubmit your service to us to have the changes made live.
 
