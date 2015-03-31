@@ -46,13 +46,14 @@ This is how your service will eventually be structured (although you won't have 
     |-- config.js - describes the service & authorization fields
     |-- index.js - a place for shared code
     |-- ping.js - the core runs this to check authorization
-    |-- method_name
-        |-- config.js - describes the method & input/output fields
-        |-- run.js - the core calls this script to run the method
-        |-- input.js - optional, returns dynamic input fields
-        |-- output.js - optional, returns dynamic output fields
-    |-- another_method
-        |-- ...
+    |-- methods
+        |-- method_name
+            |-- config.js - describes the method & input/output fields
+            |-- run.js - the core calls this script to run the method
+            |-- input.js - optional, returns dynamic input fields
+            |-- output.js - optional, returns dynamic output fields
+        |-- another_method
+            |-- ...
 
 There's a few other files you might also have in your root, such as `oauth.js`, `auth.json` and `.gitignore`.
 
@@ -61,50 +62,51 @@ Scripts
 
 `ping.js`, `run.js`, `input.js` and `output.js` all work in a similar way.
 
-They're passed a `data` object along with a `callback` function that accepts either an `error` or an `output` object:
+They're passed an `options` object along with a `done` callback function that accepts either an `error` or an `output` object:
 
-    module.exports = function(data, callback) {
-      /* Do something here with input */
-      callback(error, output);
+    module.exports = function(options, done) {
+      /* Do something here */
+      done(error, output);
     }
 
-Your script receives the input and does whatever work is necessary.  If all is well, the script should call `callback(null, object)`.  If there's a problem, tell the core about it by returning `callback(error)` (see the section on _Creating Methods > Handling Errors_).
+Your script receives the input and does whatever work is necessary.  If all is well, the script should call `done(null, object)`.  If there's a problem, tell the core about it by returning `done(error)` (see the section on _Creating Methods > Handling Errors_).
 
 Each type of script will be explained in more detail later.
 
-config.js
+index.js
 ---------
 
-The `config.js` file at the root of your module defines the service name and its auth settings.  It looks something like this:
+The `index.js` file at the root of your module defines the service name and its auth settings.  It looks something like this:
 
-    module.exports = {
+    var sdk = require('flowxo-sdk');
+    
+    var service = new sdk.Service({
       name: 'Your Service',
       slug: 'your_service',
       auth: {
         ...
       }
-    }
+    });
+    
+    module.exports = service;
+
+This script is also a place to hold your shared code.  It's common to create a function that abstracts the handling of HTTP requests, and perhaps a function that handles errors.
+
+Take a look at the example modules to see what kind of code you should be centralising here.
 
 ping.js
 -------
 
 The core sometimes needs to check whether it's able to connect to your service.  For example, after the user has provided their credentials to connect a new account, the core will call `ping.js` to check those credentials work.
 
-You'll be passed a `data` object containing the credentials that the user supplied (in `data.auth`), and should return either `true` or `false` as the output:
+You'll be passed an `options` object containing the credentials that the user supplied (in `options.credentials`), and should return either `true` or `false` as the output:
 
-    module.exports = function(data, callback) {
+    module.exports = function(options, done) {
       /* Check the credentials */
-      callback(null, true);
+      done(null, true);
     }
 
 In this script, an authorization error returned by the API (such as `401 Unauthorized`) shouldn't be treated as an error, and instead you should set the output to `false`.  This differs from the other script types, where a `401` __should__ usually be considered an error.
-
-index.js
---------
-
-This script is a place to hold your shared code.  It's common to create a function that abstracts the handling of HTTP requests, and perhaps a function that handles errors.
-
-Take a look at the example modules to see what kind of code you should be centralising here.
 
 Authorization
 =============
@@ -118,7 +120,7 @@ We support authorization with credentials (an API key, token, username/password 
 
 Usually that means sending credentials in the request headers or query string, or perhaps exchanging the credentials for a token before using that in requests.
 
-To configure credentials based auth, you'll need to edit the `auth` property in the `config.js` file at the root of your service.
+To configure credentials based auth, you'll need to edit the `auth` property in the `index.js` file at the root of your service.
 
 For example, if you need to collect 2 fields, an API key and an account name, you should declare those fields like this:
 
@@ -144,7 +146,7 @@ For example, if you need to collect 2 fields, an API key and an account name, yo
 
 See the section _Creating Methods > Input Field Types_ for a list of the field types you can use here.
 
-When your scripts are run, you'll get the credentials in `data.auth`.
+When your scripts are run, you'll get the credentials in `options.credentials`.
 
 OAuth
 -----
@@ -155,7 +157,7 @@ If there's a choice, it's usually better to use OAuth as the user experience wil
 
 Flow XO relies on the [Passport](http://passportjs.org/) library.  You'll need to define some settings in `oauth.js` (the Passport 'Strategy').  The default file contains a skeleton with enough helper text to get you started. The basic task is to update the `strategy` property with your service's OAuth details (ID, secret, callback URL, etc.).  Passport has some documentation on [setting up OAuth](http://passportjs.org/guide/oauth/).
 
-Once you have a valid `oauth.js` file, the service can be declared as OAuth in your main `config.js`:
+Once you have a valid `oauth.js` file, the service can be declared as OAuth in your `index.js`:
 
     auth: {
       type: 'oauth',
@@ -164,7 +166,7 @@ Once you have a valid `oauth.js` file, the service can be declared as OAuth in y
       }
     }
 
-When your scripts are run, you'll get an `access_key` in `data.auth`, which you can use wherever the API expects an OAuth token.
+When your scripts are run, you'll get an `access_key` in `options.credentials`, which you can use wherever the API expects an OAuth token.
 
 You'll also need to take special care to use an _OAuth Error_ when the API reports an authorization problem.  That way, the core knows to try and refresh the access token and try your script again (when possible).  See the section _Handling Errors > OAuth Errors_ for details.
 
@@ -192,21 +194,26 @@ Each method has its own `config.js` file, which defines the method's name, what 
 
 A typical config file looks like this:
 
-    module.exports = {
+    var config = {
       name: 'A Method',
       slug: 'a_method',
       type: 'poller',
       kind: 'trigger',
       scripts: {
-        input: 'input.js'
+        input: require('./input'),
+        run: require('./run')
       },
       fields: {
         input: [...],
         output: [...]
       }
     }
+    
+    module.exports = function(service){
+	  service.registerMethod(config);
+    };
 
-- `scripts` - You can reference an `input.js` and/or an `output.js` script (in this method's directory).  Use input/output scripts to dynamically define fields that are generated at runtime and show alongside the static fields you define in the `fields` property.  See the _input.js_ and _output.js_ sections for more details.
+- `scripts` - All methods should have a `run` script.  You can reference an `input` and/or an `output` script too.  Use input/output scripts to dynamically define fields that are generated at runtime and show alongside the static fields you define in the `fields` property.  See the _input.js_ and _output.js_ sections for more details.
 - `type` - Accepts values of `poller` (see the section _Polling_), `webhook` (see the section _Webhooks_) or `action` (anything else).
 - `kind` - Defines the method as either a `trigger` or `task`.
 - `fields` - Contains `input` and `output` objects which hold arrays of fields that define the fields that will be available for input to the script, and the properties that your script will output (on success).  See the sections on _Input Fields_ and _Output Fields_.
@@ -227,22 +234,22 @@ Use an output script where the service supports 'custom fields'.  For example, m
 
 The script is very similar to `run.js`, except it either returns an error, or an array of output fields on success.  See the section _Output Fields_ for the format of the array you should return.
 
-Note that `data.input` will hold the input values that the user has given to the method.  Note that any `{{outputs}}` from other tasks in those values will be replaced with empty strings.
+Note that `options.input` will hold the input values that the user has given to the method.  Note that any `{{outputs}}` from other tasks in those values will be replaced with empty strings.
 
 run.js
 ------
 
-You'll be passed a `data` object and a callback.  The script should do its work and either call `callback(err)` or `callback(null, output)`.
+You'll be passed an `options` object and `done` (a callback).  The script should do its work and either call `done(err)` or `done(null, output)`.
 
-    module.exports = function(data, callback) {
+    module.exports = function(options, done) {
       /* Do some stuff */
-      callback(null, [Object]);
+      done(null, [Object]);
     }
 
-The `data` object contains the auth credentials and the input values:
+The `options` object contains the auth credentials and the input values:
 
     {
-      auth: {
+      credentials: {
         /* auth credentials */
       },
       input: {
@@ -446,7 +453,9 @@ Once it's passed to the core, it's converted to:
 
 You'll see that we try and give array items sensible, readable keys.  The first item of an array or a single object with the same properties will always have the same keys, that helps in situations where an API returns either an object or array depending on the number of items.
 
-When you name your output keys, you should use their 'flattened' key.  TODO: Check if the core's flatten function treats objects and arrays with a single item the same?
+When you name your output keys, you should use their 'flattened' key.
+
+TODO: Check if the core's flatten function treats objects and arrays with a single item the same?
 
 Polling
 -------
@@ -458,12 +467,12 @@ At present, polling triggers are checked every minute.  Sometimes your method wi
 The polling process is actually quite straightforward:
 
 1. Fetch a time ordered list of items from the API (newest first).  Set a sensible limit on the number of results, 10, 25 or 50 results is usually enough.
-2. Pass the array of items to `helper.polling()`, along with a string referencing the property that holds the unique ID for each item in the list, and finally a callback.
+2. Pass the array of items to `sdk.Utils.polling()`, along with a string referencing the property that holds the unique ID for each item in the list, and finally a callback.
 3. Your callback will be passed an array of new items (or an empty array), which can then be processed further and passed back as the result.
 
 You can define your method as a polling trigger in `config.js`:
 
-    module.exports = {
+    var config = {
       name: 'A Polling Trigger',
       slug: 'a_polling_trigger',
       type: 'poller',
@@ -471,19 +480,18 @@ You can define your method as a polling trigger in `config.js`:
       ...
     }
 
-To help you with polling, there's a `polling` function inside the SDK that will take care of a lot of the work:
+The `polling` function inside the SDK will take care of a lot of the work:
 
-    var sdk = require('flowxo-sdk');
-    sdk.Utils.polling(data, key, cache, callback);
+    sdk.Utils.polling(data, key, scriptStore, callback);
 
 All you need to do is give it a list and tell it what property within each list item holds the ID. A callback is fired with an array of new items.
 
 - `data` (Array) - An array that is to be check for new items.  This will often come directly from an API, but you may need to pick out the property containing the list of items.
 - `key` (String) - The property that holds the unique ID for each item in the list.  For example, on Twitter's `timelines.user` endpoint, each tweet that's returned contains an `id_str` property which is the unique ID for the tweet. In this case, set the key to `id_str`.  You can use double underscore notation here to reference a nested key (such as `meta__ids__id`).
-- `cache` (Function) - Always expects the `options.cache` function passed into the script.
+- `scriptStore` (Function) - Always expects the `options.scriptStore` function passed into the script.
 - `callback(err, items)` - The callback function is called with either an error, or if successful, an array containing the new items found (those with a key that hasn't been seen before).  The array might be empty if no new items are found.
 
-Internally, the function asks the cache whether each key has been seen before (is it 'cached'), and if not, adds it to the array of items it returns.  The core will then update the cache of items once it's handed the list of new items.
+Internally, the function asks the `scriptStore` whether each key has been seen before, and if not, adds it to the array of items it returns.  The core will then update the cache of items once it's handed the list of new items.
 
 To see polling triggers in action, study the examples included in the SDK.
 
@@ -500,7 +508,7 @@ Users follow a similar process to setting up general inbound webhooks:
 
 To define your method as a webhook trigger, set your `config.js` up like this:
 
-    module.exports = {
+    var config = {
       name: 'A Webhook Trigger',
       slug: 'a_webhook_trigger',
       type: 'webhook',
