@@ -23,7 +23,12 @@ describe('FlowXO SDK Service',function(){
 					}
 
 				}
-			]
+			],
+			scripts:{
+				ping: function(options,cb){
+					cb(null,options);
+				}
+			}
 		});
 	});
 
@@ -66,6 +71,25 @@ describe('FlowXO SDK Service',function(){
 		});
 	});
 
+	describe('#runServiceScript',function(){
+		it('should throw error when script is not defined',function(done){
+			service.runServiceScript('notascript',{},function(err,result){
+				err.should.exist();
+				should.not.exist(result);
+				done();
+			});
+		});
+
+		it('should run a service script successfully',function(done){
+			service.runServiceScript('ping',{ping: true},function(err,result){
+				should.not.exist(err);
+				result.should.exist();
+				assert.propertyVal(result,'ping',true);
+				done();
+			});
+		});
+	});
+
 	describe('#registerMethod',function(){
 		it('should add a method to the service',function(){
 			service.methods.length.should.equal(1);
@@ -73,6 +97,18 @@ describe('FlowXO SDK Service',function(){
 				name: 'newmethod'
 			});
 			service.methods.length.should.equal(2);
+		});
+	});
+
+	describe('#runScript',function(){
+		it('should throw an error with <2 or >5 arguments',function(done){
+			done();
+		});
+	});
+
+	describe('#toJSON',function(){
+		it('should return all required fields',function(){
+			console.log(service.toJSON());
 		});
 	});
 

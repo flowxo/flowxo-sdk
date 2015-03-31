@@ -33,6 +33,7 @@
     "requireLocal": false,
     "rootPath": false,
     "spyOn": false,
-    "should": false
+    "should": false,
+    "assert": false
   }
 }

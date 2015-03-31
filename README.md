@@ -548,7 +548,7 @@ Make sure you include a `message` or the message from `err` will be used instead
 
 A special case is where the API returns an error relating to the OAuth token.
 
-Use an instance of `OAuthError`, which works the same as `Error`.  The platform will attempt to refresh the OAuth token and retry the request once.  If that doesn't succeed, the error will be written to the workflow log.
+Use an instance of `AuthServiceError`, which works the same as `Error`.  The platform will attempt to refresh the OAuth token and retry the request once.  If that doesn't succeed, the error will be written to the workflow log.
 
 ### Retryable Errors ###
 
@@ -640,7 +640,7 @@ runner.run(slug, script, options, callback)
 
 ### Request Replay ###
 
-By default, tests are run live, connecting to real API's and making real requests. Whilst this is obviously an important part of the test process, there can be times when this can make testing slow. 
+By default, tests are run live, connecting to real API's and making real requests. Whilst this is obviously an important part of the test process, there can be times when this can make testing slow.
 
     REPLAY=record grunt test
 
