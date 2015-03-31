@@ -530,7 +530,7 @@ The callback for your script expects either an error (if the request failed) or 
 
 ServiceErrors are where a request to the API succeeded (in technical terms) but the user's request can't be completed for operational reasons.  They include authorisation problems, validation errors and quotas being exceeded.
 
-The platform does not make any attempt to retry after a 'regular' error, and these types of errors are not logged or monitored by the platform, only written to the workflow log.
+The platform does not make any attempt to retry after a `ServiceError`, and these types of errors are not logged or monitored by the platform, only written to the workflow log.
 
 If you run into an error, create a `ServiceError` object and return it as the error argument in your callback:
 
