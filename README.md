@@ -221,9 +221,9 @@ A typical config file looks like this:
       service.registerMethod(config);
     };
 
-- `scripts` - All methods should have a `run` script.  You can reference an `input` and/or an `output` script too.  Use input/output scripts to dynamically define fields that are generated at runtime and show alongside the static fields you define in the `fields` property.  See the _input.js_ and _output.js_ sections for more details.
 - `type` - Accepts values of `poller` (see the section _Polling_), `webhook` (see the section _Webhooks_) or `action` (anything else).
 - `kind` - Defines the method as either a `trigger` or `task`.
+- `scripts` - All methods should have a `run` script.  You can reference an `input` and/or an `output` script too.  Use input/output scripts to dynamically define fields that are generated at runtime and show alongside the static fields you define in the `fields` property.  See the _input.js_ and _output.js_ sections for more details.
 - `fields` - Contains `input` and `output` objects which hold arrays of fields that define the fields that will be available for input to the script, and the properties that your script will output (on success).  See the sections on _Input Fields_ and _Output Fields_.
 
 input.js
