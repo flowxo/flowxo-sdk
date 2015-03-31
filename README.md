@@ -543,30 +543,6 @@ Handling Errors
 
 The callback for your script expects either an error (if the request failed) or an object (on success).  This section will help you to understand how to construct your errors.
 
-### Service Errors ###
-
-ServiceErrors are where a request to the API succeeded (in technical terms) but the user's request can't be completed for operational reasons.  They include authorisation problems (except OAuth, see below), validation errors and quotas being exceeded.
-
-The platform does not make any attempt to retry after a `ServiceError`, and these types of errors are not logged or monitored by the platform, only written to the workflow log.
-
-If you run into an error, create a `ServiceError` object and return it as the error argument in your callback:
-
-    cb(new sdk.Error.ServiceError("You must provide a value."))
-
-Take care with the tone and style of your errors, as they'll be displayed directly to the user.  You should follow our style guide.
-
-For common/recognised errors, it's normally best to extract the error message and create your own error object from the original message.  The objective here is to present a friendly, useful and readable message to user.  To help with this, you can create a `ServiceError` object with a friendlier message and the original error like so:
-
-    cb(new sdk.Error.ServiceError({ err: [object], message: "Please provide a value." }))
-
-Make sure you include a `message` or the message from `err` will be used instead.
-
-### OAuth Errors ###
-
-A special case is where the API returns an error relating to the OAuth token.
-
-Use an instance of `AuthServiceError`, which works the same as `Error`.  The platform will attempt to refresh the OAuth token and retry the request once.  If that doesn't succeed, the error will be written to the workflow log.
-
 ### Retryable Errors ###
 
 These occur when you can't access a service or you get a response back in a format that you don't recognise.  They're usually recoverable, and so the platform will retry the request later.
@@ -598,6 +574,30 @@ Always provide as much information as you can (for debug purposes).  You should 
 The platform will retry the request up to 5 times (with exponential back-off), and if after the 5th attempt a retryable error still occurs, it will be written to the workflow log as "The request failed because something unexpected happened.".
 
 Retryable errors are logged and monitored by the platform.
+
+### Service Errors ###
+
+ServiceErrors are where a request to the API succeeded (in technical terms) but the user's request can't be completed for operational reasons.  They include authorisation problems (except OAuth, see below), validation errors and quotas being exceeded.
+
+The platform does not make any attempt to retry after a `ServiceError`, and these types of errors are not logged or monitored by the platform, only written to the workflow log.
+
+If you run into an error, create a `ServiceError` object and return it as the error argument in your callback:
+
+    cb(new sdk.Error.ServiceError("You must provide a value."))
+
+Take care with the tone and style of your errors, as they'll be displayed directly to the user.  You should follow our style guide.
+
+For common/recognised errors, it's normally best to extract the error message and create your own error object from the original message.  The objective here is to present a friendly, useful and readable message to user.  To help with this, you can create a `ServiceError` object with a friendlier message and the original error like so:
+
+    cb(new sdk.Error.ServiceError({ err: [object], message: "Please provide a value." }))
+
+Make sure you include a `message` or the message from `err` will be used instead.
+
+### OAuth Errors ###
+
+A special case is where the API returns an error relating to the OAuth token.
+
+Use an instance of `AuthServiceError`, which works the same as `ServiceError`.  The platform will attempt to refresh the OAuth token and retry the request once.  If that doesn't succeed, the error will be written to the workflow log.
 
 Authorized Libraries
 --------------------
