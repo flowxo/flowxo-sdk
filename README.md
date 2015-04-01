@@ -370,7 +370,12 @@ The value of a date/time field will always be passed into your script as an obje
 
 You'll find the original value in `string`, a flag to say whether the date is `valid`, and `parsed` which will either contain `null` or a valid date object.
 
-TODO: Explain how to format dates for moment
+To stringify the date into ISO 8601 format, you can use [Moment.js](http://momentjs.com/) (an authorized library):
+
+    var moment = require('moment');
+    var dateTimeString = moment(datetime.parsed).toISOString();
+
+Alternatively you can use `moment.format()` to format the date exactly as you need it.
 
 ### Boolean Fields ###
 
