@@ -509,6 +509,8 @@ Internally, the function asks the `scriptStore` whether each key has been seen b
 
 To see polling triggers in action, study the examples included in the SDK.
 
+TODO: Did Joe implement support for underscore notation for the `key` value?
+
 Webhooks
 --------
 
