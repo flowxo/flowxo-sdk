@@ -8,11 +8,5 @@ describe('FlowXO SDK Errors',function(){
 			err.message.should.equal('test');
 			err.name.should.equal('Error');
 		});
-
-		it('should accept an object of params',function(){
-			var err = new sdk.Error.ServiceError({message: 'test'});
-			err.message.should.equal('test');
-			err.name.should.equal('Error');
-		});
 	});
 });

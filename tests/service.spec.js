@@ -108,7 +108,6 @@ describe('FlowXO SDK Service',function(){
 
   describe('#toJSON',function(){
     it('should return all required fields',function(){
-      console.log(service.toJSON());
     });
   });
 
