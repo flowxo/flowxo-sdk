@@ -575,7 +575,9 @@ The platform will retry the request up to 5 times (with exponential back-off), a
 
 ### Service Errors ###
 
-Service Errors are where a request to the API succeeded (in technical terms) but the user's request can't be completed for operational reasons.  They include authorisation problems (except OAuth, see below), validation errors and quotas being exceeded.
+Service Errors are usually where a request to the API succeeded (in technical terms) but the user's request can't be completed for operational reasons.  They include authorisation problems (except OAuth, see below), validation errors and quotas being exceeded.
+
+You might also use a `ServiceError` where you do some validation on input and realise there's a problem, before even making the request to the API.
 
 The platform does not make any attempt to retry after a `ServiceError`, and these types of errors are not logged or monitored by the platform, only written to the workflow log.
 
@@ -589,11 +591,11 @@ There might also be times where you'd like to include an error object along with
 
 Take care with the tone and style of your errors, as they'll be displayed directly to the user.
 
-### OAuth Errors ###
+### Auth Errors ###
 
-A special case is where the API returns an error relating to the OAuth token (commonly when the API returns a status code `401`).
+A special case is where the API returns an error relating to authorization (usually when a REST API returns a status code `401`).
 
-Use an instance of `AuthError`, which is very similar to `ServiceError`.  The platform will attempt to refresh the OAuth token and retry the request once.  If that doesn't succeed, the error will be written to the workflow log.
+Use an instance of `AuthError`, which is very similar to `ServiceError`.  If the service is authorized with OAuth 2.0, the platform will attempt to refresh the OAuth token and retry the request once.  If that doesn't succeed, the error will be written to the workflow log.
 
 ### Example ###
 
