@@ -18,6 +18,8 @@ You'll also need to be familiar with [Git](http://git-scm.com/) as you'll be usi
 
 As most modules will be fairly thin wrappers around HTTP API's, you should understand how to make HTTP requests in Node.  We encourage you to use the popular [Request](https://github.com/request/request) module, but you can choose to make requests with Node's plain [https](https://nodejs.org/docs/v0.12.0/api/https.html) API if you prefer.
 
+Finally, build and test related tasks are handled by the Javascript task runner [Grunt](http://gruntjs.com/) so a working knowledge of this is useful.
+
 That's all.  The other tools that the SDK calls on will be installed locally with the `npm install`.
 
 Scaffolding Your Service
@@ -31,7 +33,7 @@ You should now be able to run `yo flowxo` to generate a service.
 
 If you select a _Credentials_ service, you'll be asked to define the fields that the user must complete. Normally this would be a username, password, API key, token, account name, etc.  Just define all the fields you'll need to collect in order to access and authorize against your service's API.  See the _Authorization > Credentials_ section for more information.
 
-If you select an _OAuth_ service, a skeleton `oauth.js` file will be created for you.  See the _Authorization > OAuth_ section for how to do this.
+If you select an _OAuth1_ or _OAuth2_ service, some skeleton configuration will be created that will need to be updated later.  See the _Authorization > OAuth_ section for how to do this.
 
 You should now have a populated directory with some scripts.  Next, we'll take a look at what we've generated.
 
@@ -54,22 +56,23 @@ This is how your service will eventually be structured (although you won't have 
         |-- another_method
             |-- ...
 
-There's a few other files you might also have in your root, including `oauth.js`, `auth.json` and `.gitignore`.
+There's a few other files you might also have in your root, including `README.md`, `credentials.json` and `.gitignore`.
 
 Requiring the SDK
 -----------------
 
     var sdk = require('flowxo-sdk');
 
-The SDK exposes these functions:
+The SDK exposes these properties:
 
 - `Service`: The main service object, return an instance of this in `index.js`.
 - `Error`: Contains a set of Flow XO error objects (see _Creating Methods > Handling Errors_).
-- `Utils`: Utility functions, such as `Utils.polling`.
+- `Utils`: Utility functions.
 
 Scripts
 -------
 
+A FlowXO service is built up of some configuration plus a number of _scripts_.
 `ping.js`, `run.js`, `input.js` and `output.js` all work in a similar way.
 
 They're passed an `options` object along with a callback function `done` that accepts either an `err` or an `output` object:
@@ -86,7 +89,7 @@ Each type of script will be explained in more detail later.
 index.js
 ---------
 
-The `index.js` file at the root of your module defines the service name and its auth settings.  It looks something like this:
+The `index.js` file at the root of your module defines the service.  It looks something like this:
 
     var service = new sdk.Service({
       name: 'Your Service',
@@ -98,6 +101,8 @@ The `index.js` file at the root of your module defines the service name and its 
 
     module.exports = service;
 
+The FlowXO core will `require` your service like any other node module. Our module exports only one thing - an instance of the `sdk.Service` object configured for our service.
+
 This script is also a place to hold your shared code.  It's common to create a function that abstracts the handling of HTTP requests, and perhaps a function that handles errors.
 
 Take a look at the example modules to see what kind of code you should be centralising here.
@@ -107,19 +112,21 @@ ping.js
 
 The core sometimes needs to check whether it's able to connect to your service.  For example, after the user has provided their credentials to connect a new account, the core will call `ping.js` to check those credentials work.
 
-You'll be passed an `options` object containing the credentials that the user supplied (in `options.credentials`), and should return either `true` or `false` as the output:
+You'll be passed an `options` object containing the credentials that the user supplied (in `options.credentials`), and like the other scripts you should either call `done(null)` to indicate success or `done(err)` to indicate error:
 
     module.exports = function(options, done) {
       /* Check the credentials */
-      done(null, true);
+      if (err) {
+        done(err);
+      } else {
+        done(null);
+      }
     }
-
-In this script, an authorization error returned by the API (such as `401 Unauthorized`) shouldn't be treated as an error, and instead you should set the output to `false`.  This differs from the other script types, where a `401` __should__ usually be considered an error.
-
+s
 Authorization
 =============
 
-Flow XO supports credential based auth (where the user provides some kind of secret that can be used for authorization) or the [OAuth](http://oauth.net/) protocol, where the user grants access directly through the service being accessed.
+Flow XO supports credential based auth (where the user provides some kind of secret that can be used for authorization) or the [OAuth](http://oauth.net/) protocol, where the user grants access directly through the service being accessed. Both OAuth1 and OAuth2 are supported.
 
 Credentials
 -----------
@@ -163,25 +170,28 @@ Alternatively, we support [OAuth](http://oauth.net/) (versions [1.0](http://oaut
 
 If there's a choice, it's usually better to use OAuth as the user experience will be much better than copying & pasting credentials.
 
-Flow XO relies on the [Passport](http://passportjs.org/) library.  You'll need to define some settings in `oauth.js` (the Passport 'Strategy').  The default file contains a skeleton with enough helper text to get you started. The basic task is to update the `strategy` property with your service's OAuth details (ID, secret, callback URL, etc.).  Passport has some documentation on [setting up OAuth](http://passportjs.org/guide/oauth/).
-
-Once you have a valid `oauth.js` file, the service can be declared as OAuth in your `index.js`:
+Flow XO relies on the [Passport](http://passportjs.org/) library for managing OAuth1 and OAuth2 authentication. If you have created an OAuth service, the generated `index.js` file contains a skeleton auth configuration with enough helper text to get you started. The basic task is to update the `strategy` property with a valid Passport strategy, and to configure the options (clientID and clientSecret) and params (scope, state, etc) that you need. An example for a Facebook service might look like...
 
     auth: {
-      type: 'oauth',
-      params: { // Optionally declare any extra strategy params
-        scope: ['read', 'write']
+      type: 'oauth2',
+      strategy: require('passport-facebook').Strategy,
+      options: {
+        clientID: process.env.FACEBOOK_ID,
+        clientSecret: process.env.FACEBOOK_SECRET
+      },
+      params: {
+        scope: ['email','user_likes']
       }
     }
 
-When your scripts are run, you'll get an `access_key` in `options.credentials`, which you can use wherever the API expects an OAuth token.
+When your scripts are run, you'll get the relevant credentials in the `options.credentials` object. For example for OAuth2 you would get `{access_token: <token>, refresh_token: <refresh_token>}`, which can then be used when making requests to the API.
 
-You'll also need to take special care to use an _OAuth Error_ when the API reports an authorization problem.  That way, the core knows to try and refresh the access token and try your script again (when possible).  See the section _Handling Errors > OAuth Errors_ for details.
+You'll also need to take special care to use an _Auth Error_ when the API reports an authorization problem.  That way, the core knows to try and refresh the access token and try your script again (when possible).  See the section _Handling Errors > OAuth Errors_ for details.
 
 Local Testing
 -------------
 
-The SDK contains a Grunt task:
+Your service's Gruntfile.js contains a task:
 
     grunt auth
 
@@ -190,10 +200,14 @@ This will take you through generating a set of auth credentials that you can use
 - If your service uses credentials, you'll simply be asked to complete the required fields e.g. API Key.
 - If you're using OAuth, a browser window will open asking you to authorize.
 
-Credentials are stored in an `auth.json` in the root of your service.  Of course, this file should **not** be committed to version control.  The default `.gitignore` takes care of this.
+Credentials are stored in an `credentials.json` in the root of your service.  Of course, this file should **not** be committed to version control.  The default `.gitignore` takes care of this.
 
 Creating Methods
 ================
+
+The [FlowXO Generator](https://github.com/flowxo/flowxo-generator) contains a generator to scaffold individual methods as well as entire services. Simply run `yo flowxo:method` and follow the steps to generate a new method.
+
+Methods are stored in the `methods` folder on the root of your service. Each method has it's own folder with the name being the `slug` of the method. Inside each method folder you'll see the following set of files:
 
 config.js
 ---------
@@ -247,14 +261,14 @@ Note that `options.input` will hold the input values that the user has given to 
 run.js
 ------
 
-You'll be passed an `options` object and `done` (a callback).  The script should do its work and either call `done(err)` or `done(null, output)`.
+This is the primary script of the method. Like every other script, you'll be passed an `options` object and `done` (a callback).  The script should do its work and either call `done(err)` or `done(null, output)`.
 
     module.exports = function(options, done) {
       /* Do some stuff */
       done(null, [Object]);
     }
 
-The `options` object contains the auth credentials and the input values (plus a `scriptStore` function that you'll only need when using `sdk.Utils.polling`):
+The `options` object contains the following properties:
 
     {
       credentials: {
@@ -263,7 +277,8 @@ The `options` object contains the auth credentials and the input values (plus a 
       input: {
         /* input values */
       },
-      scriptStore: [Function] /* For use with sdk.Utils.polling */
+      // triggers only....
+      polling: [Function]
     }
 
 The `output` object should be the data returned by the method:
@@ -274,6 +289,8 @@ The `output` object should be the data returned by the method:
     }
 
 All the keys that your script might output should be included in the output fields described in the method's `config.js` (or `output.js`).
+
+**Note** For poller scripts, the `output` object should be an `Array` of objects, one per new item found.
 
 Input Fields
 ------------
@@ -481,7 +498,7 @@ At present, polling triggers are checked every minute.  Sometimes your method wi
 The polling process is actually quite straightforward:
 
 1. Fetch a time ordered list of items from the API (newest first).  Set a sensible limit on the number of results, 10, 25 or 50 results is usually enough.
-2. Pass the array of items to `sdk.Utils.polling()`, along with a string referencing the property that holds the unique ID for each item in the list, `options.scriptStore` and finally a callback.
+2. Pass the array of items to `options.poller`, along with a string referencing the property that holds the unique ID for each item in the list, and finally a callback.
 3. Your callback will be passed an array of new items (or an empty array), which can then be processed further and passed back as the result.
 
 You can define your method as a polling trigger in `config.js`:
@@ -494,22 +511,19 @@ You can define your method as a polling trigger in `config.js`:
       ...
     }
 
-The `Utils.polling` function inside the SDK will take care of a lot of the work:
+Polling scripts will be passed a special function in their `options.poller` property, which will take care of a lot of the work:
 
-    sdk.Utils.polling(data, key, scriptStore, callback);
+    options.poller(data, key, callback);
 
 All you need to do is give it a list and tell it what property within each list item holds the ID. A callback is fired with an array of new items.
 
 - `data` (Array) - An array that is to be checked for new items.  This will often come directly from an API, but you may need to pick out the property containing the list of items.
-- `key` (String) - The property that holds the unique ID for each item in the list.  For example, on Twitter's `timelines.user` endpoint, each tweet that's returned contains an `id_str` property which is the unique ID for the tweet. In this case, set the key to `id_str`.  You can use double underscore notation here to reference a nested key (such as `meta__ids__id`).
-- `scriptStore` (Function) - Always expects the `options.scriptStore` function passed into the script.
-- `callback(err, items)` - The callback function is called with either an error, or if successful, an array containing the new items found (those with a key that hasn't been seen before).  The array might be empty if no new items are found.
+- `key` (String) - The property that holds the unique ID for each item in the list.  For example, on Twitter's `timelines.user` endpoint, each tweet that's returned contains an `id_str` property which is the unique ID for the tweet. In this case, set the key to `id_str`.
+- `callback(err, newItems)` - The callback function is called with either an error, or if successful, an array containing the new items found (those with a key that hasn't been seen before).  The array might be empty if no new items are found.
 
-Internally, the function asks the `scriptStore` whether each key has been seen before, and if not, adds it to the array of items it returns.  The core will then update the cache of items once it's handed the list of new items.
+Internally, the `options.poller` function asks the database whether each key has been seen before, and if not, adds it to the array of items it returns.  The core will then update the cache of items once it's handed the list of new items.
 
 To see polling triggers in action, study the examples included in the SDK.
-
-TODO: Did Joe implement support for underscore notation for the `key` value?
 
 Webhooks
 --------
@@ -648,43 +662,183 @@ Running Methods
 
     grunt run
 
-Will present you with a menu system where you can choose a method, select a script within that method, and then set some inputs. Once you've made your selections, the method will execute (using the auth credentials saved in your `auth.json` file) and the output will be displayed on screen.
+Will present you with a menu system where you can choose a method, select a script within that method, and then set some inputs. Once you've made your selections, the method will execute (using the auth credentials saved in your `credentials.json` file) and the output will be displayed on screen.
 
 You'll then be given the option to update the inputs and run again. This functionality is particularly useful for testing a polling trigger, where you can run the script once, do something in your service, then run it again to check that your new record is found.
 
-Writing Tests
-=============
+Testing
+=======
 
+Test Overview
+-------------
+
+Tests are stored in the `tests` folder at the root of the service. A test file has the `.spec.js` file prefix. By default some tests are scaffolded when the service is created, and when new methods are added. These tests will need to be updated by you as, untouched, they will fail.
+
+The default layout is to have one test file per method and additionally one service-level test, but you are welcome to organise them as you wish (all `.spec.js` files under the `tests` folder will be picked up automatically whever they are located).
+
+Tests are standard Node.js [mocha](http://mochajs.org/) tests. A supporting script `tests/bootstrap.js` is run before each execution of the tests, and makes a number of useful things accessible in your test scripts:
+- `this.credentials` - the credentials being used in this test run. This is read from `credentials.json` in the root of your service
+- `this.service` - the service under test (as if you had called `this.service = require('my-service');`)
+- `this.runner` - an instance of a `ScriptRunner` which handles all the business of executing your script files. The `ScriptRunner` has one main function:
+```
+// Run a method script
+runner.run(slug, script, options, callback);
+// Run a service script e.g. ping.js
+runner.run(script, options, callback);
+```
+
+- `slug` - the slug of the method to run.
+- `script` - the script to run. If a method was provided this is a method script, either 'run', 'input' or 'output'. If no method was provided, this is a service level script. Currently there is only one service-level script, `ping`
+- `options` - the options to be passed into the script.  Normally you would define `options.input` as the input parameters.
+- `callback` - callback function expecting the arguments `err` and `output`.
+
+Writing Tests
+-------------
+
+An example test file:
+```
+var sdk = require('flowxo-sdk');
+
+describe('Get Person',function(){
+  describe('Run Script',function(){
+    it('should return error when no person_id is passed in',function(done){
+      this.runner.run('get_person','run',{},function(err,output){
+        expect(err).to.be.defined;
+        expect(output).to.be.undefined;
+        expect(err).to.be.instanceof(sdk.Error.ServiceError);
+        done();
+      });
+    });
+  });
+});
+```
+
+Passing Data Into Tests
+-----------------------
+
+Sometimes you will need to pass data into your test suite in order for it to execute properly. This data may be dependent on your own personal credentials with a particular account in the service. For example if you have written a `get_person` test that requires to run against the real API, you'll need to provide both a set of credentials AND a valid `person_id` to the script in order for it to work. The credentials are handled by the test mechanism (`this.credentials is available which is read from your `credentials.json` file in the root of your service, which can be created by `grunt auth`).
+
+To pass other transient data into the script, use a `.env` file in the root of your repository. This will be automatically picked up by `grunt test` and the values in it will be available in `process.env`. **NOTE** This `.env` file should not be stored under version control - the default `.gitignore` handles this.
+
+An example `.env` file for the above case would be
+```
+PERSON_ID=af23f34
+```
+
+And then in the script this can be used as:
+An example test file:
+```
+var sdk = require('flowxo-sdk');
+
+describe('Get Person',function(){
+  describe('Run Script',function(){
+    it('should return error when no person_id is passed in',function(done){
+      this.runner.run('get_person','run',{input:{person_id: process.env.PERSON_ID}},function(err,output){
+      // ....
+      });
+    });
+  });
+});
+```
+
+**NOTE** If the setup of any data is required in order for your test suite to pass successfull, this should be clearly documented in the `README.md` file.
+
+Test Approach
+-------------
+
+The test mechanism is designed for and encourages you to connect to your _real_ service in order to validate your service performs as expected. Whilst this is obviously a crucial part of testing, it can be slow if every single test case requires establishing a connection to a remote server. For example if your are testing part of your service that deals with formatting the APIs data to send back to the core, you probably don't need to call the real API every time - you know what the data is going to look like anyway.
+
+One approach is to try and structure your service code into separate units that can be tested indepndently. For example if you pulled the code for formatting the response out of the `run.js` script and into a seperately callable function (perhaps on the service object itself `service.formatData()`) then you are albe to test this function *offline* with all the permutation and edge-cases you need, without having to call the API everytime.
+
+Another way is to simple *mock* calls to the API. A good library for this is the [nock](https://github.com/pgte/nock) library. An example test case:
+```
+'use strict';
+var nock = require('nock');
+
+// Before each test, reset nock
+beforeEach(nock.cleanAll);
+
+describe('Get Person',function(){
+  it('should throw authentication error on 401',function(done){
+    // Setup our mocked 401 response
+    var scope = nock('https://my.service.com')
+                .get('/person/1')
+                .reply(401);
+
+    this.runner('get_person','run',{input:{person_id: 1}},function(err,output){
+      expect(err).to.be.defined;
+      expect(err).to.be.instanceof(sdk.Error.AuthError);
+      expect(scope.isDone()).to.be.true;
+    });
+  });
+});
+```
+
+Running Tests
+-------------
 Tests can be run with the task:
 
     grunt test
 
-When tests are run, credentials are taken from the `auth.json` file present in the root of your service folder (if present) and passed onto the service methods.
+When tests are run, credentials are taken from the `credentials.json` file present in the root of your service folder (if present) and passed onto the service methods.
 
-Tests are standard Node.js [mocha](http://mochajs.org/) tests. Some important global variables are available in your test scripts:
+Recipes
+=======
 
-- `service` - the main/shared functions for your service (in `index.js`).
-- `runner` - an instance of `ScriptRunner` which allows you to easily run your methods. The `ScriptRunner` has one main function:
+The FlowXO SDK and the services scaffolded by the FlowXO Generator try to be as non-opioniated as possible, not forcing you to take one approach over another. Below are some common _recipies_ you may find helpful in your code.
 
+Input Validation
+----------------
+Where possible, we recommend that you leave detailed input validation up to the API you are dealing with - just send up the data you've got and see what response you get back. Hopefully if the service in question has decent error handling you'll get a good error message back which you can use directly.
+
+However there can be times when some simple validation of the input will immediately reveal an error is going to occur before continuing. For example if you are writing a `get_person` method, and your `run.js` script is going to construct the following URL to query:
 ```
-runner.run(slug, script, options, callback)
+  var personUrl = 'https://my.service.com/persons' + options.person_id
 ```
+Of `options.person_id` is `undefined`, or contains spaces, or isn't alphanumeric, we can immediately abort.
 
-- `slug` - the slug of the method to run.
-- `script` - the script to run, either 'run', 'input' or 'output'.
-- `options` - the options to be passed into the script.  Normally you would define `options.input` as the input parameters.
-- `callback` - callback function expecting the arguments `err` and `output`.
+To perform this sort of validation, a good library to use is [validate.js](). This could be implemented in the following way:
+```
+###########################################################################
+# in index.js of your service
+###########################################################################
+var validate = require('validate.js'); // npm install --save validate.js
+                                       // to use this
+var service = new sdk.Service({
+  //...
+});
+//...
 
-### Request Replay ###
+/**
+ * Validate the data according to the constraints and return an
+ * error suitable for sending back to the core, if required
+ */
+service.validate = function(data,constraints){
+  var errors = validate(data,constraints,{flatten: true});
+  if(errors){
+    return new sdk.Error.ServiceError(errors.join('. '));
+  }else{
+    return undefined;
+  }
+}
 
-By default, tests are run live, connecting to real API's and making real requests. Whilst this is obviously an important part of the test process, there can be times when this can make testing slow.
+###########################################################################
+# in run.js of your method
+###########################################################################
+module.exports = function(options,done){
+  // Input validation
+  var inputErr = this.validate(options.input,{
+    person_id: { presence: true, numericality: true }
+  });
 
-    REPLAY=record grunt test
+  if(inputErr){
+    return done(inputErr);
+  }
 
-Running in this mode will use [Node Replay](https://github.com/assaf/node-replay).  This module monitors all inbound and outbound HTTP requests made by a Node.js process.
-
-In `record` mode, it will record any requests it hasn't seen before (these get stored in the `tests/fixtures` folder of your service). In future test runs where a request is recognised, Node Replay returns the cached response instead of calling the real API. See [Node Replay](https://github.com/assaf/node-replay) for more information.
-
+  // Else carry on safe in the knowledge options.person_id is
+  // there and is a number
+}
+```
 Submitting your Service
 =======================
 
