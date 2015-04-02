@@ -103,7 +103,9 @@ The `index.js` file at the root of your module defines the service.  It looks so
 
 The FlowXO core will `require` your service like any other node module. Our module exports only one thing - an instance of the `sdk.Service` object configured for our service.
 
-This script is also a place to hold your shared code.  It's common to create a function that abstracts the handling of HTTP requests, and perhaps a function that handles errors.
+This `index.js` file is also a great place to hold your shared code, by attaching it to the `Service` object. That's because when your scripts execute, they are executed as if they were methods of the service object itself.
+
+It's common to create a function that abstracts the handling of HTTP requests, and perhaps a function that handles errors. See _Recipies > Input Validation_ for an example of creating a common `service.validate` function that you can use throughout your scripts.
 
 Take a look at the example modules to see what kind of code you should be centralising here.
 
@@ -640,7 +642,7 @@ If you need a library that isn't on this list, please get in touch so we can rev
 
 ### Authorized Libraries ###
 
-- [Async.js](https://github.com/caolan/async) - Async utilities
+- [Async](https://github.com/caolan/async) - Async utilities
 - [Moment.js](http://momentjs.com/) - Parse, validate, manipulate and display dates
 - [Request](https://github.com/request/request) - Simplified HTTP request client
 - [xml2js](https://github.com/Leonidas-from-XIV/node-xml2js) - XML to object conversion
