@@ -575,9 +575,7 @@ The platform will retry the request up to 5 times (with exponential back-off), a
 
 ### Service Errors ###
 
-Service Errors are usually where a request to the API succeeded (in technical terms) but the user's request can't be completed for operational reasons.  They include authorisation problems (except OAuth, see below), validation errors and quotas being exceeded.
-
-You might also use a `ServiceError` where you do some validation on input and realise there's a problem, before even making the request to the API.
+Service Errors are where a user's request can't be completed for operational reasons.  This includes validation errors, objects not being found, quotas being exceeded, etc.
 
 The platform does not make any attempt to retry after a `ServiceError`, and these types of errors are not logged or monitored by the platform, only written to the workflow log.
 
