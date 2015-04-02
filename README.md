@@ -554,7 +554,7 @@ The callback for your script expects either an error (if the request failed) or 
 
 These occur when you can't access a service or you get a response back in a format that you don't recognise.  They're usually recoverable, and so the platform will retry the request later.
 
-When you encounter a retryable error, return a regular JavaScript error object as the error argument in your callback.  Either create a new one (`new Error()`) or hand back the error object passed in from a library such as `request`.
+When you encounter a retryable error, return a regular JavaScript error as the error argument in your callback.  Either create a new one (`new Error()`) or hand back the error object passed in from a library such as `request`.
 
 You should use a Retryable Error in situations like these:
 
@@ -569,7 +569,7 @@ Depending on the situation, you can either return an error object directly, or c
 - `done(new Error(response.statusCode + ' ' + body))` (some kind of temporary error reported by API)
 - `done(new Error('Could not parse: ' + body))` (API returns invalid JSON)
 
-It's up to you what information your error contains, but make sure it describes the problem.  The user will never see these error messages, they're only logged and monitored by Flow XO.
+It's up to you what information your error contains, but make sure it describes the problem.  The user will never see these error messages, they're logged and monitored by Flow XO.
 
 The platform will retry the request up to 5 times (with exponential back-off), and if after the 5th attempt a retryable error still occurs, it will be written to the workflow log as "The request failed because something unexpected happened.".
 
@@ -591,7 +591,7 @@ Take care with the tone and style of your errors, as they'll be displayed direct
 
 ### OAuth Errors ###
 
-A special case is where the API returns an error relating to the OAuth token.
+A special case is where the API returns an error relating to the OAuth token (commonly when the API returns a status code `401`).
 
 Use an instance of `AuthError`, which is very similar to `ServiceError`.  The platform will attempt to refresh the OAuth token and retry the request once.  If that doesn't succeed, the error will be written to the workflow log.
 
