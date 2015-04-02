@@ -370,7 +370,12 @@ The value of a date/time field will always be passed into your script as an obje
 
 You'll find the original value in `string`, a flag to say whether the date is `valid`, and `parsed` which will either contain `null` or a valid date object.
 
-TODO: Explain how to format dates for moment
+To stringify the date into ISO 8601 format, you can use [Moment.js](http://momentjs.com/) (an authorized library):
+
+    var moment = require('moment');
+    var dateTimeString = moment(datetime.parsed).toISOString();
+
+Alternatively you can use `moment.format()` to format the date exactly as you need it.
 
 ### Boolean Fields ###
 
@@ -503,6 +508,8 @@ All you need to do is give it a list and tell it what property within each list 
 Internally, the function asks the `scriptStore` whether each key has been seen before, and if not, adds it to the array of items it returns.  The core will then update the cache of items once it's handed the list of new items.
 
 To see polling triggers in action, study the examples included in the SDK.
+
+TODO: Did Joe implement support for underscore notation for the `key` value?
 
 Webhooks
 --------
