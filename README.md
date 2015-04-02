@@ -554,57 +554,66 @@ The callback for your script expects either an error (if the request failed) or 
 
 These occur when you can't access a service or you get a response back in a format that you don't recognise.  They're usually recoverable, and so the platform will retry the request later.
 
-This is the default error type.  If you return a standard error object (not from `sdk.Error`), it will be treated as a `RetryableServiceError`.
+When you encounter a retryable error, return a regular JavaScript error as the error argument in your callback.  Either create a new one (`new Error()`) or hand back the error object passed in from a library such as `request`.
 
-When you encounter a retryable error, create an instance of the `RetryableServiceError` object and return it as the error argument in your callback.
+You should use a Retryable Error in situations like these:
 
-The `RetryableServiceError` expects an object containing any debug information you think is relevant.  It might include:
+- HTTP requests fail.  For example, where you use `request.post()` to call the API and your callback receives an error object.
+- Where you receive a 500 status code from the API, and you were expecting 200.
+- If you receive a 200 status code (as expected) and test for the presence of a `result` JSON key in the body, but find that it's not there.
+- A `JSON.parse` of the API's response throws an error.
 
-- An error object `err`.
-- The HTTP status code received `status`.
-- The response body of the HTTP request `body`.
+Depending on the situation, you can either return an error object directly, or create a new error:
 
-For example:
+- `done(err)` (problem connecting to API)
+- `done(new Error(response.statusCode + ' ' + body))` (some kind of temporary error reported by API)
+- `done(new Error('Could not parse: ' + body))` (API returns invalid JSON)
 
-    cb(new sdk.Error.RetryableServiceError({ err: [object] }))
-    cb(new sdk.Error.RetryableServiceError({ status: 504, body: "Gateway Timeout" }))
-    cb(new sdk.Error.RetryableServiceError({ err: [object], status: 500, body: "Server Error" }))
-    cb(new sdk.Error.RetryableServiceError({ err: [object], foo: "bar" }))
-
-Always provide as much information as you can (for debug purposes).  You should use a `RetryableServiceError` in situations like these:
-
-- HTTP requests fail.  For example, where you use `request.post()` to call the API and your callback receives an error object.  Pass the error object directly into `RetryableServiceError`.  No need to send a status code or body, as the HTTP request failed.
-- Where you receive a 500 status code from the API, and you were expecting 200.  Pass the status code and body you receive into the error object.
-- If you receive a 200 status code (as expected) and test for the presence of a `result` JSON key in the body, but find that it's not there, then pass the status and body into the error.
-- A `JSON.parse` of the API's response throws an error.  Pass in the caught error from `JSON.parse` along with the status and body from the API.
+It's up to you what information your error contains, but make sure it describes the problem.  The user will never see these error messages, they're logged and monitored by Flow XO.
 
 The platform will retry the request up to 5 times (with exponential back-off), and if after the 5th attempt a retryable error still occurs, it will be written to the workflow log as "The request failed because something unexpected happened.".
 
-Retryable errors are logged and monitored by the platform.
-
 ### Service Errors ###
 
-ServiceErrors are where a request to the API succeeded (in technical terms) but the user's request can't be completed for operational reasons.  They include authorisation problems (except OAuth, see below), validation errors and quotas being exceeded.
+Service Errors are where a request to the API succeeded (in technical terms) but the user's request can't be completed for operational reasons.  They include authorisation problems (except OAuth, see below), validation errors and quotas being exceeded.
 
 The platform does not make any attempt to retry after a `ServiceError`, and these types of errors are not logged or monitored by the platform, only written to the workflow log.
 
 If you run into an error, create a `ServiceError` object and return it as the error argument in your callback:
 
-    cb(new sdk.Error.ServiceError("You must provide a value."))
+    cb(new sdk.Error.ServiceError('You must provide a value.'))
 
-Take care with the tone and style of your errors, as they'll be displayed directly to the user.  You should follow our style guide.
+There might also be times where you'd like to include an error object along with your message for debugging purposes, although the error itself won't be shown to the user:
 
-For common/recognised errors, it's normally best to extract the error message and create your own error object from the original message.  The objective here is to present a friendly, useful and readable message to user.  To help with this, you can create a `ServiceError` object with a friendlier message and the original error like so:
+    cb(new sdk.Error.ServiceError('You must provide a value.', err))
 
-    cb(new sdk.Error.ServiceError({ err: [object], message: "Please provide a value." }))
-
-Make sure you include a `message` or the message from `err` will be used instead.
+Take care with the tone and style of your errors, as they'll be displayed directly to the user.
 
 ### OAuth Errors ###
 
-A special case is where the API returns an error relating to the OAuth token.
+A special case is where the API returns an error relating to the OAuth token (commonly when the API returns a status code `401`).
 
-Use an instance of `AuthServiceError`, which works the same as `ServiceError`.  The platform will attempt to refresh the OAuth token and retry the request once.  If that doesn't succeed, the error will be written to the workflow log.
+Use an instance of `AuthError`, which is very similar to `ServiceError`.  The platform will attempt to refresh the OAuth token and retry the request once.  If that doesn't succeed, the error will be written to the workflow log.
+
+### Example ###
+
+Here's a commonly used pattern for dealing with errors in a `request` callback.  In this case, our API broadly follows [REST](http://en.wikipedia.org/wiki/Representational_state_transfer) principles, and uses OAuth:
+
+    request(options, function(err, response, body) {
+      if (err) {
+        done(err);
+      } else if (response.statusCode === 401) {
+        done(new sdk.Error.AuthError(body.errorMessage));
+      } else if (response.statusCode >= 400 && response.statusCode < 500) {
+        done(new sdk.Error.ServiceError(body.errorMessage));
+      } else if (response.statusCode >= 300) {
+        done(new Error(response.statusCode + ' ' + body));
+      } else {
+        /* Success! */
+      }
+    });
+
+In practice, you'll probably want to wrap this logic up into an `errorHandler` function in `index.js`.  That's the case for all of the examples in the SDK.
 
 Authorized Libraries
 --------------------
