@@ -95,7 +95,7 @@ The `index.js` file at the root of your module defines the service name and its 
         ...
       }
     });
-    
+
     module.exports = service;
 
 This script is also a place to hold your shared code.  It's common to create a function that abstracts the handling of HTTP requests, and perhaps a function that handles errors.
@@ -216,7 +216,7 @@ A typical config file looks like this:
         output: [...]
       }
     }
-    
+
     module.exports = function(service) {
       service.registerMethod(config);
     };
@@ -615,6 +615,8 @@ If you need a library that isn't on this list, please get in touch so we can rev
 - [Request](https://github.com/request/request) - Simplified HTTP request client
 - [xml2js](https://github.com/Leonidas-from-XIV/node-xml2js) - XML to object conversion
 - [validate.js](http://validatejs.org/) - Validating javascript objects (commonly the input data)
+- [q](https://github.com/kriskowal/q) - Promise library
+- [lodash](https://lodash.com/) - Javascript utility library
 
 Updating a Method
 -----------------
