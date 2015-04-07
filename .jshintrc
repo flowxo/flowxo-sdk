@@ -1,5 +1,6 @@
 {
   "node": true,
+  "expr": true,
   "browser": true,
   "esnext": true,
   "bitwise": true,
@@ -34,6 +35,7 @@
     "rootPath": false,
     "spyOn": false,
     "should": false,
-    "assert": false
+    "assert": false,
+    "chai": false
   }
 }

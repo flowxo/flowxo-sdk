@@ -14,7 +14,7 @@
     "winston": "^0.9.0"
   },
   "devDependencies": {
-    "chai": "^1.10.0",
+    "chai": "^2.1.0",
     "grunt": "^0.4.5",
     "grunt-contrib-jshint": "^0.11.1",
     "grunt-contrib-watch": "^0.6.1",
@@ -24,5 +24,9 @@
     "mocha": "^2.1.0",
     "replay": "^1.12.0",
     "time-grunt": "^1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flowxo/flowxo-sdk"
   }
 }
