@@ -696,6 +696,10 @@ runner.run(script, options, callback);
 - `options` - the options to be passed into the script.  Normally you would define `options.input` as the input parameters.
 - `callback` - callback function expecting the arguments `err` and `output`.
 
+Additionally the `tests/helpers.js` script initializes some common test frameworks to be used in the test specs:
+- [chai](http://chaijs.com/) - A BDD/TDD assertion library
+- [sinon](http://sinonjs.org/docs/) - A spy and mocking framework
+
 Writing Tests
 -------------
 
@@ -715,6 +719,57 @@ describe('Get Person',function(){
     });
   });
 });
+```
+
+Assertions
+----------
+
+The FlowXO SDK comes with a library of custom `chai` assertions that allow you
+to assert specific details of your service are correct. By default, your service
+will have generated a `service.spec.js` test specification, which includes an
+example of a FlowXO `chai` assertion
+```
+  it('should be a valid service', function() {
+      expect(this.service).to.be.a.flowxo.service;
+  })
+```
+
+All the FlowXO `chai` assertions cascade their checking down. For example when the above is run it checks the entire service right from the top-level fields down to the methods and their fields. Similarly the assertion `expect(method).to.be.a.flowxo.method` will check the method and then down to the fields in the method.
+
+A full list of the available assertions:
+- `service`
+- `method`
+- `field` - This can be modified using `input` or `output` properties in the assertion chain (by default it chooses input). For example
+```
+expect(field).to.be.a.flowxo.input.field
+```
+- `auth`
+- `slug`
+
+Additionally a `chai` method `matchConfig` is defined which allows you to check that the output from a script matches the configuration as defined by the method. This ensures that the output is of the appropriate type (object for an action, array for a poller) and that the fields match the configuration. For example:
+```
+'use strict';
+
+describe('Add', function() {
+  var method;
+
+  beforeEach(function() {
+    method = this.service.getMethod('add');
+  });
+
+  describe('Run Script', function() {
+    it('should have a working run script', function(done) {
+      var options = {};
+      this.runner.run('add', 'run', options, function(err, output) {
+        expect(err).not.to.exist;
+        expect(output).to.be.an('object');
+        expect(output).to.matchConfig(method);
+        done();
+      });
+    });
+  });
+});
+
 ```
 
 Passing Data Into Tests
