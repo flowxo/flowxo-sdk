@@ -1,7 +1,7 @@
 var Service = require('./lib/service');
 var ScriptRunner = require('./lib/scriptRunner');
 var MockScriptStore = require('./lib/mockScriptStore');
-var Utils = require('./lib/utils');
+var Util = require('./lib/util');
 var FXOError = require('./lib/error');
 var Chai = require('./lib/chai');
 
@@ -9,7 +9,7 @@ module.exports = {
   Service: Service,
   ScriptRunner: ScriptRunner,
   MockScriptStore: MockScriptStore,
-  Utils: Utils,
+  Util: Util,
   Error: FXOError,
   Chai: Chai
 };
