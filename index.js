@@ -11,5 +11,7 @@ module.exports = {
   MockScriptStore: MockScriptStore,
   Util: Util,
   Error: FXOError,
+  AuthError: FXOError.AuthError,
+  ServiceError: FXOError.ServiceError,
   Chai: Chai
 };
