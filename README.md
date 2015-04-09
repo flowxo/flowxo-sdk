@@ -3,7 +3,7 @@ Introduction
 
 [Flow XO](https://flowxo.com) is a platform that lets users build automated sales & marketing workflows on top of their existing cloud apps.
 
-Each supported service is built as a 'module' which is called by the Flow XO 'core'.  A service is split into separate _methods_, and each method is either a _trigger_ (looks for new records) or an _action_ (creates, updates or deletes records).
+Each supported service is built as a 'module' which is called by the Flow XO 'core'.  A service is split into separate _methods_, and each method is either a _trigger_ (receives or looks for new records) or an _action_ (creates, updates or deletes records).
 
 We've opened up our SDK so that anyone can build support for their service into Flow XO.  The SDK gives you scaffolding for your service, a command-line tool to run your methods locally, tools to write tests and some examples of working services.  Not forgetting these docs which should hopefully guide you through the process.
 
