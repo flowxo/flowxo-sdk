@@ -25,7 +25,7 @@ describe('Assertions',function(){
         expect({key: 'key'}).to.be.input.field;
       };
 
-      expect(fn).to.throw('to have a property \'type\'');
+      expect(fn).to.throw('to have a property \'label\'');
     });
 
   });
@@ -54,7 +54,9 @@ describe('Assertions',function(){
             fields:{
               input: [{
                 key: 'test',
-                type: 'select'
+                type: 'select',
+                label: 'Test',
+                input_options: []
               }],
               output: [{
                 key: 'output', label: 'Output'
@@ -92,7 +94,7 @@ describe('Assertions',function(){
     });
 
     it('should validate output',function(){
-      var input = [{key: 'bob',type: 'select'}];
+      var input = [{key: 'bob',type: 'datetime',label:'Test'}];
       var output = [{key: 'bob',label: 'test'}];
 
       expect(output).to.be.flowxo.output;
