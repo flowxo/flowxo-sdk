@@ -36,6 +36,6 @@
     "spyOn": false,
     "should": false,
     "assert": false,
-    "chai": false
+    "chai": true
   }
 }

@@ -37,8 +37,7 @@ describe('Assertions',function(){
         name: 'testname',
         slug: 'testslug',
         auth:{
-          type: 'oauth',
-          authProvider: function(){}
+          type: 'oauth1',
         },
         methods: [
           {
