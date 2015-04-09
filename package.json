@@ -1,12 +1,15 @@
 {
   "name": "flowxo-sdk",
-  "version": "0.0.1",
-  "description": "An SDK for developing FlowXO Services",
+  "version": "1.0.0",
+  "description": "An SDK for developing Flow XO Services.",
   "main": "index.js",
   "scripts": {
     "test": "grunt test"
   },
-  "author": "Joe Woodhouse <joewoodhouse30@gmail.com>",
+  "author": {
+    "name": "Joe Woodhouse",
+    "email": "joewoodhouse30@gmail.com"
+  },
   "dependencies": {
     "lodash": "^3.1.0",
     "moment": "^2.9.0",

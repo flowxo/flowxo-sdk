@@ -1,9 +1,9 @@
 'use strict';
 
-module.exports = function(grunt){
+module.exports = function(grunt) {
 
   // Add the grunt-mocha-test tasks.
-//  grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-mocha-test');
 
   // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);
@@ -11,11 +11,10 @@ module.exports = function(grunt){
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
-
   grunt.initConfig({
-    mochaTest:{
-      test:{
-        options:{
+    mochaTest: {
+      test: {
+        options: {
           reporter: 'spec',
           quiet: false,
           clearRequireCache: false,
@@ -24,31 +23,31 @@ module.exports = function(grunt){
         src: ['tests/**/*.spec.js']
       }
     },
-    jshint:{
-      options:{
+    jshint: {
+      options: {
         jshintrc: true,
         reporter: require('jshint-stylish')
       },
-      source:{
-        src: ['Gruntfile.js','index.js','lib/**/*.js']
+      source: {
+        src: ['Gruntfile.js', 'index.js', 'lib/**/*.js']
       },
-      tests:{
+      tests: {
         src: ['tests/**/*.spec.js'],
       }
     },
-    watch:{
-      js:{
-        options:{
+    watch: {
+      js: {
+        options: {
           spawn: true,
           interrupt: true,
           debounceDelay: 250
         },
-        files: ['index.js','lib/**/*.js','tests/**/*.spec.js'],
-        tasks: ['jshint','test']
+        files: ['index.js', 'lib/**/*.js', 'tests/**/*.spec.js'],
+        tasks: ['jshint', 'test']
       }
     }
   });
 
-  grunt.registerTask('test',['mochaTest']);
-  grunt.registerTask('default',['test','watch']);
+  grunt.registerTask('test', ['mochaTest']);
+  grunt.registerTask('default', ['test', 'watch']);
 };

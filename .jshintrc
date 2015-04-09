@@ -1,7 +1,6 @@
 {
   "node": true,
   "expr": true,
-  "browser": true,
   "esnext": true,
   "bitwise": true,
   "curly": true,
@@ -19,23 +18,10 @@
   "trailing": true,
   "smarttabs": true,
   "globals": {
-    "after": false,
     "afterEach": false,
-    "angular": false,
-    "before": false,
     "beforeEach": false,
     "describe": false,
     "expect": false,
-    "inject": false,
-    "it": false,
-    "xit": false,
-    "jasmine": false,
-    "rootPath": false,
-    "requireLocal": false,
-    "rootPath": false,
-    "spyOn": false,
-    "should": false,
-    "assert": false,
-    "chai": true
+    "it": false
   }
 }
