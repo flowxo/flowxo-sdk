@@ -5,6 +5,9 @@ var Util = require('./lib/util');
 var FXOError = require('./lib/error');
 var Chai = require('./lib/chai');
 
+// Ensure the Date object has superpowers
+require('flowxo-utils').activateDateParser();
+
 module.exports = {
   Service: Service,
   ScriptRunner: ScriptRunner,
