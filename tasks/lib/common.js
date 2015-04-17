@@ -1,5 +1,7 @@
 'use strict';
 
+require('./check-deps');
+
 var chalk = require('chalk'),
     inquirer = require('inquirer');
 

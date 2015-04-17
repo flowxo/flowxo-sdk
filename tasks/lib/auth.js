@@ -1,5 +1,7 @@
 'use strict';
 
+require('./check-deps');
+
 var open = require('open'),
     express = require('express'),
     session = require('express-session'),
