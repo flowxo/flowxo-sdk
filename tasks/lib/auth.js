@@ -6,7 +6,8 @@ var open = require('open'),
     crypto = require('crypto'),
     url = require('url'),
     passport = require('passport'),
-    refresh = require('passport-oauth2-refresh');
+    refresh = require('passport-oauth2-refresh'),
+    SDK = require('../../index.js');
 
 var CommonUtil = require('./common');
 
@@ -147,7 +148,19 @@ AuthUtil.handlers.oauth2 = function(grunt, service, cb) {
  * Handler for basic Credentials
  */
 AuthUtil.handlers.credentials = function(grunt, service, cb) {
-  CommonUtil.promptFields(service.auth.fields, cb);
+  CommonUtil.promptFields(service.auth.fields, { validateRequired: false }, function(err, credentials) {
+    if(err) { return cb(err); }
+
+    // Check the creds are valid
+    var runner = new SDK.ScriptRunner(service, {
+      credentials: credentials
+    });
+
+    runner.run('ping', {}, function(err) {
+      if(err) { return cb(err); }
+      cb(null, credentials);
+    });
+  });
 };
 
 /**
