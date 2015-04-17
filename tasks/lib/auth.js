@@ -156,7 +156,7 @@ AuthUtil.handlers.credentials = function(grunt, service, cb) {
       credentials: credentials
     });
 
-    runner.run('ping', {}, function(err) {
+    runner.run('ping', function(err) {
       if(err) { return cb(err); }
       cb(null, credentials);
     });

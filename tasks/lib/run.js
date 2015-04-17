@@ -198,7 +198,7 @@ RunUtil.run = function(grunt, options, cb) {
         return callback(null, method);
       }
       CommonUtil.header(grunt, 'Custom Input Fields');
-      runner.run(method.slug, 'input', {}, function(err, customInputFields) {
+      runner.run(method.slug, 'input', function(err, customInputFields) {
         if(err) {
           return callback(err);
         }
