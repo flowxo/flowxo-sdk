@@ -657,7 +657,7 @@ This object's data can be referenced using these keys:
 }
 ```
 
-So to include output fields for 'Deal Name' and 'Deal Person' in your method's `config.js`, you would use:
+So to include output fields for _Deal Name_ and _Deal Person_ in your method's `config.js`, you would use:
 
 ```
 [{
