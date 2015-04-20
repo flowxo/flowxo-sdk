@@ -16,7 +16,7 @@ You'll also need to be familiar with [Git](http://git-scm.com/) as you'll be usi
 
 As most modules will be fairly thin wrappers around HTTP API's, you should understand how to make HTTP requests in Node. We encourage you to use the popular [Request](https://github.com/request/request) module, but you can choose to make requests with Node's plain [https](https://nodejs.org/api/https.html) API if you prefer.
 
-Finally, build and test related tasks are handled by the Javascript task runner [Grunt](http://gruntjs.com/) so a working knowledge of this is useful.
+Finally, build and test related tasks are handled by the JavaScript task runner [Grunt](http://gruntjs.com/) so a working knowledge of this is useful.
 
 That's all. The other tools that the SDK uses will be installed locally with `npm install`.
 
@@ -35,9 +35,11 @@ Services are used by the core Flow XO platform. Before your service can be deplo
 
 # Example Services
 
-We've provided a couple of example services that you can use for reference when building your service:
+Use our example services as a reference when building your service:
 
 - [Trello Example](https://github.com/flowxo/flowxo-services-trello-example) - uses OAuth1 for authentication.
+
+_(We're hoping to bring you more examples soon!)_
 
 # Scaffolding Your Service
 
@@ -138,7 +140,7 @@ This `index.js` file is also a great place to hold or link to your shared code, 
 
 In the example above you'll see two important fields for defining the service. The `name` field is how the service will be presented to the user throughout the system. The `slug` field is used internally by the Flow XO core, and should be a lowercase underscore-delimited string uniquely representing your service. Normally you should not need to change these generated values.
 
-It's common to create a module that abstracts the handling of HTTP requests, and perhaps a function that handles errors. See _Recipies > Input Validation_ for an example of creating a common `service.validate` function that you can use throughout your scripts.
+It's common to create a module that abstracts the handling of HTTP requests, and perhaps a function that handles errors. See _Recipes > Input Validation_ for an example of creating a common `service.validate` function that you can use throughout your scripts.
 
 Take a look at the example modules to see what kind of code you should be centralising here.
 
@@ -180,7 +182,7 @@ auth: {
 
 See the section _Creating Methods > config.js > Input Fields_ for a list of the field types you can use here.
 
-When your scripts are run, you'll get the credentials in `options.credentials` when running a script.
+When your scripts are run, you'll get the credentials in `options.credentials`.
 
 ### ping.js
 
@@ -244,9 +246,9 @@ auth: {
 
 Make sure that if the strategy requires any extra configuration, you add it to either the `options` or the `params` object. Refer to the strategy's documentation for more details on this.
 
-_Note: you do not need to add a `callbackURL` to the options object, as the system will automatically generate a callbackURL for you. When testing the service, you'll need to setup your development machine so that the generated callback URL can be reached by the test runner. See the section Testing -> Integration Tests -> Authentication for more details._
+_Note: you do not need to add a `callbackURL` to the options object, as the system will automatically generate a callbackURL for you. When testing the service, you'll need to setup your development machine so that the generated callback URL can be reached by the test runner. See the section Testing > Integration Tests > Authentication for more details._
 
-You'll notice the use of [environment variables](https://nodejs.org/api/process.html#process_process_env) to prevent the hard coding of the key and secret. When configuring the service, we'll provide you with these details for connecting to the service, and you should enter the details into the `.env` file for testing purposes. For more details on setting environment variables, refer to the section _Testing -> Integration Tests -> Authentication_.
+You'll notice the use of [environment variables](https://nodejs.org/api/process.html#process_process_env) to prevent the hard coding of the key and secret. When configuring the service, we'll provide you with these details for connecting to the service, and you should enter the details into the `.env` file for testing purposes. For more details on setting environment variables, refer to the section _Testing > Integration Tests > Authentication_.
 
 When your scripts are run, you'll get the relevant credentials in the `options.credentials` object:
 
@@ -281,7 +283,7 @@ var options = {
 request(options, done);
 ```
 
-You'll need to take special care to use an _Auth Error_ when the API reports an authorization problem. That way, if the service is an OAuth2 service, the core knows to try and refresh the access token and try your script again (when possible). See the section _Handling Errors > OAuth Errors_ for details.
+You'll need to take special care to use an _Auth Error_ when the API reports an authorization problem. That way, if the service is an OAuth2 service, the core knows to try and refresh the access token and try your script again (when possible). See the section _Handling Errors > Auth Errors_ for details.
 
 # Creating Methods
 
@@ -516,11 +518,9 @@ Each property is described like so:
 }
 ```
 
-Similar to input fields, output `key`s should be unique, including keys generated by the `output.js` script.
+Similar to input fields, output `key`s should be unique, including keys generated by the `output.js` script.  You should describe all properties that your script _might_ output.
 
-You should describe all properties that your script _might_ output.
-
-If a script outputs nested data, you should describe your keys using 'flattened' notation:
+If a script outputs nested data, you should describe your keys using 'double underscore notation':
 
 ``` js
 {
@@ -529,7 +529,7 @@ If a script outputs nested data, you should describe your keys using 'flattened'
 }
 ```
 
-See the section _Output Flattening_ for more details on flattened notation.
+See the section _Double Underscore Notation_ for more details.
 
 ## input.js
 
@@ -605,11 +605,11 @@ For actions, return a single object of data.
 }
 ```
 
-All the keys that your script might output should be included in the output fields described in the method's `config.js` (or `output.js`). Remember that nested data should be described using 'nested' notation, e.g. `some__nested` (for the object above).
+All the keys that your script might output should be included in the output fields described in the method's `config.js` (or `output.js`). Remember that nested data should be described using double underscore notation, e.g. `some__nested` (for the object above).
 
-## Output Flattening
+## Double Underscore Notation
 
-Output data in Flow XO will be converted to un-nested key/value pairs by the core. For example, take this object:
+Output data in Flow XO can be referenced in your output fields using double underscore notation.  For example, take this object:
 
 ``` js
 {
@@ -638,7 +638,7 @@ Output data in Flow XO will be converted to un-nested key/value pairs by the cor
 }
 ```
 
-Once it's passed to the core, it's converted to:
+This object's data can be referenced using these keys:
 
 ``` js
 {
@@ -657,12 +657,16 @@ Once it's passed to the core, it's converted to:
 }
 ```
 
-When you name your output keys in the method `config.js`, you should use their 'flattened' key:
+So to include output fields for _Deal Name_ and _Deal Person_ in your method's `config.js`, you would use:
 
-``` js
+```
 [{
-  key: 'meta__status',
-  label: 'Meta Status'
+  key: 'name',
+  label: 'Deal Name'
+},
+{
+  key: 'people__0__name',
+  label: 'Deal Person'
 }]
 ```
 
@@ -708,7 +712,7 @@ All you need to do is give it a list and tell it what property within each list 
 
 Internally, the `options.poller` function asks the database whether each key has been seen before, and if not, adds it to the array of items it returns. The core will then update the cache of items once it's handed the list of new items.
 
-To see polling triggers in action, study the examples included in the SDK.
+To see polling triggers in action, study our example services (see the _Example Services_ section).
 
 ## Webhooks
 
@@ -755,7 +759,7 @@ These occur when you can't access a service or you get a response back in a form
 
 When you encounter a retryable error, return a regular JavaScript error as the error argument in your callback. Either create a new one (`new Error()`) or hand back the error object passed in from a library such as `request`.
 
-You should use a Retryable Error in situations like these:
+You should use a retryable error in situations like these:
 
 - HTTP requests fail. For example, where you use `request.post()` to call the API and your callback receives an error object.
 - Where you receive a 500 status code from the API, and you were expecting 200.
@@ -776,7 +780,7 @@ If you are in doubt about what error to return, use a retryable error, to give t
 
 ## Service Errors
 
-Service Errors are where a user's request can't be completed for operational reasons. This includes validation errors, objects not being found, quotas being exceeded, etc.
+Service errors are where a user's request can't be completed for operational reasons. This includes validation errors, objects not being found, quotas being exceeded, etc.
 
 The platform does not make any attempt to retry after a `ServiceError`. Instead, the error message provided with the `ServiceError` is written to the workflow log, and the error object is logged and monitored by the platform.
 
@@ -848,7 +852,7 @@ request(options, function(err, response, body) {
 });
 ```
 
-In practice, you'll probably want to wrap this logic up into a centralised `errorHandler` function in `lib/index.js`. That's the case for all of the examples in the SDK.
+In practice, you'll probably want to wrap this logic up into a centralised `errorHandler` function in `lib/index.js`. That's the case for all of our example services.
 
 # Authorized Libraries
 
@@ -863,7 +867,7 @@ If you need a library that isn't on this list, please get in touch so we can rev
 - [xml2js](https://github.com/Leonidas-from-XIV/node-xml2js) - XML to object conversion
 - [validate.js](http://validatejs.org/) - Validating javascript objects (commonly the input data)
 - [q](https://github.com/kriskowal/q) - Promise library
-- [lodash](https://lodash.com/) - Javascript utility library
+- [lodash](https://lodash.com/) - JavaScript utility library
 
 If you are developing an OAuth service, you'll also need to use a passport strategy. Find yours from the [list of providers](http://passportjs.org/guide/providers/).
 
@@ -873,21 +877,21 @@ Once a method is made available, it can't be changed or deleted, only deprecated
 
 To deprecate a method, simply set `{ deprecated: true }` in the `config.js`. You can then create a replacement method with a versioned slug `{ slug: 'a_method_v2' }` (it's OK to use the exact same `name` in your new version, only the `slug` needs to be unique). A deprecated method will not be available for selection when the user is configuring a new trigger or action, but will still be available for existing workflows.
 
-Of course, you'll need to resubmit your service to us to have the changes made live.
+Of course, you'll need to submit a Pull Request (PR) to the main `flowxo`-owned repo to have the changes made live.
 
 # Testing
 
 There are two types of testing that are supported by the SDK: unit tests and integration tests.
 
-## Unit tests
+## Unit Tests
 
-[Unit testing](http://en.wikipedia.org/wiki/Unit_testing) allows you to test each unit of your code in isolation. This facilitates [Test Driven Development](http://en.wikipedia.org/wiki/Test-driven_development), and helps to modularise your codebase.Unit tests stub out the service's API, typically using a library such as [nock](https://github.com/pgte/nock) to mock the response. For this reason unit tests are often fast, and can be run automatically.
+[Unit testing](http://en.wikipedia.org/wiki/Unit_testing) allows you to test each unit of your code in isolation. This facilitates [Test Driven Development](http://en.wikipedia.org/wiki/Test-driven_development), and helps to modularise your codebase. Unit tests stub out the service's API, typically using a library such as [nock](https://github.com/pgte/nock) to mock the response. For this reason unit tests are often fast, and can be run automatically.
 
 Unit tests are for your own benefit, and are not mandatory for the service to be submitted for validation.
 
-### Writing unit tests
+### Writing Unit Tests
 
-Unit test files are stored in the `tests/` folder at the root of the service. A test file has the `.spec.js` file prefix. By default, some tests are scaffolded when the service is created, and when new methods are added. These tests will need to be updated by you as, untouched, they will fail.
+Unit test files are stored in the `tests/` folder at the root of the service. A test file has the `.spec.js` file suffix. By default, some tests are scaffolded when the service is created, and when new methods are added. These tests will need to be updated by you as, untouched, they will fail.
 
 The default layout is to have one test file per method and additionally one service-level test, but you are welcome to organise them as you wish (all `.spec.js` files under the `tests/` folder will be picked up automatically wherever they are located).
 
@@ -965,7 +969,7 @@ Refer to the example services for more details on how to architect your code to 
 - Concentrate on providing small blocks of code, which can be fed inputs, and return outputs. This will make unit testing easier.
 - Mock the service's API using a library such as [nock](https://github.com/pgte/nock), so your unit tests do not require 'real' data to run. This will ensure your tests will run fast, as there will be no network latency.
 
-### Running unit tests
+### Running Unit Tests
 
 ```
 # Run your specs
@@ -975,7 +979,7 @@ grunt test
 grunt watch
 ```
 
-## Integration tests
+## Integration Tests
 
 [Integration testing](http://en.wikipedia.org/wiki/Integration_testing) emulates how the Flow XO platform will use your service, using the live API. You complete the input data and the method's `input.js`, `output.js` and `run.js` scripts are run in order, passing the provided data through and displaying the results. You can also record a series of integration tests, and replay them in order.
 
@@ -1023,7 +1027,7 @@ Secondly, since OAuth relies on redirecting the browser window to a URL hosted b
 
 _Note - you may be wondering why we don't just use `http://localhost:9000` or `http://127.0.0.1:9000`as the `redirect_uri`. Unfortunately, some OAuth providers do not allow `localhost` or `127.0.0.1`, and so we have invented a fake TLD to use instead._
 
-### Running integration tests
+### Running Integration Tests
 
 You run an integration test with
 
@@ -1039,7 +1043,7 @@ You can also run a single method script:
 grunt run --single
 ```
 
-### Recording integration tests
+### Recording Integration Tests
 
 You can record a series of integration tests with
 
@@ -1064,7 +1068,7 @@ Note that subsequent calls to `grunt run --record` will append to your existing 
 
 The `runs/` folder can be committed to version control, allowing others the chance to replay tests you have recorded. Bear in mind that they will often need to be authenticated as the same user as you in order to replay the tests successfully.
 
-### Testing pollers
+### Testing Pollers
 
 The first time an integration test is run for a poller, you'll see no data returned from the service. This is due to the way that pollers work: the first time the API is hit, the pollcache is filled with all existing data from the service.
 
@@ -1081,7 +1085,7 @@ The pollcache is stored in memory, one per method. This has the following implic
 
 # Recipes
 
-The Flow XO SDK and the services scaffolded by the Flow XO Generator try to be as non-opioniated as possible, not forcing you to take one approach over another. Below are some common _recipies_ you may find helpful in your code.
+The Flow XO SDK and the services scaffolded by the Flow XO Generator try to be as non-opioniated as possible, not forcing you to take one approach over another. Below are some common 'recipes' you may find helpful in your code.
 
 ## Input Validation
 
@@ -1138,7 +1142,7 @@ module.exports = function(options,done){
 }
 ```
 
-## Request client
+## Request Client
 
 If the service you are accessing has a RESTful API, it can often be beneficial to streamline the request sending and response handling into a single function, and pass in parameters depending on the endpoint to be reached.
 
@@ -1219,7 +1223,7 @@ ServiceClient.prototype.createPerson = function(person, done) {
 };
 ```
 
-## Mocking API calls
+## Mocking API Calls
 
 The integration test runner is designed for and encourages you to connect to your _real_ service in order to validate your service performs as expected. Whilst this is obviously a crucial part of integration testing, it can be undesirable for a unit test to establish a connection to a remote server.
 
