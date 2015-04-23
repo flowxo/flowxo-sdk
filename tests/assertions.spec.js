@@ -111,6 +111,31 @@ describe('Assertions', function() {
       expect(input).to.be.flowxo.input;
       expect(input[0]).to.be.flowxo.input.field;
       expect(output[0]).to.be.flowxo.output.field;
+
+      expect(function(){
+        expect({key: 'bob'}).to.be.flowxo.output.field;
+      }).to.throw('to have a property \'label\'');
+
+      expect(function(){
+        expect({key: 'bob', label: undefined}).to.be.flowxo.output.field;
+      }).to.throw('expected undefined to be truthy');
+
+      expect(function(){
+        expect({key: undefined, label: 'test'}).to.be.flowxo.output.field;
+      }).to.throw('expected undefined to be truthy');
+
+      expect(function(){
+        expect({key: null, label: 'test'}).to.be.flowxo.output.field;
+      }).to.throw('expected null to be truthy');
+    });
+
+    it('should validate authentication type',function(){
+      expect({type: 'oauth2'}).to.be.flowxo.auth;
+      expect({type: 'oauth1'}).to.be.flowxo.auth;
+      expect({type: 'credentials', fields: []}).to.be.flowxo.auth;
+      expect(function(){
+        expect({type: 'notauth'}).to.be.flowxo.auth;
+      }).to.throw('Must have valid auth type');
     });
 
   });
