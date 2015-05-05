@@ -220,72 +220,53 @@ RunUtil.run = function(grunt, options, cb) {
       }
     },
 
-    // Static Inputs
+    // Inputs
     function(method, callback) {
-      if(method.fields.input && method.fields.input.length) {
-        CommonUtil.header(grunt, 'Standard Input Fields');
+      // First determine whether we're going to do anything at all
+      if((method.fields.input && method.fields.input.length) || method.scripts.input) {
+        CommonUtil.header(grunt, 'Input Fields');
+      } else {
+        return callback(null, method);
+      }
 
-        // If we've been given them, just set and move on
-        if(inputsPredefined) {
-          inputs.forEach(function(input) {
-            if(!input.custom) {
-              grunt.log.writeln(input.label + ': ' + input.value);
-            }
-          });
-          return callback(null, method);
-        }
+      // If we've been given them, just set and move on
+      if(inputsPredefined) {
+        inputs.forEach(function(input) {
+          grunt.log.writeln(input.label + ': ' + input.value);
+        });
+        return callback(null, method);
+      }
 
-        // Else prompt for them
-        CommonUtil.promptFields(method.fields.input, fieldPromptOptions, function(err, answers) {
+      function doPrompts(inputSet) {
+        CommonUtil.promptFields(inputSet, fieldPromptOptions, function(err, answers) {
           if(err) {
             return callback(err);
           } else {
-            addInputsIfDefined(method.fields.input, answers);
-            callback(null, method);
+            addInputsIfDefined(inputSet, answers);
+            return callback(null, method);
           }
         });
-      } else {
-        callback(null, method);
       }
-    },
 
-    // input.js
-    function(method, callback) {
       if(!method.scripts.input) {
-        return callback(null, method);
-      }
-      CommonUtil.header(grunt, 'Custom Input Fields');
-      runner.run(method.slug, 'input', function(err, customInputFields) {
-        if(err) {
-          return callback(err);
-        }
-
-        try {
-          chai.expect(customInputFields).to.be.flowxo.input.fields;
-        } catch(e) {
-          grunt.fail.fatal('Error in return from input.js script: ' + e.toString());
-        }
-
-        // If we've been given some values, use those
-        if(inputsPredefined) {
-          inputs.forEach(function(input) {
-            if(input.custom) {
-              grunt.log.writeln(input.label + ': ' + input.value);
-            }
-          });
-          return callback(null, method);
-        }
-
-        // Else prompt for some
-        CommonUtil.promptFields(customInputFields, fieldPromptOptions, function(err, answers) {
+        // If we are here, there must be some static inputs but no custom
+        doPrompts(method.fields.input);
+      } else {
+        runner.run(method.slug, 'input', function(err, customInputFields) {
           if(err) {
-            callback(err);
-          } else {
-            addInputsIfDefined(customInputFields, answers, true);
-            callback(null, method);
+            return callback(err);
           }
+
+          try {
+            chai.expect(customInputFields).to.be.flowxo.input.fields;
+          } catch(e) {
+            grunt.fail.fatal('Error in return from input.js script: ' + e.toString());
+          }
+          var combinedInputs = method.fields.input;
+          combinedInputs = combinedInputs.concat(customInputFields);
+          doPrompts(combinedInputs);
         });
-      });
+      }
     },
 
     // output.js
