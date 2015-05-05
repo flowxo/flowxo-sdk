@@ -40,6 +40,7 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
   }
 
   var options = cloneObject(service.auth.options);
+
   envs.forEach(function(env) {
     if(!options[env.option]) {
       grunt.fail.fatal('Unable to authenticate: no ' + env.option + ' defined. Did you remember to fill in your ' + env.key + ' in the .env file?');
@@ -102,12 +103,14 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
  * Handler for OAuth1
  */
 AuthUtil.handlers.oauth1 = function(grunt, service, cb) {
+  var slug = service.slug.toUpperCase();
+
   var envs = [{
     option: 'consumerKey',
-    key: 'TRELLO_KEY'
+    key: slug + '_KEY'
   }, {
     option: 'consumerSecret',
-    key: 'TRELLO_SECRET'
+    key: slug + '_SECRET'
   }];
 
   var formatter = function(token, token_secret, profile, done) {
@@ -127,12 +130,14 @@ AuthUtil.handlers.oauth1 = function(grunt, service, cb) {
  * Handler for OAuth2
  */
 AuthUtil.handlers.oauth2 = function(grunt, service, cb) {
+  var slug = service.slug.toUpperCase();
+
   var envs = [{
     option: 'clientID',
-    key: 'TRELLO_ID'
+    key: slug + '_ID'
   }, {
     option: 'clientSecret',
-    key: 'TRELLO_SECRET'
+    key: slug + '_SECRET'
   }];
 
   var formatter = function(access_token, refresh_token, profile, done) {
