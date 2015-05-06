@@ -105,6 +105,11 @@ RunUtil.displayScriptOutput = function(grunt, outputs, data) {
   }
 };
 
+RunUtil.displayScriptError = function(grunt, err) {
+  CommonUtil.header(grunt, 'Script Error', 'red');
+  grunt.log.writeln(chalk.red(err.message || err));
+};
+
 RunUtil.promptScript = function(method, cb) {
   var prompts = [{
     type: 'list',
@@ -316,7 +321,7 @@ RunUtil.run = function(grunt, options, cb) {
         input: inputs
       }, function(err, result) {
         if(err) {
-          callback(err);
+          callback(err, method, {});
         } else {
           callback(null, method, result);
         }
@@ -338,8 +343,7 @@ RunUtil.run = function(grunt, options, cb) {
     }
   ], function(err, method, result) {
     if(err) {
-      CommonUtil.header(grunt, 'Script Error', 'red');
-      grunt.fail.fatal(err);
+      // RunUtil.displayScriptError(grunt,err);
     }
     // Callback enough data so the caller can record
     // the run
@@ -351,7 +355,8 @@ RunUtil.runUntilStopped = function(grunt, options, cb) {
   function runIt() {
     RunUtil.run(grunt, options, function(err, result, method, inputs) {
       if(err) {
-        return cb(err);
+        RunUtil.displayScriptError(grunt, err);
+        // return cb(err);
       }
 
       if(options.runCompleted) {
@@ -478,19 +483,28 @@ RunUtil.runReplayed = function(grunt, options, cb) {
 
   grunt.log.subhead(chalk.cyan('Replaying test run from ' + runFile));
 
-  /**
-   * For each test we need to
-   * - Display any title and description, if set
-   * - Run the input.js script, and check it's format
-   * - Display the standard_inputs and then the custom inputs
-   * - Run the output.js script with the combined inputs
-   * - Run the run.js script with the combined inputs
-   * - Validate the output against the config
-   * - Display the result to the user
-   */
+  function displayTitle(title) {
+      grunt.log.subhead(chalk.magenta(title));
+    }
+    /**
+     * For each test we need to
+     * - Display any title and description, if set
+     * - Run the input.js script, and check it's format
+     * - Display the standard_inputs and then the custom inputs
+     * - Run the output.js script with the combined inputs
+     * - Run the run.js script with the combined inputs
+     * - Validate the output against the config
+     * - Display the result to the user
+     */
   var i = tests.length;
   async.eachSeries(tests, function(test, cb) {
     i--;
+
+    // If there's a title, display it
+    if(test.title) {
+      displayTitle(test.title);
+    }
+
     RunUtil.run(grunt, {
       method: test.method,
       runner: runner,
@@ -498,7 +512,7 @@ RunUtil.runReplayed = function(grunt, options, cb) {
       inputs: test.inputs
     }, function(err) {
       if(err) {
-        grunt.fail.fatal(err);
+        RunUtil.displayScriptError(grunt, err);
       }
 
       if(i === 0) {
