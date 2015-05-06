@@ -262,8 +262,13 @@ RunUtil.run = function(grunt, options, cb) {
           } catch(e) {
             grunt.fail.fatal('Error in return from input.js script: ' + e.toString());
           }
-          var combinedInputs = method.fields.input;
-          combinedInputs = combinedInputs.concat(customInputFields);
+          var combinedInputs = [];
+          if(method.fields.input) {
+            combinedInputs = combinedInputs.concat(method.fields.input);
+          }
+          if(customInputFields) {
+            combinedInputs = combinedInputs.concat(customInputFields);
+          }
           doPrompts(combinedInputs);
         });
       }
