@@ -2,7 +2,7 @@
 
 [Flow XO](https://flowxo.com) is a platform that lets users build automated sales & marketing workflows on top of their existing cloud apps.
 
-Each supported service is built as a 'module' which is called by the Flow XO 'core'. A service is split into separate _methods_, and each method is either a _trigger_ (looks for new records, or receives new records via a webhook) or an _action_ (creates, updates or deletes records).
+Each supported service is built as a _module_ which is called by the Flow XO _core_. A service is split into separate _methods_, and each method is either a _trigger_ (looks for new records, or receives new records via a webhook) or an _action_ (creates, updates or deletes records).
 
 We've opened up our SDK so that anyone can build support for their service into Flow XO. The SDK gives you scaffolding for your service, a command-line tool to run your methods locally, tools to write tests and some examples of working services. Not forgetting these docs which should hopefully guide you through the process.
 
@@ -19,19 +19,6 @@ As most modules will be fairly thin wrappers around HTTP API's, you should under
 Finally, build and test related tasks are handled by the JavaScript task runner [Grunt](http://gruntjs.com/) so a working knowledge of this is useful.
 
 That's all. The other tools that the SDK uses will be installed locally with `npm install`.
-
-# Workflow
-
-Services are used by the core Flow XO platform. Before your service can be deployed for use, it must be validated by us. We use the following workflow to achieve this.
-
-1. We will create a new private GitHub repository under the `flowxo` organization and provide you with read-only access.
-2. You will fork the repository into your own account.
-3. You develop and test the service as outlined in this guide, pushing your code to your local forked repo.
-4. When you are ready to submit your service, you'll submit a Pull Request (PR) to the main `flowxo`-owned repo.
-5. We'll review your code and run your integration tests for the service, to ensure everything works correctly.
-6. If there are any changes that need to be made, we'll comment on your PR. You should make the changes and push your code to your local branch, updating the PR accordingly.
-7. Steps 5 and 6 are repeated until there are no further changes required.
-8. We will merge the PR into the main `flowxo`-owned repo, and the service will be deployed to the Flow XO platform.
 
 # Example Services
 
@@ -59,7 +46,7 @@ You should now have a populated directory with some scripts. Next, we'll take a 
 
 # Code Structure
 
-A service is a collection of JavaScript files, with scripts relating to the service as a whole in `/lib`, and a directory for each method beneath that. You will also notice a set of files under `/tests` - these are called when testing your service.
+A service is a collection of JavaScript files, with scripts relating to the service as a whole in `/lib`, and a directory for each method beneath that in `/methods`. You will also notice a set of files under `/tests` - these are called when testing your service.
 
 This is how your service will eventually be structured (although you won't have any methods yet):
 
@@ -78,7 +65,7 @@ service_name
         |-- ...
   |-- tests/ - contains files used to run service for testing
 ```
-There's a few other files you will also have in your root, including `README.md`, `credentials.json` and `.gitignore`.
+You'll see many other files and directories, for example a `tests` directory where you can store your unit tests.
 
 The service expects files to remain in their default locations, so try not to move things around unless you know what you are doing.
 
@@ -102,8 +89,7 @@ You'll only be concerned with the public properties when building your service.
 
 # Scripts
 
-A Flow XO service is built up of some configuration plus a number of _scripts_.
-`ping.js`, `run.js`, `input.js` and `output.js` all work in a similar way.
+A Flow XO service is built up of some configuration plus a number of _scripts_. `ping.js`, `run.js`, `input.js` and `output.js` all work in a similar way.
 
 They're passed an `options` object along with a callback function `done`, which is a standard node.js ['error-first' callback](http://thenodeway.io/posts/understanding-error-first-callbacks/) function.
 
@@ -124,6 +110,7 @@ The `lib/index.js` file defines the service. It looks something like this:
 
 ``` js
 var service = new sdk.Service({
+  serviceRoot: __dirname,
   name: 'Your Service',
   slug: 'your_service',
   auth: {
@@ -138,7 +125,7 @@ The Flow XO core will `require` your service like any other node module. Our mod
 
 This `index.js` file is also a great place to hold or link to your shared code, by attaching it to the `Service` object. That's because when your scripts execute, they are executed as if they were methods of the service object itself.
 
-In the example above you'll see two important fields for defining the service. The `name` field is how the service will be presented to the user throughout the system. The `slug` field is used internally by the Flow XO core, and should be a lowercase underscore-delimited string uniquely representing your service. Normally you should not need to change these generated values.
+In the example above you'll see two important fields for defining the service. The `name` field is how the service will be presented to the user in the UI. The `slug` field is used internally by the Flow XO core, and should be a lowercase underscore-delimited string uniquely representing your service. Normally you should not need to change these generated values.
 
 It's common to create a module that abstracts the handling of HTTP requests, and perhaps a function that handles errors. See _Recipes > Input Validation_ for an example of creating a common `service.validate` function that you can use throughout your scripts.
 
@@ -146,7 +133,7 @@ Take a look at the example modules to see what kind of code you should be centra
 
 # Authorization
 
-Flow XO supports [credential based auth](http://en.wikipedia.org/wiki/Application_programming_interface_key) (where the user provides some kind of secret that can be used for authorization) or the [OAuth](http://oauth.net/) protocol, where the user grants access directly through the service being accessed. For the latter, both OAuth 1.0a and OAuth 2.0 are supported.
+Flow XO supports credential based auth (where the user provides some kind of secret that can be used for authorization) or the [OAuth](http://oauth.net/) protocol, where the user grants access directly through the service being accessed. Both OAuth1 and OAuth2 are supported.
 
 ## Credentials
 
@@ -609,7 +596,7 @@ All the keys that your script might output should be included in the output fiel
 
 ## Double Underscore Notation
 
-Output data in Flow XO can be referenced in your output fields using double underscore notation.  For example, take this object:
+Output data in Flow XO can be referenced in your output fields using _double underscore notation_.  For example, take this object:
 
 ``` js
 {
@@ -774,7 +761,7 @@ Depending on the situation, you can either return an error object directly, or c
 
 It's up to you what information your error contains, but make sure it describes the problem. The user will never see these error messages, they're logged and monitored by Flow XO.
 
-The platform will retry the request up to 5 times (with exponential back-off), and if after the 5th attempt a retryable error still occurs, it will be written to the workflow log as "The request failed because something unexpected happened.".
+The core will retry the request up to 5 times (with exponential back-off), and if after the 5th attempt a retryable error still occurs, it will be written to the workflow log as "The request failed because something unexpected happened.".
 
 If you are in doubt about what error to return, use a retryable error, to give the script the best possible chance to succeed.
 
@@ -782,7 +769,7 @@ If you are in doubt about what error to return, use a retryable error, to give t
 
 Service errors are where a user's request can't be completed for operational reasons. This includes validation errors, objects not being found, quotas being exceeded, etc.
 
-The platform does not make any attempt to retry after a `ServiceError`. Instead, the error message provided with the `ServiceError` is written to the workflow log, and the error object is logged and monitored by the platform.
+The core does not make any attempt to retry after a `ServiceError`. Instead, the error message provided with the `ServiceError` is written to the workflow log, and the error object is logged and monitored by the core.
 
 If you run into an error, create a `ServiceError` object and return it as the error argument in your callback:
 
@@ -852,7 +839,7 @@ request(options, function(err, response, body) {
 });
 ```
 
-In practice, you'll probably want to wrap this logic up into a centralised `errorHandler` function in `lib/index.js`. That's the case for all of our example services.
+In practice, you'll probably want to wrap this logic up into a centralised `errorHandler` function in `lib/index.js`.
 
 # Authorized Libraries
 
@@ -1259,4 +1246,13 @@ describe('Get Person',function(){
 
 # Submitting your Service
 
-As outlined above in the _Workflow_ section, you'll be using Github's Pull Request feature to submit your code for review.
+# Workflow
+
+Before you submit your service to us, please work through this checklist:
+
+- Share details of a developer/test account with us, ready to run your tests through (include details in `README.md`).
+- Make sure your service has good unit tests.
+- Include a set of `grunt run` tests that we can `grunt run --replay` to see your methods working well.  We need to see your methods dealing with a variety of input (both valid and invalid). It's best to [get in touch](mailto:support@flowxo.com) with us at this stage so we can explain what you need to do here.
+- If there's anything else we need to consider when reviewing your service, it should be included in `README.md`.
+
+To submit, please [email us](mailto:support@flowxo.com) with details of the service you've built and your contact details, and we'll explain what to do next. Thanks for supporting Flow XO!
