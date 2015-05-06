@@ -33,7 +33,7 @@ _(We're hoping to bring you more examples soon!)_
 To make it easy to build your service, we've written a [Yeoman](http://yeoman.io/) generator, which complements this SDK. You should install and use this to scaffold your service:
 
 ``` bash
-npm install -g yo flowxo/generator-flowxo
+npm install -g yo generator-flowxo
 ```
 
 You should now be able to run `yo flowxo` to generate a service.
