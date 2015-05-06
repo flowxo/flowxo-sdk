@@ -58,15 +58,20 @@ RunUtil.displayScriptOutput = function(grunt, outputs, data) {
   var dataLabelled;
 
   function writeField(field, last) {
-    grunt.log.writeln(chalk.cyan(fieldIndent + JSON.stringify(field.label) + ': ' + JSON.stringify(field.value) + '' + (last ? '' : ',')));
+    var format = field.value === undefined ? chalk.gray : chalk.cyan;
+    grunt.log.writeln(format(fieldIndent + JSON.stringify(field.label) + ': ' + JSON.stringify(field.value) + '' + (last ? '' : ',')));
   }
 
   function writeObject(obj, last) {
-    grunt.log.writeln(chalk.cyan(objIndent + '{'));
-    for(var i = 0; i < obj.length; i++) {
-      writeField(obj[i], i === obj.length - 1);
+    if(obj.length === 0) {
+      grunt.log.writeln(chalk.cyan(objIndent + '{}' + (last ? '' : ',')));
+    } else {
+      grunt.log.writeln(chalk.cyan(objIndent + '{'));
+      for(var i = 0; i < obj.length; i++) {
+        writeField(obj[i], i === obj.length - 1);
+      }
+      grunt.log.writeln(chalk.cyan(objIndent + '}' + (last ? '' : ',')));
     }
-    grunt.log.writeln(chalk.cyan(objIndent + '}' + (last ? '' : ',')));
   }
 
   if(outputs.length) {
@@ -75,18 +80,24 @@ RunUtil.displayScriptOutput = function(grunt, outputs, data) {
 
     // If this is an array
     if(util.isArray(data)) {
-      // Set the indents
-      fieldIndent = '    ';
-      objIndent = '  ';
+      if(data.length === 0) {
+        grunt.log.writeln(chalk.cyan('[]'));
 
-      grunt.log.writeln(chalk.cyan('['));
+      } else {
+        // Set the indents
+        fieldIndent = '    ';
+        objIndent = '  ';
 
-      for(var i = 0; i < data.length; i++) {
-        dataLabelled = RunUtil.formatScriptOutput(outputs, data[i]);
-        writeObject(dataLabelled, i === data.length - 1);
+        grunt.log.writeln(chalk.cyan('['));
+
+        for(var i = 0; i < data.length; i++) {
+          dataLabelled = RunUtil.formatScriptOutput(outputs, data[i]);
+          writeObject(dataLabelled, i === data.length - 1);
+        }
+
+        grunt.log.writeln(chalk.cyan(']'));
       }
 
-      grunt.log.writeln(chalk.cyan(']'));
     } else {
       dataLabelled = RunUtil.formatScriptOutput(outputs, data);
       writeObject(dataLabelled, true);
@@ -347,6 +358,7 @@ RunUtil.runUntilStopped = function(grunt, options, cb) {
         options.runCompleted(result, method, inputs);
       }
 
+      grunt.log.writeln();
       inquirer.prompt({
         type: 'confirm',
         name: 'again',
