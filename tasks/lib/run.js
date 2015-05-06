@@ -3,13 +3,13 @@
 require('./check-deps');
 
 var util = require('util'),
-    path = require('path'),
-    inquirer = require('inquirer'),
-    chalk = require('chalk'),
-    async = require('async'),
-    chai = require('chai'),
-    FxoUtils = require('flowxo-utils'),
-    SDK = require('../../index.js');
+  path = require('path'),
+  inquirer = require('inquirer'),
+  chalk = require('chalk'),
+  async = require('async'),
+  chai = require('chai'),
+  FxoUtils = require('flowxo-utils'),
+  SDK = require('../../index.js');
 
 chai.use(SDK.Chai);
 
@@ -22,36 +22,86 @@ RunUtil.displayScriptData = function(grunt, data) {
   grunt.log.writeln(chalk.cyan(JSON.stringify(data, null, 2)));
 };
 
+/**
+ * Processes the data returned from a script
+ * into a format suitable for outputing
+ * @param  {Array} outputs Flow XO Output Field objects
+ * @param  {Object} data Data returned from script
+ * @return {Array} Processed data - either an array of fields, or an
+ * array of arrays if the incoming data
+ */
+RunUtil.formatScriptOutput = function(outputs, data) {
+
+  // Flatten the output.
+  var flattened = FxoUtils.getFlattenedFields(data);
+
+  var flattenedIdx = flattened.reduce(function(result, field) {
+    result[field.key] = field;
+    return result;
+  }, {});
+
+  return outputs.reduce(function(result, output) {
+    // Lookup the field from the data
+    var field = flattenedIdx[output.key];
+    result.push({
+      label: output.label,
+      value: field ? data[field.key] : undefined
+    });
+    return result;
+  }, []);
+};
+
 RunUtil.displayScriptOutput = function(grunt, outputs, data) {
+
+  var fieldIndent = '  ';
+  var objIndent = '';
+  var dataLabelled;
+
+  function writeField(field, last) {
+    var format = field.value === undefined ? chalk.gray : chalk.cyan;
+    grunt.log.writeln(format(fieldIndent + JSON.stringify(field.label) + ': ' + JSON.stringify(field.value) + '' + (last ? '' : ',')));
+  }
+
+  function writeObject(obj, last) {
+    if(obj.length === 0) {
+      grunt.log.writeln(chalk.cyan(objIndent + '{}' + (last ? '' : ',')));
+    } else {
+      grunt.log.writeln(chalk.cyan(objIndent + '{'));
+      for(var i = 0; i < obj.length; i++) {
+        writeField(obj[i], i === obj.length - 1);
+      }
+      grunt.log.writeln(chalk.cyan(objIndent + '}' + (last ? '' : ',')));
+    }
+  }
+
   if(outputs.length) {
-    // First create an indexed hash of fields
-    var fieldsIdx = outputs.reduce(function(data, f) {
-      data[f.key] = f;
-      return data;
-    }, {});
-
-    var labelise = function(data) {
-      // Flatten the output.
-      var flattened = FxoUtils.getFlattenedFields(data);
-
-      // Create a new object, with the key as the label from
-      // the output. If there is no output field corresponding
-      // to the data, ignore it.
-      return flattened.reduce(function(result, data) {
-        var field = fieldsIdx[data.key];
-        if(field) {
-          result[field.label] = data.value;
-        }
-        return result;
-      }, {});
-    };
-
-    var dataLabelled = util.isArray(data) ?
-      data.map(labelise) :
-      labelise(data);
 
     CommonUtil.header(grunt, 'LABELLED:', 'green');
-      grunt.log.writeln(chalk.cyan(JSON.stringify(dataLabelled, null, 2)));
+
+    // If this is an array
+    if(util.isArray(data)) {
+      if(data.length === 0) {
+        grunt.log.writeln(chalk.cyan('[]'));
+
+      } else {
+        // Set the indents
+        fieldIndent = '    ';
+        objIndent = '  ';
+
+        grunt.log.writeln(chalk.cyan('['));
+
+        for(var i = 0; i < data.length; i++) {
+          dataLabelled = RunUtil.formatScriptOutput(outputs, data[i]);
+          writeObject(dataLabelled, i === data.length - 1);
+        }
+
+        grunt.log.writeln(chalk.cyan(']'));
+      }
+
+    } else {
+      dataLabelled = RunUtil.formatScriptOutput(outputs, data);
+      writeObject(dataLabelled, true);
+    }
   }
 };
 
@@ -108,20 +158,20 @@ RunUtil.getCredentials = function(grunt, credentialsPath) {
 };
 
 RunUtil.getRunFile = function(grunt) {
-  return (grunt.option('name') || 'runs') + '.json';
+  return(grunt.option('name') || 'runs') + '.json';
 };
 
 RunUtil.run = function(grunt, options, cb) {
   var runner = options.runner,
-      service = options.service,
-      method = options.method;
+    service = options.service,
+    method = options.method;
 
   // Firstly, validate the service.
   // If it is not configured correctly, end.
   RunUtil.validateService(grunt, service);
 
   var inputs = options.inputs || [],
-      outputs = [];
+    outputs = [];
 
   var inputsPredefined = inputs.length !== 0;
 
@@ -308,6 +358,7 @@ RunUtil.runUntilStopped = function(grunt, options, cb) {
         options.runCompleted(result, method, inputs);
       }
 
+      grunt.log.writeln();
       inquirer.prompt({
         type: 'confirm',
         name: 'again',
@@ -324,8 +375,8 @@ RunUtil.runUntilStopped = function(grunt, options, cb) {
 
 RunUtil.runSingleScript = function(grunt, options, cb) {
   var runner = options.runner,
-      service = options.service,
-      method, script;
+    service = options.service,
+    method, script;
 
   // Firstly, validate the service.
   // If it is not configured correctly, end.
@@ -390,8 +441,8 @@ RunUtil.runSingleScript = function(grunt, options, cb) {
 
 RunUtil.runRecorded = function(grunt, options, cb) {
   var runFile = path.join(
-        options.runsFolder,
-        RunUtil.getRunFile(grunt));
+    options.runsFolder,
+    RunUtil.getRunFile(grunt));
 
   var tests;
   try {
@@ -418,10 +469,10 @@ RunUtil.runRecorded = function(grunt, options, cb) {
 
 RunUtil.runReplayed = function(grunt, options, cb) {
   var runner = options.runner,
-      service = options.service,
-      runFile = path.join(
-        options.runsFolder,
-        RunUtil.getRunFile(grunt));
+    service = options.service,
+    runFile = path.join(
+      options.runsFolder,
+      RunUtil.getRunFile(grunt));
 
   var tests = grunt.file.readJSON(runFile);
 
