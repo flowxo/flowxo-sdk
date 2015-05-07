@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.2] - 2015-05-07
+### Fixed
+- Fixed a bug where nested outputs were not being displayed properly (all listed as undefined previously) 
+
 ## [1.1.1] - 2015-05-06
 ### Fixed
 - Fixed a bug which occurred when `grunt run` is called on a method with a custom input script, but no regular input fields.
