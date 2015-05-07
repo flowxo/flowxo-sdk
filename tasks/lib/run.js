@@ -45,7 +45,7 @@ RunUtil.formatScriptOutput = function(outputs, data) {
     var field = flattenedIdx[output.key];
     result.push({
       label: output.label,
-      value: field ? data[field.key] : undefined
+      value: field && field.value
     });
     return result;
   }, []);

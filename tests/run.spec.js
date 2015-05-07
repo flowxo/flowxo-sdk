@@ -27,7 +27,6 @@ describe('RunUtil', function() {
       };
 
       var result = RunUtil.formatScriptOutput(outputs, data);
-      console.log(result);
       expect(result).to.be.an('array').length(4);
       expect(result[0].value).to.equal(data.key1);
       expect(result[1].value).to.be.undefined;
@@ -48,6 +47,28 @@ describe('RunUtil', function() {
       expect(result[1].label).to.equal(outputs[1].label);
       expect(result[2].label).to.equal(outputs[2].label);
       expect(result[3].label).to.equal(outputs[3].label);
+    });
+
+    it('should handle nested data',function(){
+      var nested_outputs = [{
+        key: 'top',
+        label: 'Top'
+      },{
+        key: 'nested__value',
+        label: 'Nested Value'
+      }];
+
+      var nested_data = {
+        top: 'Test Value',
+        nested:{
+          value: 'Nested Value'
+        }
+      };
+
+      var result = RunUtil.formatScriptOutput(nested_outputs,nested_data);
+      expect(result).to.be.an('array').length(2);
+      expect(result[0].value).to.equal(nested_data.top);
+      expect(result[1].value).to.equal(nested_data.nested.value);
     });
   });
 });
