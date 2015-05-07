@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.2] - 2015-05-07
+### Fixed
+- Fixed a bug in displaying nested outputs.
+
 ## [1.1.1] - 2015-05-06
 ### Fixed
 - Fixed a bug which occurred when `grunt run` is called on a method with a custom input script, but no regular input fields.
@@ -20,5 +24,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial release of the SDK.
 
+[1.1.2]: https://github.com/flowxo/flowxo-sdk/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/flowxo/flowxo-sdk/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/flowxo/flowxo-sdk/compare/v1.0.0...v1.1.0
