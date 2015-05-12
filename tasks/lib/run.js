@@ -20,8 +20,6 @@ var CommonUtil = require('./common');
 
 var RunUtil = {};
 
-var WEBHOOK_PORT = 9095;
-
 RunUtil.displayScriptData = function(grunt, data) {
   CommonUtil.header(grunt, 'DATA:', 'green');
   grunt.log.writeln(chalk.cyan(JSON.stringify(data, null, 2)));
@@ -311,7 +309,7 @@ RunUtil.run = function(grunt, options, cb) {
 
       // If it's a webhook, delegate off
       if(method.type === 'webhook') {
-        return RunUtil.runWebhook(grunt, method, function(err, result) {
+        return RunUtil.runWebhook(grunt, options, method, function(err, result) {
           callback(err, method, result || {});
         });
       }
@@ -528,15 +526,11 @@ RunUtil.runReplayed = function(grunt, options, cb) {
 
 /**
  * Run a Webhook method
- * @param  {[type]}   grunt    [description]
- * @param  {[type]}   method   [description]
- * @param  {Function} callback [description]
- * @return {[type]}            [description]
  */
-RunUtil.runWebhook = function(grunt, method, callback) {
+RunUtil.runWebhook = function(grunt, options, method, callback) {
 
   // First get a URL
-  ngrok.connect(WEBHOOK_PORT, function(err, url) {
+  ngrok.connect(options.webhookPort, function(err, url) {
     if(err) {
       return callback('Failed to get URL for Webhook: ' + err);
     }
@@ -564,13 +558,15 @@ RunUtil.runWebhook = function(grunt, method, callback) {
     var app = express();
 
     app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({extended: true}));
+    app.use(bodyParser.urlencoded({
+      extended: true
+    }));
 
-    app.post('/',function(req,res){
+    app.post('/', function(req, res) {
       res.status(200).send();
-      callback(null,req.body);
+      callback(null, req.body);
     });
-    app.listen(WEBHOOK_PORT);
+    app.listen(options.webhookPort);
 
     grunt.log.writeln('\n\rWaiting for webhook data...');
 
@@ -592,7 +588,8 @@ RunUtil.runTask = function(grunt, options) {
   var runOpts = {
     service: service,
     runner: runner,
-    runsFolder: options.runsFolder
+    runsFolder: options.runsFolder,
+    webhookPort: options.webhookPort || 9095
   };
 
   var done = this.async();
