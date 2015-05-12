@@ -9,13 +9,18 @@ var util = require('util'),
   async = require('async'),
   chai = require('chai'),
   FxoUtils = require('flowxo-utils'),
-  SDK = require('../../index.js');
+  SDK = require('../../index.js'),
+  ngrok = require('ngrok'),
+  express = require('express'),
+  bodyParser = require('body-parser');
 
 chai.use(SDK.Chai);
 
 var CommonUtil = require('./common');
 
 var RunUtil = {};
+
+var WEBHOOK_PORT = 9095;
 
 RunUtil.displayScriptData = function(grunt, data) {
   CommonUtil.header(grunt, 'DATA:', 'green');
@@ -151,8 +156,8 @@ RunUtil.validateService = function(grunt, service) {
 };
 
 RunUtil.checkRunScriptResult = function(result, method) {
-  if(method.kind === 'trigger') {
-    chai.expect(result).to.be.a.flowxo.trigger.script.output;
+  if(method.type === 'poller') {
+    chai.expect(result).to.be.a.flowxo.poller.script.output;
   } else {
     chai.expect(result).to.be.a.flowxo.script.output;
   }
@@ -303,6 +308,14 @@ RunUtil.run = function(grunt, options, cb) {
 
     // run.js
     function(method, callback) {
+
+      // If it's a webhook, delegate off
+      if(method.type === 'webhook') {
+        return RunUtil.runWebhook(grunt, method, function(err, result) {
+          callback(err, method, result || {});
+        });
+      }
+
       runner.run(method.slug, 'run', {
         input: inputs
       }, function(err, result) {
@@ -328,9 +341,6 @@ RunUtil.run = function(grunt, options, cb) {
       callback(null, method, result);
     }
   ], function(err, method, result) {
-    if(err) {
-      // RunUtil.displayScriptError(grunt,err);
-    }
     // Callback enough data so the caller can record
     // the run
     cb(err, result, method, inputs);
@@ -342,7 +352,6 @@ RunUtil.runUntilStopped = function(grunt, options, cb) {
     RunUtil.run(grunt, options, function(err, result, method, inputs) {
       if(err) {
         RunUtil.displayScriptError(grunt, err);
-        // return cb(err);
       }
 
       if(options.runCompleted) {
@@ -515,6 +524,58 @@ RunUtil.runReplayed = function(grunt, options, cb) {
       });
     });
   }, cb);
+};
+
+/**
+ * Run a Webhook method
+ * @param  {[type]}   grunt    [description]
+ * @param  {[type]}   method   [description]
+ * @param  {Function} callback [description]
+ * @return {[type]}            [description]
+ */
+RunUtil.runWebhook = function(grunt, method, callback) {
+
+  // First get a URL
+  ngrok.connect(WEBHOOK_PORT, function(err, url) {
+    if(err) {
+      return callback('Failed to get URL for Webhook: ' + err);
+    }
+    // Configuration text
+    if(method.help && method.help.webhook && method.help.webhook.config && method.help.webhook.config.length > 0) {
+      CommonUtil.header(grunt, 'Webhook Configuration');
+      method.help.webhook.config.forEach(function(line) {
+        grunt.log.writeln('* ' + line);
+      });
+    }
+
+    // URL
+    CommonUtil.header(grunt, 'Webhook URL');
+    grunt.log.writeln(chalk.cyan(url));
+
+    // Text text
+    if(method.help && method.help.webhook && method.help.webhook.test && method.help.webhook.test.length > 0) {
+      CommonUtil.header(grunt, 'Webhook Test');
+      method.help.webhook.test.forEach(function(line) {
+        grunt.log.writeln('* ' + line);
+      });
+    }
+
+    // Start an express server
+    var app = express();
+
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({extended: true}));
+
+    app.post('/',function(req,res){
+      res.status(200).send();
+      callback(null,req.body);
+    });
+    app.listen(WEBHOOK_PORT);
+
+    grunt.log.writeln('\n\rWaiting for webhook data...');
+
+  });
+
 };
 
 RunUtil.runTask = function(grunt, options) {
