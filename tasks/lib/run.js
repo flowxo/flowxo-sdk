@@ -181,7 +181,7 @@ RunUtil.run = function(grunt, options, cb) {
   var inputs = options.inputs || [],
     outputs = [];
 
-  var inputsPredefined = inputs.length !== 0;
+  var inputsPredefined = options.hasOwnProperty('inputs');
 
   var fieldPromptOptions = {
     validateRequired: false
