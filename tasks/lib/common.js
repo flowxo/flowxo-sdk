@@ -26,7 +26,21 @@ CommonUtil.promptFields = function(inputs, options, cb) {
     options.validateRequired = true;
   }
 
-  var prompts = inputs.map(function(input) {
+  // Loop through, keeping track of where we are
+  // in the input list. This is so we can modify
+  // the inputs in-place, if necessary.
+  var i = 0,
+      limit = inputs.length;
+
+  var results = {};
+
+  function doPrompt() {
+    if(i === limit) {
+      return cb(null, results);
+    }
+
+    var input = inputs[i];
+
     var prompt = {
       name: input.key,
       message: input.label,
@@ -74,12 +88,28 @@ CommonUtil.promptFields = function(inputs, options, cb) {
       prompt.default = input.default;
     }
 
-    return prompt;
-  });
+    var progress = function(results, cb) { cb(); };
 
-  inquirer.prompt(prompts, function(result) {
-    cb(null, result);
-  });
+    prompt.before = input.before || progress;
+    prompt.after = input.after || progress;
+
+    var next = function() {
+      i++;
+      doPrompt();
+    };
+
+    prompt.before(results, function(skip) {
+      if(skip) {
+        return next();
+      }
+      inquirer.prompt(prompt, function(res) {
+        results[prompt.name] = res[prompt.name];
+        prompt.after(results, next);
+      });
+    });
+  }
+
+  doPrompt();
 };
 
 module.exports = CommonUtil;

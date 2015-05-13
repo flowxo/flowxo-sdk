@@ -7,6 +7,7 @@ var util = require('util'),
   inquirer = require('inquirer'),
   chalk = require('chalk'),
   async = require('async'),
+  _ = require('lodash'),
   chai = require('chai'),
   FxoUtils = require('flowxo-utils'),
   SDK = require('../../index.js'),
@@ -241,6 +242,46 @@ RunUtil.run = function(grunt, options, cb) {
       }
 
       function doPrompts(inputSet) {
+        // If any of our fields have dependencies,
+        // we need to run the input.js when they change.
+        var inputSetIdx = _.indexBy(inputSet, 'key');
+        inputSet.forEach(function(input) {
+          if(input.dependants && input.dependants.length) {
+            input.after = function(results, done) {
+              var dataToSend = {
+                input: {
+                  target: {
+                    field: input.key,
+                    value: results[input.key]
+                  }
+                }
+              };
+              runner.run(method.slug, 'input', dataToSend, function(err, updatedInputFields) {
+                if(err) {
+                  return callback(err);
+                }
+
+                // Update the fields
+                if(updatedInputFields) {
+                  updatedInputFields.forEach(function(f) {
+                    var existingInputField = inputSetIdx[f.key];
+                    if(existingInputField) {
+                      _.assign(existingInputField, f);
+                    }
+                  });
+                }
+                done();
+              });
+            };
+
+            input.dependants.forEach(function(dependant) {
+              var field = inputSetIdx[dependant];
+              field.before = function(results, done) {
+                done(!results[input.key]);
+              };
+            });
+          }
+        });
         CommonUtil.promptFields(inputSet, fieldPromptOptions, function(err, answers) {
           if(err) {
             return callback(err);
