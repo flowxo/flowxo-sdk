@@ -2,9 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.2.2] - 2015-05-13
+### Fixed
+- User profile should be `user_profile` instead of `profile`.
+
 ## [1.2.1] - 2015-05-12
 ### Fixed
-- Fix issue with recording a test method run with empty inputs
+- Fix issue with recording a test method run with empty inputs.
 
 ## [1.2.0] - 2015-05-12
 ### Added
@@ -32,6 +36,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial release of the SDK.
 
+[1.2.2]: https://github.com/flowxo/flowxo-sdk/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/flowxo/flowxo-sdk/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/flowxo/flowxo-sdk/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/flowxo/flowxo-sdk/compare/v1.1.1...v1.1.2

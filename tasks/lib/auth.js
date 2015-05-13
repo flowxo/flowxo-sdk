@@ -119,7 +119,7 @@ AuthUtil.handlers.oauth1 = function(grunt, service, cb) {
       token_secret: token_secret,
       consumer_key: service.auth.options.consumerKey,
       consumer_secret: service.auth.options.consumerSecret,
-      profile: profile
+      user_profile: profile
     });
   };
 
@@ -144,7 +144,7 @@ AuthUtil.handlers.oauth2 = function(grunt, service, cb) {
     done(null, {
       access_token: access_token,
       refresh_token: refresh_token,
-      profile: profile
+      user_profile: profile
     });
   };
 
@@ -190,7 +190,7 @@ AuthUtil.refresh = function(grunt, options, cb) {
     done(null, {
       access_token: access_token,
       refresh_token: refresh_token,
-      profile: profile
+      user_profile: profile
     });
   };
 
