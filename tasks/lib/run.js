@@ -220,7 +220,7 @@ RunUtil.run = function(grunt, options, cb) {
       if(inputsPredefined) {
         inputs.forEach(function(input) {
           var prompt = CommonUtil.createPrompt(input);
-          grunt.log.writeln(prompt.message + ' ' + input.value);
+          grunt.log.writeln(chalk.magenta(' ' + prompt.message + ' ' + input.value));
         });
         return callback(null, method);
       }
