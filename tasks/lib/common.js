@@ -42,18 +42,21 @@ CommonUtil.createPrompt = function(input, options) {
   // Select type
   if(input.type === 'select') {
     prompt.type = 'list';
-    prompt.choices = input.input_options.map(function(choice) {
-      return {
-        name: choice.label,
-        value: choice.value
-      };
-    });
-    if(!input.required || !options.validateRequired) {
-      prompt.choices.unshift({
-        name: '(none)',
-        value: ''
+    if(input.input_options) {
+      prompt.choices = input.input_options.map(function(choice) {
+        return {
+          name: choice.label,
+          value: choice.value
+        };
       });
+      if(!input.required || !options.validateRequired) {
+        prompt.choices.unshift({
+          name: '(none)',
+          value: ''
+        });
+      }
     }
+
   } else if(input.type === 'datetime') {
     prompt.message += ' ⌚ ';
   } else if(input.type === 'boolean') {
