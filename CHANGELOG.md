@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.2.3] - 2015-05-14
+### Added
+- Input fields used when recording are now displayed when running in replay mode.
+
 ## [1.2.2] - 2015-05-13
 ### Fixed
 - User profile should be `user_profile` instead of `profile`.
@@ -36,6 +40,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial release of the SDK.
 
+[1.2.3]: https://github.com/flowxo/flowxo-sdk/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/flowxo/flowxo-sdk/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/flowxo/flowxo-sdk/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/flowxo/flowxo-sdk/compare/v1.1.2...v1.2.0
