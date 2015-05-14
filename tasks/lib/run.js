@@ -7,7 +7,6 @@ var util = require('util'),
   inquirer = require('inquirer'),
   chalk = require('chalk'),
   async = require('async'),
-  _ = require('lodash'),
   chai = require('chai'),
   FxoUtils = require('flowxo-utils'),
   SDK = require('../../index.js'),
@@ -20,6 +19,12 @@ chai.use(SDK.Chai);
 var CommonUtil = require('./common');
 
 var RunUtil = {};
+
+RunUtil.filterInputs = function(inputs) {
+  return inputs.filter(function(input) {
+    return input.value !== null && input.value !== '';
+  });
+};
 
 RunUtil.displayScriptData = function(grunt, data) {
   CommonUtil.header(grunt, 'DATA:', 'green');
@@ -188,29 +193,6 @@ RunUtil.run = function(grunt, options, cb) {
     validateRequired: false
   };
 
-  function addInputIfDefined(field, answers, custom) {
-    var ans = answers[field.key];
-
-    /* jshint eqnull: true */
-    if(ans != null && ans !== '') {
-      var f = {
-        key: field.key,
-        type: field.type || 'text',
-        value: answers[field.key],
-        custom: custom === true,
-        label: field.label
-      };
-      inputs.push(f);
-    }
-    /* jshint eqnull: false */
-  }
-
-  function addInputsIfDefined(fields, answers, custom) {
-    fields.forEach(function(field) {
-      addInputIfDefined(field, answers, custom);
-    });
-  }
-
   async.waterfall([
     // Method Selection
     function(callback) {
@@ -236,57 +218,23 @@ RunUtil.run = function(grunt, options, cb) {
       // If we've been given them, just set and move on
       if(inputsPredefined) {
         inputs.forEach(function(input) {
-          grunt.log.writeln(input.label + ': ' + input.value);
+          var prompt = CommonUtil.createPrompt(input);
+          grunt.log.writeln(prompt.message + ' ' + input.value);
+          // grunt.log.writeln(input.label + ': ' + input.value);
         });
         return callback(null, method);
       }
 
       function doPrompts(inputSet) {
-        // If any of our fields have dependencies,
-        // we need to run the input.js when they change.
-        var inputSetIdx = _.indexBy(inputSet, 'key');
-        inputSet.forEach(function(input) {
-          if(input.dependants && input.dependants.length) {
-            input.after = function(results, done) {
-              var dataToSend = {
-                input: {
-                  target: {
-                    field: input.key,
-                    value: results[input.key]
-                  }
-                }
-              };
-              runner.run(method.slug, 'input', dataToSend, function(err, updatedInputFields) {
-                if(err) {
-                  return callback(err);
-                }
-
-                // Update the fields
-                if(updatedInputFields) {
-                  updatedInputFields.forEach(function(f) {
-                    var existingInputField = inputSetIdx[f.key];
-                    if(existingInputField) {
-                      _.assign(existingInputField, f);
-                    }
-                  });
-                }
-                done();
-              });
-            };
-
-            input.dependants.forEach(function(dependant) {
-              var field = inputSetIdx[dependant];
-              field.before = function(results, done) {
-                done(!results[input.key]);
-              };
-            });
-          }
-        });
         CommonUtil.promptFields(inputSet, fieldPromptOptions, function(err, answers) {
           if(err) {
             return callback(err);
           } else {
-            addInputsIfDefined(inputSet, answers);
+            inputSet.forEach(function(input) {
+              input.value = answers[input.key];
+              input.type = input.type || 'text';
+              inputs.push(input);
+            });
             return callback(null, method);
           }
         });
@@ -327,8 +275,11 @@ RunUtil.run = function(grunt, options, cb) {
       if(!method.scripts.output) {
         return callback(null, method);
       }
+      // Filter out any empty inputs
+      var filteredInputs = RunUtil.filterInputs(inputs);
+
       runner.run(method.slug, 'output', {
-        input: inputs
+        input: filteredInputs
       }, function(err, customOutputs) {
         if(err) {
           callback(err);
@@ -355,8 +306,11 @@ RunUtil.run = function(grunt, options, cb) {
         });
       }
 
+      // Filter out any empty inputs
+      var filteredInputs = RunUtil.filterInputs(inputs);
+
       runner.run(method.slug, 'run', {
-        input: inputs
+        input: filteredInputs
       }, function(err, result) {
         if(err) {
           callback(err, method, {});
@@ -445,8 +399,11 @@ RunUtil.runSingleScript = function(grunt, options, cb) {
     },
     // Run the script
     function(inputs, callback) {
+      // Filter out any empty inputs
+      var filteredInputs = RunUtil.filterInputs(inputs);
+
       runner.run(method.slug, script, {
-        input: inputs
+        input: filteredInputs
       }, function(err, result) {
         if(err) {
           callback(err);
