@@ -492,6 +492,39 @@ You'll find the original value in `input`, a flag to say whether the boolean is 
 
 Boolean fields are most useful for custom inputs, where the `input_options` are generated from the connected service's API.
 
+#### Field dependencies
+
+An input field can be configured as a dependant of another field. This signals to the dependant field that its configuration should be loaded _dynamically_ - that is, according to the value of the parent field.
+
+This is useful for relational data, where the value of one field governs the options and/or default value of the other. You'll mostly be configuring Select Boxes as dynamic fields.
+
+This concept is best explained with an example:
+
+- Consider a set of sports leagues, with each league containing different teams. This can be modelled with two select boxes: _league_ and _team_.
+- The options for the _league_ select box are fixed. The options for the _team_ select box are dynamic, and depend upon the value of _league_.
+- Initially, the _league_ select box has no value selected, and so the _team_ select box has no options (and will be automatically hidden by the core UI).
+- When a value is selected for the _league_ select box, this value is used to calculate the options for the _team_ select box.
+- Each time the _league_ value is changed, new options are loaded for the _team_ select box.
+
+To signal that a field has dependencies, list each dependant field's key in the `dependants` array:
+
+``` js
+{
+  key: 'league',
+  label: 'League',
+  type: 'select',
+  input_options: [
+    { value: 'prem', label: 'Premier League' },
+    { value: 'champ', label: 'Championship' }
+  ],
+  dependants: ['team']
+}
+```
+
+Note that you _should not_ list the dependant field in `config.js`, this should instead be returned as a custom field from `input.js`.
+
+You'll be using the `input.js` script to calcluate and return the dependant field, rather than listing it in `config.js`. See the section _input.js -> Loading dependant fields_ for more details.
+
 ### Output Fields
 
 Output fields should be provided as an array of objects that describe what data the script will output (its output 'properties').
@@ -523,6 +556,83 @@ See the section _Double Underscore Notation_ for more details.
 Sometimes it's necessary to generate fields at runtime. As an example, if our method has an input _User_, then it's usually best to load up a list of users into a select box rather than expect a user ID. We won't know who those users are until the account has been authorized, and that list might change from time to time.
 
 So the way forward is to use an `input.js` script. The script is very similar to `run.js`, except it either returns an error, or an array of input fields on success. See the section _Input Fields_ for the format of the array you should return.
+
+### Loading dependant fields
+
+If your service includes dependant fields, `input.js` is also the place where you'll be calculating the dynamic configuration of the field.
+
+You'll know that `input.js` is being run to load a dependant field by the presence of a `target` property in the input data. If `target` is present, check the `target.field` property to determine the field that changed, and find the field's new value in `target.value`. Combine this information to load the dependant field(s).
+
+_Note: when calculating and returning a dependant field, don't return any other custom fields. The core will take care of merging the newly configured dependant field with the rest of the input fields._
+
+Here is an example of loading a dependant field.
+
+``` js
+// config.js
+...
+fields: {
+  input: [{
+    key: 'league',
+    label: 'League',
+    type: 'select',
+    input_options: [
+      { value: 'prem', label: 'Premier League' },
+      { value: 'champ', label: 'Championship' }
+    ],
+    dependants: ['team']
+  }]
+}
+...
+
+
+// input.js
+'use strict';
+
+module.exports = function(options, done) {
+  var teamOptions = [];
+
+  var target = options.input && options.input.target;
+
+  if(target) {
+    // Try to fetch the team options.
+    if(target.field === 'league') {
+      // In real life, we'd likely now hit an API
+      // to fetch the teamOptions, but here just
+      // fill in with dummy data.
+      if(target.value === 'prem') {
+        teamOptions = [{
+          label: 'Chelsea',
+          value: 'chelsea'
+        }, {
+          label: 'Manchester United',
+          value: 'man-utd'
+        }];
+
+      } else if (target.value === 'champ') {
+        teamOptions = [{
+          label: 'Bristol City',
+          value: 'bristol-city'
+        }, {
+          label: 'Nottingham Forest',
+          value: 'notts-forest'
+        }];
+      }
+    }
+  }
+
+  done(null, [{
+    key: 'team',
+    label: 'Team',
+    description: 'Select the team.',
+    required: true,
+    type: 'select',
+    input_options: teamOptions
+  }]);
+};
+
+```
+
+Notice that the `teamOptions` is only populated if the `target` input is present. Otherwise, the team field is returned with empty options.
 
 ## output.js
 
@@ -1088,35 +1198,22 @@ var personUrl = 'https://my.service.com/persons/' + options.person_id
 
 If `options.person_id` is `undefined`, or contains spaces, or isn't alphanumeric, we should immediately abort.
 
-To perform this sort of validation, we recommend using [validate.js](http://rickharrison.github.io/validate.js/). This could be implemented in the following way:
+To perform this sort of validation, the SDK provides a set of helper methods based on the [validate.js](http://rickharrison.github.io/validate.js/) library.
+
+There are two methods available on the service:
+
+- `service.validate`: exposes the `validate.js` object and therefore provides the entire `validate.js` API.
+- `service.validateScriptInput(data, constrainsts, options)`: runs the passed data through the validator, returning any errors as an instance of `sdk.Error.ServiceError`. This is a convenience wrapper around the `service.validate` method, which is useful for validating script input data, as any returned error can be passed straight to the `done` handler of the script.
+
+Here is an example of using the `validateScriptInput` method in a script.
 
 ``` js
-// index.js
-
-var sdk = require('flowxo-sdk');
-var validate = require('validate.js'); // npm install --save validate.js
-var service = new sdk.Service({
-  //...
-});
-//...
-
-/**
- * Validate the data according to the constraints and return an
- * error suitable for sending back to the core, if required
- */
-service.validate = function(data, constraints) {
-  var errors = validate(data, constraints, { flatten: true });
-  if(errors) {
-    return new sdk.Error.ServiceError(errors.join('. '));
-  }
-}
-
 
 // run.js
 
-module.exports = function(options,done){
+module.exports = function(options, done){
   // Input validation
-  var inputErr = this.validate(options.input, {
+  var inputErr = this.validateScriptInput(options.input, {
     person_id: { presence: true, numericality: true }
   });
 
@@ -1126,6 +1223,35 @@ module.exports = function(options,done){
 
   // Else carry on safe in the knowledge options.person_id is
   // there and is a number
+}
+```
+
+The built-in validator applies some sane defaults to `validate.js`, namely:
+
+- format: 'flat'
+- fullMessages: true
+
+### Validating Datetime and Boolean fields
+
+The SDK also provides two custom validators for dealing with Flow XO Datetime and Boolean fields. Use them as follows:
+
+``` js
+// run.js
+
+module.exports = function(options, done){
+  // Input validation
+  var inputErr = this.validateScriptInput(options.input, {
+    required_due_date: { fxoDatetime: { required: true } },
+    optional_due_date: { fxoDatetime: true },
+    required_boolean: { fxoBoolean: { required: true } },
+    optional_boolean: { fxoBoolean: true },
+  });
+
+  if(inputErr){
+    return done(inputErr);
+  }
+
+  // ...
 }
 ```
 
