@@ -231,9 +231,11 @@ RunUtil.run = function(grunt, options, cb) {
             return callback(err);
           } else {
             inputSet.forEach(function(input) {
-              input.value = answers[input.key];
-              input.type = input.type || 'text';
-              inputs.push(input);
+              // Make a copy of the input
+              var i = util._extend({},input);
+              i.value = answers[input.key];
+              i.type = input.type || 'text';
+              inputs.push(i);
             });
             return callback(null, method);
           }
