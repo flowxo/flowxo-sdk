@@ -16,6 +16,59 @@ CommonUtil.header = function(grunt, msg, color) {
   grunt.log.writeln(line);
 };
 
+CommonUtil.createPrompt = function(input, options) {
+  options = options || {};
+
+  var prompt = {
+    name: input.key,
+    message: input.label,
+    type: 'input'
+  };
+
+  if(input.description) {
+    prompt.message += ' [' + input.description + ']';
+  }
+
+  // Required
+  if(input.required) {
+    prompt.message = prompt.message + '*';
+    if(options.validateRequired) {
+      prompt.validate = function(item) {
+        return !!item;
+      };
+    }
+  }
+
+  // Select type
+  if(input.type === 'select') {
+    prompt.type = 'list';
+    prompt.choices = input.input_options.map(function(choice) {
+      return {
+        name: choice.label,
+        value: choice.value
+      };
+    });
+    if(!input.required || !options.validateRequired) {
+      prompt.choices.unshift({
+        name: '(none)',
+        value: ''
+      });
+    }
+  } else if(input.type === 'datetime') {
+    prompt.message += ' ⌚ ';
+  } else if(input.type === 'boolean') {
+    prompt.message += ' ☯ ';
+  }
+
+  prompt.message = prompt.message += ':';
+
+  if(input.default) {
+    prompt.default = input.default;
+  }
+
+  return prompt;
+};
+
 CommonUtil.promptFields = function(inputs, options, cb) {
   if(arguments.length === 2) {
     cb = options;
@@ -27,54 +80,7 @@ CommonUtil.promptFields = function(inputs, options, cb) {
   }
 
   var prompts = inputs.map(function(input) {
-    var prompt = {
-      name: input.key,
-      message: input.label,
-      type: 'input'
-    };
-
-    if(input.description) {
-      prompt.message += ' [' + input.description + ']';
-    }
-
-    // Required
-    if(input.required) {
-      prompt.message = prompt.message + '*';
-      if(options.validateRequired) {
-        prompt.validate = function(item) {
-          return !!item;
-        };
-      }
-    }
-
-    // Select type
-    if(input.type === 'select') {
-      prompt.type = 'list';
-      prompt.choices = input.input_options.map(function(choice) {
-        return {
-          name: choice.label,
-          value: choice.value
-        };
-      });
-      if(!input.required || !options.validateRequired) {
-        prompt.choices.unshift({
-          name: '(none)',
-          value: ''
-        });
-      }
-    } else if(input.type === 'datetime') {
-      prompt.message += ' ⌚ ';
-    } else if(input.type === 'boolean') {
-      prompt.message += ' ☯ ';
-    }
-
-    prompt.message = prompt.message += ':';
-
-    if(input.default) {
-      prompt.default = input.default;
-    }
-
-    return prompt;
+    return CommonUtil.createPrompt(input, options);
   });
 
   inquirer.prompt(prompts, function(result) {

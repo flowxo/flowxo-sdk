@@ -20,6 +20,12 @@ var CommonUtil = require('./common');
 
 var RunUtil = {};
 
+RunUtil.filterInputs = function(inputs) {
+  return inputs.filter(function(input) {
+    return input.value !== null && input.value !== '';
+  });
+};
+
 RunUtil.displayScriptData = function(grunt, data) {
   CommonUtil.header(grunt, 'DATA:', 'green');
   grunt.log.writeln(chalk.cyan(JSON.stringify(data, null, 2)));
@@ -179,6 +185,7 @@ RunUtil.run = function(grunt, options, cb) {
   RunUtil.validateService(grunt, service);
 
   var inputs = options.inputs || [],
+    filteredInputs = [],
     outputs = [];
 
   var inputsPredefined = options.hasOwnProperty('inputs');
@@ -186,29 +193,6 @@ RunUtil.run = function(grunt, options, cb) {
   var fieldPromptOptions = {
     validateRequired: false
   };
-
-  function addInputIfDefined(field, answers, custom) {
-    var ans = answers[field.key];
-
-    /* jshint eqnull: true */
-    if(ans != null && ans !== '') {
-      var f = {
-        key: field.key,
-        type: field.type || 'text',
-        value: answers[field.key],
-        custom: custom === true,
-        label: field.label
-      };
-      inputs.push(f);
-    }
-    /* jshint eqnull: false */
-  }
-
-  function addInputsIfDefined(fields, answers, custom) {
-    fields.forEach(function(field) {
-      addInputIfDefined(field, answers, custom);
-    });
-  }
 
   async.waterfall([
     // Method Selection
@@ -235,7 +219,8 @@ RunUtil.run = function(grunt, options, cb) {
       // If we've been given them, just set and move on
       if(inputsPredefined) {
         inputs.forEach(function(input) {
-          grunt.log.writeln(input.label + ': ' + input.value);
+          var prompt = CommonUtil.createPrompt(input);
+          grunt.log.writeln(prompt.message + ' ' + input.value);
         });
         return callback(null, method);
       }
@@ -245,7 +230,11 @@ RunUtil.run = function(grunt, options, cb) {
           if(err) {
             return callback(err);
           } else {
-            addInputsIfDefined(inputSet, answers);
+            inputSet.forEach(function(input) {
+              input.value = answers[input.key];
+              input.type = input.type || 'text';
+              inputs.push(input);
+            });
             return callback(null, method);
           }
         });
@@ -277,6 +266,12 @@ RunUtil.run = function(grunt, options, cb) {
       }
     },
 
+    function(method, callback) {
+      // Filter out any empty inputs
+      filteredInputs = RunUtil.filterInputs(inputs);
+      callback(null, method);
+    },
+
     // output.js
     function(method, callback) {
       if(method.fields.output) {
@@ -286,8 +281,9 @@ RunUtil.run = function(grunt, options, cb) {
       if(!method.scripts.output) {
         return callback(null, method);
       }
+
       runner.run(method.slug, 'output', {
-        input: inputs
+        input: filteredInputs
       }, function(err, customOutputs) {
         if(err) {
           callback(err);
@@ -315,7 +311,7 @@ RunUtil.run = function(grunt, options, cb) {
       }
 
       runner.run(method.slug, 'run', {
-        input: inputs
+        input: filteredInputs
       }, function(err, result) {
         if(err) {
           callback(err, method, {});
