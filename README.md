@@ -492,7 +492,7 @@ You'll find the original value in `input`, a flag to say whether the boolean is 
 
 Boolean fields are most useful for custom inputs, where the `input_options` are generated from the connected service's API.
 
-#### Field dependencies
+#### Field Dependencies
 
 An input field can be configured as a dependant of another field. This signals to the dependant field that its configuration should be loaded _dynamically_ - that is, according to the value of the parent field.
 
@@ -523,7 +523,7 @@ To signal that a field has dependencies, list each dependant field's key in the 
 
 Note that you _should not_ list the dependant field in `config.js`, this should instead be returned as a custom field from `input.js`.
 
-You'll be using the `input.js` script to calcluate and return the dependant field, rather than listing it in `config.js`. See the section _input.js -> Loading dependant fields_ for more details.
+You'll be using the `input.js` script to calcluate and return the dependant field, rather than listing it in `config.js`. See the section _input.js > Loading dependant fields_ for more details.
 
 ### Output Fields
 
@@ -557,7 +557,7 @@ Sometimes it's necessary to generate fields at runtime. As an example, if our me
 
 So the way forward is to use an `input.js` script. The script is very similar to `run.js`, except it either returns an error, or an array of input fields on success. See the section _Input Fields_ for the format of the array you should return.
 
-### Loading dependant fields
+### Loading Dependant Fields
 
 If your service includes dependant fields, `input.js` is also the place where you'll be calculating the dynamic configuration of the field.
 
@@ -1231,7 +1231,7 @@ The built-in validator applies some sane defaults to `validate.js`, namely:
 - format: 'flat'
 - fullMessages: true
 
-### Validating Datetime and Boolean fields
+### Validating Datetime and Boolean Fields
 
 The SDK also provides two custom validators for dealing with Flow XO Datetime and Boolean fields. Use them as follows:
 
@@ -1371,8 +1371,6 @@ describe('Get Person',function(){
 ```
 
 # Submitting your Service
-
-# Workflow
 
 Before you submit your service to us, please work through this checklist:
 
