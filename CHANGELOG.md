@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.0] - 2015-05-18
+### Added
+- Support dependant input fields - field config which depends upon the values of parent fields.
+- Validation helper methods.
+
 ## [1.2.3] - 2015-05-14
 ### Added
 - Input fields used when recording are now displayed when running in replay mode.
@@ -40,6 +45,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial release of the SDK.
 
+[1.3.0]: https://github.com/flowxo/flowxo-sdk/compare/v1.2.3...v1.3.0
 [1.2.3]: https://github.com/flowxo/flowxo-sdk/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/flowxo/flowxo-sdk/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/flowxo/flowxo-sdk/compare/v1.2.0...v1.2.1
