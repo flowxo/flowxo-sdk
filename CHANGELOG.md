@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.1] - 2015-05-19
+### Fixed
+- Ensure that method config always defines a run script.
+
 ## [1.3.0] - 2015-05-18
 ### Added
 - Support dependant input fields - field config which depends upon the values of parent fields.
