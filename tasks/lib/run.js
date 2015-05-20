@@ -176,6 +176,94 @@ RunUtil.getRunFile = function(grunt) {
   return(grunt.option('name') || 'runs') + '.json';
 };
 
+RunUtil.harvestInputs = function(grunt, runner, method, inputs, callback) {
+  var fieldPromptOptions = {
+    validateRequired: false
+  };
+
+  function doPrompts(inputSet) {
+    // If any of our fields have dependencies,
+    // we need to run the input.js when they change.
+    var inputSetIdx = _.indexBy(inputSet, 'key');
+    inputSet.forEach(function(input) {
+      if(input.dependants && input.dependants.length) {
+        input.after = function(results, done) {
+          var dataToSend = {
+            input: {
+              target: {
+                field: input.key,
+                value: results[input.key]
+              }
+            }
+          };
+          runner.run(method.slug, 'input', dataToSend, function(err, updatedInputFields) {
+            if(err) {
+              return callback(err);
+            }
+
+            // Update the fields
+            if(updatedInputFields) {
+              updatedInputFields.forEach(function(f) {
+                var existingInputField = inputSetIdx[f.key];
+                if(existingInputField) {
+                  _.assign(existingInputField, f);
+                }
+              });
+            }
+            done();
+          });
+        };
+
+        input.dependants.forEach(function(dependant) {
+          var field = inputSetIdx[dependant];
+          field.before = function(results, done) {
+            done(!results[input.key]);
+          };
+        });
+      }
+    });
+    CommonUtil.promptFields(inputSet, fieldPromptOptions, function(err, answers) {
+      if(err) {
+        return callback(err);
+      } else {
+        inputSet.forEach(function(input) {
+          // Make a copy of the input
+          var i = util._extend({},input);
+          i.value = answers[input.key];
+          i.type = input.type || 'text';
+          inputs.push(i);
+        });
+        return callback(null, inputs);
+      }
+    });
+  }
+
+  if(!method.scripts.input) {
+    // If we are here, there must be some static inputs but no custom
+    doPrompts(method.fields.input);
+  } else {
+    runner.run(method.slug, 'input', function(err, customInputFields) {
+      if(err) {
+        return callback(err);
+      }
+
+      try {
+        chai.expect(customInputFields).to.be.flowxo.input.fields;
+      } catch(e) {
+        grunt.fail.fatal('Error in return from input.js script: ' + e.toString());
+      }
+      var combinedInputs = [];
+      if(method.fields.input) {
+        combinedInputs = combinedInputs.concat(method.fields.input);
+      }
+      if(customInputFields) {
+        combinedInputs = combinedInputs.concat(customInputFields);
+      }
+      doPrompts(combinedInputs);
+    });
+  }
+};
+
 RunUtil.run = function(grunt, options, cb) {
   var runner = options.runner,
     service = options.service,
@@ -190,10 +278,6 @@ RunUtil.run = function(grunt, options, cb) {
     outputs = [];
 
   var inputsPredefined = options.hasOwnProperty('inputs');
-
-  var fieldPromptOptions = {
-    validateRequired: false
-  };
 
   async.waterfall([
     // Method Selection
@@ -226,87 +310,14 @@ RunUtil.run = function(grunt, options, cb) {
         return callback(null, method);
       }
 
-      function doPrompts(inputSet) {
-        // If any of our fields have dependencies,
-        // we need to run the input.js when they change.
-        var inputSetIdx = _.indexBy(inputSet, 'key');
-        inputSet.forEach(function(input) {
-          if(input.dependants && input.dependants.length) {
-            input.after = function(results, done) {
-              var dataToSend = {
-                input: {
-                  target: {
-                    field: input.key,
-                    value: results[input.key]
-                  }
-                }
-              };
-              runner.run(method.slug, 'input', dataToSend, function(err, updatedInputFields) {
-                if(err) {
-                  return callback(err);
-                }
+      // Otherwise, harvest the inputs.
+      RunUtil.harvestInputs(grunt, runner, method, inputs, function(err) {
+        if(err) {
+          return callback(err);
+        }
 
-                // Update the fields
-                if(updatedInputFields) {
-                  updatedInputFields.forEach(function(f) {
-                    var existingInputField = inputSetIdx[f.key];
-                    if(existingInputField) {
-                      _.assign(existingInputField, f);
-                    }
-                  });
-                }
-                done();
-              });
-            };
-
-            input.dependants.forEach(function(dependant) {
-              var field = inputSetIdx[dependant];
-              field.before = function(results, done) {
-                done(!results[input.key]);
-              };
-            });
-          }
-        });
-        CommonUtil.promptFields(inputSet, fieldPromptOptions, function(err, answers) {
-          if(err) {
-            return callback(err);
-          } else {
-            inputSet.forEach(function(input) {
-              // Make a copy of the input
-              var i = util._extend({},input);
-              i.value = answers[input.key];
-              i.type = input.type || 'text';
-              inputs.push(i);
-            });
-            return callback(null, method);
-          }
-        });
-      }
-
-      if(!method.scripts.input) {
-        // If we are here, there must be some static inputs but no custom
-        doPrompts(method.fields.input);
-      } else {
-        runner.run(method.slug, 'input', function(err, customInputFields) {
-          if(err) {
-            return callback(err);
-          }
-
-          try {
-            chai.expect(customInputFields).to.be.flowxo.input.fields;
-          } catch(e) {
-            grunt.fail.fatal('Error in return from input.js script: ' + e.toString());
-          }
-          var combinedInputs = [];
-          if(method.fields.input) {
-            combinedInputs = combinedInputs.concat(method.fields.input);
-          }
-          if(customInputFields) {
-            combinedInputs = combinedInputs.concat(customInputFields);
-          }
-          doPrompts(combinedInputs);
-        });
-      }
+        callback(null, method);
+      });
     },
 
     function(method, callback) {
@@ -419,10 +430,6 @@ RunUtil.runSingleScript = function(grunt, options, cb) {
   // If it is not configured correctly, end.
   RunUtil.validateService(grunt, service);
 
-  var fieldPromptOptions = {
-    validateRequired: false
-  };
-
   async.waterfall([
     // Get a method
     RunUtil.promptMethod.bind(RunUtil, service),
@@ -435,16 +442,20 @@ RunUtil.runSingleScript = function(grunt, options, cb) {
     function(userScript, callback) {
       // If it's a run script, do some inputs
       script = userScript;
-      if(userScript === 'run' && method.fields.input) {
-        RunUtil.promptFields(method.fields.input, fieldPromptOptions, callback);
+      if((userScript === 'run' || userScript === 'output') &&
+         (method.fields.input || method.scripts.input)) {
+        var inputs = (method.fields && method.fields.input) || [];
+        RunUtil.harvestInputs(grunt, runner, method, inputs, callback);
       } else {
-        callback(null, {});
+        callback(null, []);
       }
     },
     // Run the script
     function(inputs, callback) {
+      // Remove any empty inputs
+      var filteredInputs = RunUtil.filterInputs(inputs || []);
       runner.run(method.slug, script, {
-        input: inputs
+        input: filteredInputs
       }, function(err, result) {
         if(err) {
           callback(err);
