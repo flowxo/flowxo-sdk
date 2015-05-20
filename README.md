@@ -63,11 +63,28 @@ service_name
         |-- output.js - optional, returns dynamic output fields
       |-- another_method/
         |-- ...
+  |-- runs/  - created when test runs are recorded
   |-- tests/ - contains files used to run service for testing
 ```
 You'll see many other files and directories, for example a `tests` directory where you can store your unit tests.
 
 The service expects files to remain in their default locations, so try not to move things around unless you know what you are doing.
+
+# Code Conventions
+
+You'll notice that we use the following code conventions, and services should be written to adhere to these guidelines:
+
+- Indent with 2 spaces
+- Use single quote marks
+- Line length no longer than 80 characters
+- Always use semicolons
+- Always wrap `if` statements in curly braces
+
+A `.jshintrc` file is scaffolded by the generator into the root of the service module. This can be used in conjunction with [JSHint](http://jshint.com/) to ensure your code conforms to the expected code conventions. You can also run `grunt jshint` to check that your code conforms.
+
+You can also automatically 'beautify' your code to fit these code conventions. Run `grunt jsbeautifier` to apply this to your code.
+
+If in doubt, consult the example services for more details on the conventions that we expect.
 
 # Requiring the SDK
 
@@ -1377,6 +1394,7 @@ Before you submit your service to us, please work through this checklist:
 - Share details of a developer/test account with us, ready to run your tests through (include details in `README.md`).
 - Make sure your service has good unit tests.
 - Include a set of `grunt run` tests that we can `grunt run --replay` to see your methods working well.  We need to see your methods dealing with a variety of input (both valid and invalid). It's best to [get in touch](mailto:support@flowxo.com) with us at this stage so we can explain what you need to do here.
+- Run `grunt preflight` to ensure that your unit tests all pass, code conforms to the specified code conventions, and is 'beautified'.
 - If there's anything else we need to consider when reviewing your service, it should be included in `README.md`.
 
 To submit, please [email us](mailto:support@flowxo.com) with details of the service you've built and your contact details, and we'll explain what to do next. Thanks for supporting Flow XO!
