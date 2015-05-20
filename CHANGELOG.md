@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.2] - 2015-05-20
+### Fixed
+- `grunt run --single` now works correctly, and for dynamic inputs.
+
 ## [1.3.1] - 2015-05-19
 ### Fixed
 - Ensure that method config always defines a run script.
@@ -49,6 +53,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial release of the SDK.
 
+[1.3.2]: https://github.com/flowxo/flowxo-sdk/compare/v1.3.1...v1.3.2
+[1.3.1]: https://github.com/flowxo/flowxo-sdk/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/flowxo/flowxo-sdk/compare/v1.2.3...v1.3.0
 [1.2.3]: https://github.com/flowxo/flowxo-sdk/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/flowxo/flowxo-sdk/compare/v1.2.1...v1.2.2
