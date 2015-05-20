@@ -1,15 +1,12 @@
 {
   "name": "flowxo-sdk",
   "version": "1.3.2",
-  "description": "An SDK for developing Flow XO Services.",
+  "description": "SDK for developing Flow XO Services.",
   "main": "index.js",
   "scripts": {
     "test": "grunt test"
   },
-  "author": {
-    "name": "Joe Woodhouse",
-    "email": "joewoodhouse30@gmail.com"
-  },
+  "author": "Flow XO <support@flowxo.com>",
   "contributors": [
     {
       "name": "Joe Woodhouse",
@@ -54,5 +51,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/flowxo/flowxo-sdk"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/flowxo/flowxo-sdk/issues"
+  },
+  "license": "MIT"
 }
