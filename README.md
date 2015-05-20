@@ -846,6 +846,12 @@ var config = {
   slug: 'a_webhook_trigger',
   type: 'webhook',
   kind: 'trigger',
+  scripts: {
+    run: require('./run')
+  },
+  fields: {
+    output: [...]
+  },
   help: {
     webhook: {
       config: [
@@ -860,6 +866,54 @@ var config = {
   ...
 }
 ```
+
+This configuration will automatically be scaffolded when you choose a _Webhook Trigger_ from the list when running `yo flowxo:method`.
+
+### Fields
+
+A webhook trigger cannot supply any input fields, but it should define its expected output fields in the configuration. This should match up with the format expected to be sent by the service.
+
+### Run Script
+
+Notice that a webhook trigger also has a `run.js` file, just like a poller trigger or an action. This allows you to manipulate the data received from the webhook before triggering a workflow, into the format defined by the output fields config.
+
+As an example:
+
+``` js
+// config.js
+{
+  ...
+  fields: {
+    output: [{
+      key: 'fullname',
+      label: 'Full Name'
+    }]
+  }
+  ...
+}
+
+// run.js
+module.exports = function(options, done) {
+  var received = options.input;
+
+  // Manipulate the received data into the format we expect
+  var data = {
+    fullname: received.first_name + ' ' + received.last_name
+  }
+
+  done(null, data);
+};
+```
+
+The `run.js` script is mandatory for a webhook trigger. If you don't need to manipulate the data, simply pass it straight through.
+
+``` js
+module.exports = function(options, done) {
+  done(null, options.input);
+};
+```
+
+### Help Instructions
 
 You should provide a `help` property to tell the user how to configure the webhook in your service. `help.webhook.config` and `help.webhook.test` accept an array of paragraphs which will be displayed to the user when the service is being set up.
 
