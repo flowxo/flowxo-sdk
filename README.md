@@ -566,7 +566,7 @@ If a script outputs nested data, you should describe your keys using 'double und
 }
 ```
 
-See the section _Double Underscore Notation_ for more details.
+Note that the SDK will take care of flattening and unflattening the actual data, so you do not need to worry about implementing this. Simply refer to your nested data using the double underscore notation, and the SDK will take care of the rest. See the section _Double Underscore Notation_ for more details.
 
 ## input.js
 
@@ -723,7 +723,7 @@ All the keys that your script might output should be included in the output fiel
 
 ## Double Underscore Notation
 
-Output data in Flow XO can be referenced in your output fields using _double underscore notation_.  For example, take this object:
+Output data in Flow XO can be referenced in your output fields using _double underscore notation_.  For example, take this data returned from an API:
 
 ``` js
 {
@@ -771,7 +771,7 @@ This object's data can be referenced using these keys:
 }
 ```
 
-So to include output fields for _Deal Name_ and _Deal Person_ in your method's `config.js`, you would use:
+So to include output fields for _Deal Name_ and _Deal Person_ in your method's `config.js` or `output.js`, you would use:
 
 ```
 [{
@@ -785,6 +785,8 @@ So to include output fields for _Deal Name_ and _Deal Person_ in your method's `
 ```
 
 You'll see that arrays are indexed from 0 - so `people__0__name` refers to the `name` property in the first item of the `people` array. Some APIs may return an arbitrary number of items in an array, but the config only supports addressing a fixed amount. Enter as many indexes as is reasonable for the particular service you are developing.
+
+_Note: when implementing your scripts, expect and return data in regular 'nested' form, i.e. don't worry about flattening or unflattening data. The double underscore notation is only used for the output configuration._  
 
 ## Polling
 
