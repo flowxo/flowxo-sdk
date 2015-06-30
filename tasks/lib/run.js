@@ -267,7 +267,8 @@ RunUtil.harvestInputs = function(grunt, runner, method, inputs, callback) {
 RunUtil.run = function(grunt, options, cb) {
   var runner = options.runner,
     service = options.service,
-    method = options.method;
+    method = options.method,
+    result;
 
   // Firstly, validate the service.
   // If it is not configured correctly, end.
@@ -285,20 +286,23 @@ RunUtil.run = function(grunt, options, cb) {
       if(typeof method !== 'undefined') {
         method = service.getMethod(method);
         CommonUtil.header(grunt, 'Method: ' + method.name);
-        callback(null, method);
+        callback();
       } else {
         CommonUtil.header(grunt, 'Method Selection');
-        RunUtil.promptMethod(service, callback);
+        RunUtil.promptMethod(service, function(err, m) {
+          method = m;
+          callback();
+        });
       }
     },
 
     // Inputs
-    function(method, callback) {
+    function(callback) {
       // First determine whether we're going to do anything at all
       if((method.fields.input && method.fields.input.length) || method.scripts.input) {
         CommonUtil.header(grunt, 'Input Fields');
       } else {
-        return callback(null, method);
+        return callback();
       }
 
       // If we've been given them, just set and move on
@@ -307,33 +311,26 @@ RunUtil.run = function(grunt, options, cb) {
           var prompt = CommonUtil.createPrompt(input);
           grunt.log.writeln(chalk.magenta(' ' + prompt.message + ' ' + input.value));
         });
-        return callback(null, method);
+        return callback();
       }
 
       // Otherwise, harvest the inputs.
       RunUtil.harvestInputs(grunt, runner, method, inputs, function(err) {
-        if(err) {
-          return callback(err);
-        }
-
-        callback(null, method);
+        callback(err);
       });
     },
 
-    function(method, callback) {
+    function(callback) {
       // Filter out any empty inputs
       filteredInputs = RunUtil.filterInputs(inputs);
-      callback(null, method);
-    },
 
-    // output.js
-    function(method, callback) {
+      // output.js
       if(method.fields.output) {
         outputs = outputs.concat(method.fields.output);
       }
 
       if(!method.scripts.output) {
-        return callback(null, method);
+        return callback();
       }
 
       runner.run(method.slug, 'output', {
@@ -349,34 +346,27 @@ RunUtil.run = function(grunt, options, cb) {
           }
 
           outputs = outputs.concat(customOutputs);
-          callback(null, method);
+          callback();
         }
       });
     },
 
     // run.js
-    function(method, callback) {
+    function(callback) {
 
       // If it's a webhook, delegate off
       if(method.type === 'webhook') {
-        return RunUtil.runWebhook(grunt, options, method, function(err, result) {
-          callback(err, method, result || {});
-        });
+        return RunUtil.runWebhook(grunt, options, method, callback);
       }
 
-      runner.run(method.slug, 'run', {
-        input: filteredInputs
-      }, function(err, result) {
-        if(err) {
-          callback(err, method, {});
-        } else {
-          callback(null, method, result);
-        }
-      });
+      // Otherwise, run the method
+      runner.run(method.slug, 'run', { input: filteredInputs }, callback);
     },
 
     // validation and output
-    function(method, result, callback) {
+    function(r, callback) {
+      result = r || {};
+
       RunUtil.displayScriptData(grunt, result);
       RunUtil.displayScriptOutput(grunt, outputs, result);
 
@@ -386,9 +376,9 @@ RunUtil.run = function(grunt, options, cb) {
         CommonUtil.header(grunt, 'VALIDATION:', 'red');
         grunt.fail.fatal(e);
       }
-      callback(null, method, result);
+      callback();
     }
-  ], function(err, method, result) {
+  ], function(err, result) {
     // Callback enough data so the caller can record
     // the run
     cb(err, result, method, inputs);
