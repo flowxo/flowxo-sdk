@@ -1271,7 +1271,7 @@ var personUrl = 'https://my.service.com/persons/' + options.person_id
 
 If `options.person_id` is `undefined`, or contains spaces, or isn't alphanumeric, we should immediately abort.
 
-To perform this sort of validation, the SDK provides a set of helper methods based on the [validate.js](http://rickharrison.github.io/validate.js/) library.
+To perform this sort of validation, the SDK provides a set of helper methods based on the [validate.js](http://validatejs.org/) library.
 
 There are two methods available on the service:
 
