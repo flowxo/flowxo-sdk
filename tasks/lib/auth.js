@@ -9,7 +9,9 @@ var open = require('open'),
     url = require('url'),
     passport = require('passport'),
     refresh = require('passport-oauth2-refresh'),
-    SDK = require('../../index.js');
+    SDK = require('../../index.js'),
+    fs = require('fs'),
+    https = require('https');
 
 var CommonUtil = require('./common');
 
@@ -69,6 +71,7 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
   var strategy = new service.auth.strategy(options, formatCreds);
   passport.use(name, strategy);
 
+  var httpsServer;
   var app = express();
   app.use(session({
     secret: crypto.randomBytes(64).toString('hex'),
@@ -77,6 +80,7 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
   }));
 
   app.use(passport.initialize());
+  app.enable("trust proxy");
 
   app.get(route, passport.authorize(name, service.auth.params));
 
@@ -85,7 +89,24 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
     cb(null, req.account);
   });
 
-  app.listen(OAUTH_SERVER_PORT);
+  if (OAUTH_SERVER_URL.indexOf('https://') === 0) {
+
+    grunt.log.writeln(['Using SSL Server for Auth']);
+    
+    var sslOptions = {
+      key: fs.readFileSync('key.pem'),
+      cert: fs.readFileSync('cert.pem'),
+      requestCert: false,
+      rejectUnauthorized: false
+    };
+
+    httpsServer = https.createServer(sslOptions,app);
+    httpsServer.listen(OAUTH_SERVER_PORT);
+
+
+  }else{
+    app.listen(OAUTH_SERVER_PORT);
+  }
 
   var userUrl = url.format({
     protocol: serverUrl.protocol,
