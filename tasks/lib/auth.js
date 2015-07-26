@@ -9,9 +9,7 @@ var open = require('open'),
     url = require('url'),
     passport = require('passport'),
     refresh = require('passport-oauth2-refresh'),
-    SDK = require('../../index.js'),
-    fs = require('fs'),
-    https = require('https');
+    SDK = require('../../index.js');
 
 var CommonUtil = require('./common');
 
@@ -54,6 +52,9 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
   var cbRoute = route + '/callback';
 
   // Calculate the callbackURL for the request
+  if (process.env.OAUTH_SERVER_PORT == 0) {
+    process.env.OAUTH_SERVER_PORT = process.env.PORT;
+  }
   var OAUTH_SERVER_URL = process.env.OAUTH_SERVER_URL || 'http://flowxo-dev.cc';
   var OAUTH_SERVER_PORT = process.env.OAUTH_SERVER_PORT || 9000;
 
@@ -71,7 +72,6 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
   var strategy = new service.auth.strategy(options, formatCreds);
   passport.use(name, strategy);
 
-  var httpsServer;
   var app = express();
   app.use(session({
     secret: crypto.randomBytes(64).toString('hex'),
@@ -80,7 +80,6 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
   }));
 
   app.use(passport.initialize());
-  app.enable("trust proxy");
 
   app.get(route, passport.authorize(name, service.auth.params));
 
@@ -89,24 +88,7 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
     cb(null, req.account);
   });
 
-  if (OAUTH_SERVER_URL.indexOf('https://') === 0) {
-
-    grunt.log.writeln(['Using SSL Server for Auth']);
-    
-    var sslOptions = {
-      key: fs.readFileSync('key.pem'),
-      cert: fs.readFileSync('cert.pem'),
-      requestCert: false,
-      rejectUnauthorized: false
-    };
-
-    httpsServer = https.createServer(sslOptions,app);
-    httpsServer.listen(OAUTH_SERVER_PORT);
-
-
-  }else{
-    app.listen(OAUTH_SERVER_PORT);
-  }
+  app.listen(OAUTH_SERVER_PORT);
 
   var userUrl = url.format({
     protocol: serverUrl.protocol,
@@ -116,6 +98,8 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
   });
 
   grunt.log.writeln(['Opening OAuth authentication in browser. Please confirm in browser window to continue.']);
+  grunt.log.writeln(['You can navigate manually to ' + userUrl + ' if a new window dows not open.']);
+  
 
   open(userUrl);
 };
