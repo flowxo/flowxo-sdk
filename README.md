@@ -44,6 +44,10 @@ If you select an _OAuth1_ or _OAuth2_ service, some skeleton configuration will 
 
 You should now have a populated directory with some scripts. Next, we'll take a look at what we've generated.
 
+# Coding Conventions and Guidelines
+
+Please review the following [guidelines](GUIDELINES.md) when creating services.
+
 # Code Structure
 
 A service is a collection of JavaScript files, with scripts relating to the service as a whole in `/lib`, and a directory for each method beneath that in `/methods`. You will also notice a set of files under `/tests` - these are called when testing your service.
@@ -211,7 +215,8 @@ module.exports = function(options, done) {
 
 ## OAuth
 
-Alternatively, we support [OAuth](http://oauth.net/) (versions [1.0a](http://oauth.net/core/1.0a/) and [2.0](http://oauth.net/2/)).
+Most external API's now support authentication using OAuth and typically offer OAuth2. This is the preferred method of authentication so you should always investigate if OAuth2 is supported by the API you are working with.
+We support [OAuth](http://oauth.net/) (versions [1.0a](http://oauth.net/core/1.0a/) and [2.0](http://oauth.net/2/)).
 
 If there's a choice between credentials and OAuth, it's usually better to use OAuth, as instead of copying and pasting credentials, the user will be prompted with a browser window, asking for their username/password for the connecting service.
 
@@ -256,6 +261,7 @@ You'll notice the use of [environment variables](https://nodejs.org/api/process.
 
 When your scripts are run, you'll get the relevant credentials in the `options.credentials` object:
 
+
 ``` js
 // OAuth 1
 {
@@ -275,6 +281,20 @@ When your scripts are run, you'll get the relevant credentials in the `options.c
   }
 }
 ```
+
+*Note regarding Cloud9 IDE*: Internally ``grunt auth`` is running an ExpressJs webserver over http at a default host and port of  `http://flowxo-dev.cc:9000`. This will not work on cloud9 and neither do you need a local hosts file entry if you are using cloud9.
+Instead you must determine the url that cloud9 is providing for your service. To do this go to the "Preview" menu in C9 and click "Preview Running Application". You will see a new browser window open with your custom workspace url.
+We then need to edit our `.env` file and set the values for the following 2 environment variables. Setting an oAuth port of 0 tells the flowxo sdk to allow cloud9 to choose the listening port during the oauth authentication flow.
+The url we use must be our custom cloud9 url *without* https. You should default to http first unless your API provider will only call back to a https url.
+Don't forget that you will need to configure your callback url with the oAuth provider so that they recognise your redirect uri as the same host on cloud9. 
+
+
+```
+OAUTH_SERVER_PORT=0
+OAUTH_SERVER_URL=http://stripe-demo-flowxodemo.c9.io/
+``
+
+
 
 The credentials object for OAuth1 matches the structure expected by the [Request](https://github.com/request/request#oauth-signing) library, which means you can pass `options.credentials` straight into the request options:
 
@@ -559,6 +579,18 @@ Similar to input fields, output `key`s should be unique, including keys generate
 
 If a script outputs nested data, you should describe your keys using 'double underscore notation':
 
+So an object that looks like this:
+```
+  {
+    user: {
+      id: '123',
+      name: 'jane'
+    }
+  }
+```
+
+Would be represented as this.
+
 ``` js
 {
   user__id: 'User ID',
@@ -566,7 +598,40 @@ If a script outputs nested data, you should describe your keys using 'double und
 }
 ```
 
-Note that the SDK will take care of flattening and unflattening the actual data, so you do not need to worry about implementing this. Simply refer to your nested data using the double underscore notation, and the SDK will take care of the rest. See the section _Double Underscore Notation_ for more details.
+Note that the SDK will take care of flattening and unflattening the actual data, so you do not need to worry about implementing this. 
+
+Remember that you only have to ouput fields that you want to make available. The JSON objects that you return from your client API calls can have more properties that you are outputting.
+
+Some APIs that you deal with may have nested array data like this:
+
+```
+  something: {
+    id: '11213',
+    items: [
+      { name: 'bob' },
+      { name: 'jane' } ...
+    ]
+  }
+```
+
+You will not know in advance how many array items there will be in the output data, so you should typically support up to 3, like this in your output.js
+
+```
+    {
+      key: 'items__0__name',
+      label: 'Name 1'
+    },
+    {
+      key: 'items__1__name',
+      label: 'Name 2'
+    },
+    {
+      key: 'items__2__name',
+      label: 'Name 3'
+    }
+```
+
+Simply refer to your nested data using the double underscore notation, and the SDK will take care of the rest. See the section _Double Underscore Notation_ for more details.
 
 ## input.js
 
@@ -576,7 +641,14 @@ So the way forward is to use an `input.js` script. The script is very similar to
 
 ### Loading Dependant Fields
 
-If your service includes dependant fields, `input.js` is also the place where you'll be calculating the dynamic configuration of the field.
+A dependent field is an input field whose range of values is dependant on the value selected in another input field.
+So imagine you have 2 input fields, Football League and Football Team. You want the user to select a League and then choose a Team from that League.
+Obviously you cannot determine the list of teams to present to the user, until the user has actually chosen a particular league.
+
+
+This is where input.js comes in. 
+
+If your service includes dependant fields, `input.js` is also the place where you'll be calculating the dynamic configuration of the field... i.e. what are the values the user can select or enter for each field.
 
 You'll know that `input.js` is being run to load a dependant field by the presence of a `target` property in the input data. If `target` is present, check the `target.field` property to determine the field that changed, and find the field's new value in `target.value`. Combine this information to load the dependant field(s).
 
@@ -650,6 +722,9 @@ module.exports = function(options, done) {
 ```
 
 Notice that the `teamOptions` is only populated if the `target` input is present. Otherwise, the team field is returned with empty options.
+
+If you are returning fields from input.js in addition to any fields you have specified in your config.js, ensure that you return all fields upfront.
+i.e. in the league and team example. if we had not specified the fields in the config.js, we could return them when `if (!target) { ... }` but we must make sure that we return all of them even though we don't yet know some of the values that the dependent fields will take.
 
 ## output.js
 
@@ -1165,13 +1240,14 @@ grunt init
 
 ### Authentication
 
-Since your integration tests will be hitting the service's API, before running the tests, it's important to generate some authentication credentials. This is achieved using the command
+Since your integration tests will be hitting the service's real API, before running the tests, it's important to generate some authentication credentials. 
+This is achieved using the command
 
 ```
 grunt auth
 ```
 
-Once acquired, the credentials are stored in a file `credentials.json`, and are used for all integration tests. This file __should not__ be committed to version control - an entry in the `.gitignore` file takes care of this.
+Once acquired, the `grunt auth` task will automiatcally populate the credentials in a file `credentials.json`. The contents of this file are read by the SDK and are used for all integration tests. This file __should not__ be committed to version control - an entry in the `.gitignore` file takes care of this.
 
 You'll acquire credentials in a different way, depending on the service.
 
@@ -1183,13 +1259,73 @@ Once all details have been filled in, the service's `ping.js` script is run, to 
 
 #### OAuth
 
-If your service autheticates via `oauth1` or `oauth2`, running `grunt auth` will open a browser window, where you'll need to enter your username/password to authenticate with the service. We'll provide you with these login details.
+If your service authenticates via `oauth1` or `oauth2`, running `grunt auth` will open a browser window, where you'll need to enter your username/password to authenticate with the service. We'll provide you with these login details.
 
 Prior to running `grunt auth`, there are a few things you'll need to configure.
 
 Firstly, configure the consumer key and secret (for OAuth1) or client ID and secret (for OAuth2). We'll provide you with this information, which you should add to the `.env` file. It's important that these details are only added to the `.env` file, and nowhere else - they should be treated as confidential and __not committed to version control__.
+On linux you can create your own `.env` file by using `vi .env` 
+
+A typical .env file for OAuth2 will look like this:
+
+```
+GOOGLE_SHEETS_ID=asdasd55151211515.apps.googleusercontent.com
+GOOGLE_SHEETS_SECRET=65651a5151_uhypiuagsdu
+```
+
+The field names that you populate in the .env file must match what you using in the OAuth configuration in your services `index.js` file. For instance:
+They should be of the format `SERVICENAME_ID` and `SERVICENAME_SECRET`
+
+```
+var service = new sdk.Service({
+  serviceRoot: __dirname,
+  name: 'Google Sheets',
+  slug: 'google_sheets',
+  auth: {
+    type: 'oauth2',
+
+    // The strategy key should return the Passport Strategy for your service.
+    // Passport has numerous available strategies for popular services, normally named
+    // e.g. passport-facebook, passport-twitter etc
+    // Example:
+    // strategy: require('passport-facebook').Strategy
+    strategy: require('passport-google-oauth').OAuth2Strategy,
+
+    // These options will be passed to the strategy when registering.
+    // An OAuth 2.0 strategy requires `clientID` and `clientSecret`
+    // to be passed. Fill in your ID and secret for this service in the
+    // .env file and they will be populated at runtime below.
+    // If your strategy requires any other options to be passed when registering,
+    // add them below.
+    options: {
+      clientID: process.env.GOOGLE_SHEETS_ID,
+      clientSecret: process.env.GOOGLE_SHEETS_SECRET,
+      state: true
+    },
+
+    // Authentication parameters to be used.
+    // These are sent when making an OAuth request.
+    // For example, where an OAuth 2.0 API defines access scopes,
+    // you may send
+    // params:{
+    //   scope: ['allow_email']
+    // }
+    // Note that the Google+ API and the Drive API must be enabled in https://console.developers.google.com for the project that matches the clientID
+    params: {
+      scope: ['profile',
+        'https://spreadsheets.google.com/feeds',
+        'https://www.googleapis.com/auth/plus.login',
+        'https://www.googleapis.com/auth/plus.me',
+        'https://www.googleapis.com/auth/drive.file',
+        'https://www.googleapis.com/auth/drive.readonly'
+      ]
+    }
+  }
+});
+```
 
 Secondly, since OAuth relies on redirecting the browser window to a URL hosted by our server, in order to complete the auth flow, you'll need to setup a hostfile redirect on your machine. The consumer key / client ID and secret we provide you with will link to an account with an OAuth `redirect_uri` set to `http://flowxo-dev.cc:9000`. This means that you need to ensure that when the browser redirects to this address, it accesses your machine. The easiest way to do this is to add an entry to your hostsfile (`/etc/hosts`) with the following line:
+Typically most OAuth API's require you to specify your call back hostnames in their control panel, so you should use the one below.
 
 ```
 127.0.0.1   flowxo-dev.cc
@@ -1252,6 +1388,16 @@ The pollcache is stored in memory, one per method. This has the following implic
 
 - If you end a `grunt run`, the pollcache will be cleared.
 - Poller methods will use their own individual caches, meaning that you need to run each poller method once to initialise its pollcache.
+ 
+So imagine you have a method called `new_data` that you want to test. This method simply calls some API and populates the poller with the data.
+- Type `grunt run` at the command line
+- Select the `new_data` method
+- No output will be displayed in the console, because the poller has now been populated with the initial set of data
+- The command prompt will be asking you if you want to run another method. Choose Y
+- Run another method or manually using the third parties website, add some new data that can be retrieved by the `new_data` method
+- Then ensure that you select Y to run another method and choose the `new_data` method
+- You should now see the data that you recently added. The poller has recognised the new data as `new` since the initial cache was populated.
+
 
 # Recipes
 
