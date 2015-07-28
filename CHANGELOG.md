@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.4] - 2015-07-28
+### Fixed
+- Datetime and Boolean validators now work correctly when they are `required` fields.
+
 ## [1.3.3] - 2015-06-30
 ### Fixed
 - `grunt run --record` now works correctly when entering an empty value for a custom input field which has a dependency on another input.
@@ -57,6 +61,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial release of the SDK.
 
+[1.3.4]: https://github.com/flowxo/flowxo-sdk/compare/v1.3.3...v1.3.4
 [1.3.3]: https://github.com/flowxo/flowxo-sdk/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/flowxo/flowxo-sdk/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/flowxo/flowxo-sdk/compare/v1.3.0...v1.3.1
