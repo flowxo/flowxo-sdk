@@ -182,8 +182,24 @@ RunUtil.harvestInputs = function(grunt, runner, method, inputs, callback) {
   };
 
   function doPrompts(inputSet) {
+    
     // If any of our fields have dependencies,
     // we need to run the input.js when they change.
+    if (method.testing) {
+      inputSet.unshift({
+        key: 'testNumber',
+        label: 'Test #',
+        type: 'text',
+        required: true
+      });
+      inputSet.unshift({
+        key: 'testDescription',
+        label: 'Test Description',
+        type: 'text',
+        required: true
+      });
+    }
+  
     var inputSetIdx = _.indexBy(inputSet, 'key');
     inputSet.forEach(function(input) {
       if(input.dependants && input.dependants.length) {
@@ -274,10 +290,11 @@ RunUtil.run = function(grunt, options, cb) {
   // If it is not configured correctly, end.
   RunUtil.validateService(grunt, service);
 
+  
   var inputs = options.inputs || [],
     filteredInputs = [],
     outputs = [];
-
+    
   var inputsPredefined = options.hasOwnProperty('inputs');
 
   async.waterfall([
@@ -298,6 +315,7 @@ RunUtil.run = function(grunt, options, cb) {
 
     // Inputs
     function(callback) {
+      
       // First determine whether we're going to do anything at all
       if((method.fields.input && method.fields.input.length) || method.scripts.input) {
         CommonUtil.header(grunt, 'Input Fields');
@@ -315,6 +333,7 @@ RunUtil.run = function(grunt, options, cb) {
       }
 
       // Otherwise, harvest the inputs.
+      method.testing = options.testing;
       RunUtil.harvestInputs(grunt, runner, method, inputs, function(err) {
         callback(err);
       });
@@ -322,6 +341,7 @@ RunUtil.run = function(grunt, options, cb) {
 
     function(callback) {
       // Filter out any empty inputs
+      
       filteredInputs = RunUtil.filterInputs(inputs);
 
       // output.js
@@ -387,7 +407,9 @@ RunUtil.run = function(grunt, options, cb) {
 
 RunUtil.runUntilStopped = function(grunt, options, cb) {
   function runIt() {
+    
     RunUtil.run(grunt, options, function(err, result, method, inputs) {
+      
       if(err) {
         RunUtil.displayScriptError(grunt, err);
       }
@@ -396,7 +418,6 @@ RunUtil.runUntilStopped = function(grunt, options, cb) {
         options.runCompleted(result, method, inputs);
       }
 
-      grunt.log.writeln();
       inquirer.prompt({
         type: 'confirm',
         name: 'again',
@@ -411,11 +432,14 @@ RunUtil.runUntilStopped = function(grunt, options, cb) {
   runIt();
 };
 
+
 RunUtil.runSingleScript = function(grunt, options, cb) {
   var runner = options.runner,
     service = options.service,
     method, script;
 
+  
+    grunt.log.writeln('runSingleScript');
   // Firstly, validate the service.
   // If it is not configured correctly, end.
   RunUtil.validateService(grunt, service);
@@ -501,7 +525,7 @@ RunUtil.runRecorded = function(grunt, options, cb) {
     // Write the file after each successful run
     grunt.file.write(runFile, JSON.stringify(tests, null, 2));
   };
-
+  options.testing = true;
   RunUtil.runUntilStopped(grunt, options, cb);
 };
 
@@ -615,6 +639,7 @@ RunUtil.runWebhook = function(grunt, options, method, callback) {
 };
 
 RunUtil.runTask = function(grunt, options) {
+  
   var service = options.getService();
 
   if(service.methods.length === 0) {
