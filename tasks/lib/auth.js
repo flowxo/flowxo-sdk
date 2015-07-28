@@ -52,6 +52,9 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
   var cbRoute = route + '/callback';
 
   // Calculate the callbackURL for the request
+  if (process.env.OAUTH_SERVER_PORT == 0) {
+    process.env.OAUTH_SERVER_PORT = process.env.PORT;
+  }
   var OAUTH_SERVER_URL = process.env.OAUTH_SERVER_URL || 'http://flowxo-dev.cc';
   var OAUTH_SERVER_PORT = process.env.OAUTH_SERVER_PORT || 9000;
 
@@ -95,6 +98,8 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
   });
 
   grunt.log.writeln(['Opening OAuth authentication in browser. Please confirm in browser window to continue.']);
+  grunt.log.writeln(['You can navigate manually to ' + userUrl + ' if a new window dows not open.']);
+  
 
   open(userUrl);
 };
