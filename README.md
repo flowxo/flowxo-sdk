@@ -215,7 +215,8 @@ module.exports = function(options, done) {
 
 ## OAuth
 
-Most external API's now support authentication using OAuth and typically offer OAuth2. This is the preferred method of authentication so you should always investigate if OAuth2 is supported by the API you are working with.
+Most external APIs now support authentication using OAuth and typically offer OAuth2. This is the preferred method of authentication so you should always investigate if OAuth2 is supported by the API you are working with.
+
 We support [OAuth](http://oauth.net/) (versions [1.0a](http://oauth.net/core/1.0a/) and [2.0](http://oauth.net/2/)).
 
 If there's a choice between credentials and OAuth, it's usually better to use OAuth, as instead of copying and pasting credentials, the user will be prompted with a browser window, asking for their username/password for the connecting service.

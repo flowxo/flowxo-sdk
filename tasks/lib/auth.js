@@ -83,7 +83,7 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
   }));
 
   app.use(passport.initialize());
-  app.enable("trust proxy");
+  app.enable('trust proxy');
 
   app.get(route, passport.authorize(name, service.auth.params));
 
@@ -92,10 +92,9 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
     cb(null, req.account);
   });
 
-  if (OAUTH_SERVER_URL.indexOf('https://') === 0) {
-
+  if(OAUTH_SERVER_URL.indexOf('https://') === 0) {
     grunt.log.writeln(['Using SSL Server for Auth']);
-    
+
     var sslOptions = {
       key: fs.readFileSync('key.pem'),
       cert: fs.readFileSync('cert.pem'),
@@ -103,11 +102,10 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
       rejectUnauthorized: false
     };
 
-    httpsServer = https.createServer(sslOptions,app);
+    httpsServer = https.createServer(sslOptions, app);
     httpsServer.listen(OAUTH_SERVER_PORT);
 
-
-  }else{
+  } else {
     app.listen(OAUTH_SERVER_PORT);
   }
 
@@ -120,7 +118,6 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
 
   grunt.log.writeln(['Opening OAuth authentication in browser. Please confirm in browser window to continue.']);
   grunt.log.writeln(['You can navigate manually to ' + userUrl + ' if a new window does not open.']);
-
 
   open(userUrl);
 };
