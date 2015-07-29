@@ -1,6 +1,6 @@
 {
   "name": "flowxo-sdk",
-  "version": "1.3.4",
+  "version": "1.3.5",
   "description": "SDK for developing Flow XO Services.",
   "main": "index.js",
   "scripts": {
@@ -19,6 +19,10 @@
     {
       "name": "John Jackson",
       "email": "john.jackson@flowxo.com"
+    },
+    {
+      "name": "John Byrne",
+      "email": "john.byrne@interpos.co.uk"
     },
     {
       "name": "Roberto Oliveros",
