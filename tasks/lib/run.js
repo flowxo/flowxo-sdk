@@ -184,9 +184,10 @@ RunUtil.harvestInputs = function(grunt, runner, method, inputs, callback) {
   function doPrompts(inputSet) {
     // If any of our fields have dependencies,
     // we need to run the input.js when they change.
-    var inputSetIdx = _.indexBy(inputSet, 'key');
+    var extraSet = [];
+
     inputSet.forEach(function(input) {
-      if(input.dependants && input.dependants.length) {
+      if(input.dependants) {
         input.after = function(results, done) {
           var dataToSend = {
             input: {
@@ -201,40 +202,38 @@ RunUtil.harvestInputs = function(grunt, runner, method, inputs, callback) {
               return callback(err);
             }
 
-            // Update the fields
+            // Add the fields to the input set
             if(updatedInputFields) {
               updatedInputFields.forEach(function(f) {
-                var existingInputField = inputSetIdx[f.key];
-                if(existingInputField) {
-                  _.assign(existingInputField, f);
-                }
+                extraSet.push(f);
               });
             }
             done();
           });
         };
-
-        input.dependants.forEach(function(dependant) {
-          var field = inputSetIdx[dependant];
-          field.before = function(results, done) {
-            done(!results[input.key]);
-          };
-        });
       }
     });
+
     CommonUtil.promptFields(inputSet, fieldPromptOptions, function(err, answers) {
       if(err) {
         return callback(err);
-      } else {
-        inputSet.forEach(function(input) {
-          // Make a copy of the input
-          var i = util._extend({},input);
-          i.value = answers[input.key];
-          i.type = input.type || 'text';
-          inputs.push(i);
-        });
-        return callback(null, inputs);
       }
+
+      inputSet.forEach(function(input) {
+        // Add each field to the inputs, along with the answer.
+        var i = _.clone(input);
+        i.value = answers[input.key];
+        i.type = input.type || 'text';
+        inputs.push(i);
+      });
+
+      // If there are any extra questions, ask them.
+      if(extraSet.length) {
+        return doPrompts(extraSet);
+      }
+
+      // Otherwise, we are finished.
+      return callback(null, inputs);
     });
   }
 
