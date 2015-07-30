@@ -529,7 +529,7 @@ This concept is best explained with an example:
 - When a value is selected for the _league_ select box, this value is used to calculate the options for the _team_ select box.
 - Each time the _league_ value is changed, new options are loaded for the _team_ select box.
 
-To signal that a field has dependencies, list each dependant field's key in the `dependants` array:
+To signal that a field has dependencies, include the `dependants` property:
 
 ``` js
 {
@@ -540,13 +540,13 @@ To signal that a field has dependencies, list each dependant field's key in the 
     { value: 'prem', label: 'Premier League' },
     { value: 'champ', label: 'Championship' }
   ],
-  dependants: ['team']
+  dependants: true
 }
 ```
 
-Note that you _should not_ list the dependant field in `config.js`, this should instead be returned as a custom field from `input.js`.
-
 You'll be using the `input.js` script to calcluate and return the dependant field, rather than listing it in `config.js`. See the section _input.js > Loading dependant fields_ for more details.
+
+_Note: the dependant fields are not defined in the config, instead they are returned by `input.js`. This allows you to return different dependant fields according to the value of the parent field._
 
 ### Output Fields
 
@@ -640,19 +640,10 @@ Here is an example of loading a dependant field.
 
 ``` js
 // config.js
-// The static `league` field defines a single dependant field, `team`.
+// The static `league` field is marked as having dependant fields.
 ...
 fields: {
-  input: [{
-    key: 'league',
-    label: 'League',
-    type: 'select',
-    input_options: [
-      { value: 'prem', label: 'Premier League' },
-      { value: 'champ', label: 'Championship' }
-    ],
-    dependants: ['team']
-  }]
+  input: []
 }
 ...
 
@@ -660,52 +651,74 @@ fields: {
 'use strict';
 
 module.exports = function(options, done) {
-  var teamOptions = [];
-
   var target = options.input && options.input.target;
-
-  if(target) {
-    // Try to fetch the team options.
-    if(target.field === 'league') {
-      // In real life, we'd likely now hit an API
-      // to fetch the teamOptions, but here just
-      // fill in with dummy data.
-      if(target.value === 'prem') {
-        teamOptions = [{
-          label: 'Chelsea',
-          value: 'chelsea'
-        }, {
-          label: 'Manchester United',
-          value: 'man-utd'
-        }];
-
-      } else if (target.value === 'champ') {
-        teamOptions = [{
-          label: 'Bristol City',
-          value: 'bristol-city'
-        }, {
-          label: 'Nottingham Forest',
-          value: 'notts-forest'
-        }];
-      }
-    }
+  if(!target) {
+    // Since we have no `target`, we know this is an initial load.
+    // Return the league field only.
+    // Note that we could also define this field in `config.js`.
+    return done(null, [{
+      key: 'league',
+      label: 'League',
+      type: 'select',
+      input_options: [
+        { value: 'prem', label: 'Premier League' },
+        { value: 'champ', label: 'Championship' }
+      ],
+      dependants: true  // Mark as having a dependant field
+    }])
   }
 
-  // Note that we _always_ return the team field,
-  // with or without the options.
-  done(null, [{
-    key: 'team',
-    label: 'Team',
-    description: 'Select the team.',
-    required: true,
-    type: 'select',
-    input_options: teamOptions
-  }]);
+  // Otherwise, we know this file was loaded as a result
+  // of a field's value changing.
+  if(target.field === 'league') {
+    // It was the league field that changed value.
+    // Fetch the teams associated with this league,
+    // and return these teams.
+    var teamOptions = [];
+
+    // In real life, we'd likely now hit an API
+    // to fetch the teamOptions, but here just
+    // fill in with dummy data.
+    if(target.value === 'prem') {
+      teamOptions = [{
+        label: 'Chelsea',
+        value: 'chelsea'
+      }, {
+        label: 'Manchester United',
+        value: 'man-utd'
+      }];
+
+    } else if (target.value === 'champ') {
+      teamOptions = [{
+        label: 'Bristol City',
+        value: 'bristol-city'
+      }, {
+        label: 'Nottingham Forest',
+        value: 'notts-forest'
+      }];
+    }
+
+    // Return the `team` field only.
+    // Note that `league` is NOT returned here.
+    done(null, [{
+      key: 'team',
+      label: 'Team',
+      description: 'Select the team.',
+      required: true,
+      type: 'select',
+      input_options: teamOptions
+    }]);
+
+  } else {
+    // We didn't recognise the field that changed.
+    // Return no fields.
+    done(null, []);
+  }
 };
 
 ```
 
-Notice that the `team` field is _always_ returned, and if the `input.js` script was called with a `league` value, we calculate the `teamOptions`.
+Notice that the script either returns the `league` OR `team` field, never both.
 
 ## output.js
 
