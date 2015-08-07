@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.5.0] - 2015-08-07
+### Added
+- `input.js` scripts now receive all collected input fields when being run.
+
+### Changed
+- `target` property in `input.js options` variable has changed from an object containing the target field's key and value to a string containing the key of the field that changed. Fetch the value of this field in the new `fields` hashmap.
+
 ## [1.4.0] - 2015-08-05
 ### Added
 - Support for variable dependant fields.
@@ -69,6 +76,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial release of the SDK.
 
+[1.5.0]: https://github.com/flowxo/flowxo-sdk/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/flowxo/flowxo-sdk/compare/v1.3.5...v1.4.0
 [1.3.5]: https://github.com/flowxo/flowxo-sdk/compare/v1.3.4...v1.3.5
 [1.3.4]: https://github.com/flowxo/flowxo-sdk/compare/v1.3.3...v1.3.4
