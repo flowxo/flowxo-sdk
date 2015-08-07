@@ -632,7 +632,12 @@ A dependant field is an input field whose range of values is dependant on the va
 
 For example, imagine you have 2 input fields, _Football League_ and _Football Team_. You want the user to select a League and then choose a Team from that League, but you cannot determine the list of teams to present to the user, until the user has actually chosen a particular league.
 
-This is solved by using the `input.js` script. You'll know that `input.js` is being run to load a dependant field by the presence of a `target` property in the input data. If `target` is present, check the `target.field` property to determine the field that changed, and find the field's new value in `target.value`. Combine this information to load the dependant field(s).
+This is solved by using the `input.js` script. You'll know that `input.js` is being run to load a dependant field by the presence of a `target` property in the input data. If `target` is present:
+
+- check the `target` property to determine the field that changed
+- use the `fields` property to get the value of the `target` field. `fields` will contain all input fields collected so far
+
+Combine this information to load the dependant field(s).
 
 _Note: when calculating and returning a dependant field, don't return any other custom fields. The core will take care of merging the newly configured dependant field with the rest of the input fields._
 
@@ -651,7 +656,9 @@ fields: {
 'use strict';
 
 module.exports = function(options, done) {
-  var target = options.input && options.input.target;
+  options = options || {};
+  var target = options.input.target;
+  var fields = options.input.fields;
   if(!target) {
     // Since we have no `target`, we know this is an initial load.
     // Return the league field only.
@@ -670,16 +677,24 @@ module.exports = function(options, done) {
 
   // Otherwise, we know this file was loaded as a result
   // of a field's value changing.
-  if(target.field === 'league') {
+  // The input object will resemble:
+  // {
+  //   target: 'league',
+  //   fields: {
+  //     league: 'prem'
+  //   }
+  // }
+  if(target === 'league') {
     // It was the league field that changed value.
     // Fetch the teams associated with this league,
     // and return these teams.
+    var league = fields[target];
     var teamOptions = [];
 
     // In real life, we'd likely now hit an API
     // to fetch the teamOptions, but here just
     // fill in with dummy data.
-    if(target.value === 'prem') {
+    if(league === 'prem') {
       teamOptions = [{
         label: 'Chelsea',
         value: 'chelsea'
@@ -688,7 +703,7 @@ module.exports = function(options, done) {
         value: 'man-utd'
       }];
 
-    } else if (target.value === 'champ') {
+    } else if (league === 'champ') {
       teamOptions = [{
         label: 'Bristol City',
         value: 'bristol-city'

@@ -191,10 +191,12 @@ RunUtil.harvestInputs = function(grunt, runner, method, inputs, callback) {
         input.after = function(results, done) {
           var dataToSend = {
             input: {
-              target: {
-                field: input.key,
-                value: results[input.key]
-              }
+              target: input.key,
+              // Merge the local results with the ones already harvested.
+              fields: _.assign({}, inputs.reduce(function(hash, i) {
+                hash[i.key] = i.value;
+                return hash;
+              }, {}), results)
             }
           };
           runner.run(method.slug, 'input', dataToSend, function(err, updatedInputFields) {
