@@ -656,7 +656,7 @@ fields: {
 'use strict';
 
 module.exports = function(options, done) {
-  options = options || {};
+  options.input = options.input || {};
   var target = options.input.target;
   var fields = options.input.fields;
   if(!target) {
