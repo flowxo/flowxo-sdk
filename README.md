@@ -20,6 +20,10 @@ Finally, build and test related tasks are handled by the JavaScript task runner 
 
 That's all. The other tools that the SDK uses will be installed locally with `npm install`.
 
+# Service Authoring Guidelines
+
+Please review our [Service Authoring Guidelines](GUIDELINES.md) which detail the code conventions, language, style and structure that services should follow.
+
 # Example Services
 
 Use our example services as a reference when building your service:
@@ -43,10 +47,6 @@ If you select a _Credentials_ service, you'll be asked to define the fields that
 If you select an _OAuth1_ or _OAuth2_ service, some skeleton configuration will be created that will need to be updated later. See the _Authorization > OAuth_ section for how to do this.
 
 You should now have a populated directory with some scripts. Next, we'll take a look at what we've generated.
-
-# Service Authoring Guidelines
-
-Please review our [Service Authoring Guidelines](GUIDELINES.md) which detail the code conventions, language, style and structure that services should follow.
 
 # Code Structure
 
