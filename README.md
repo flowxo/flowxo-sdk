@@ -46,7 +46,7 @@ You should now have a populated directory with some scripts. Next, we'll take a 
 
 # Service Authoring Guidelines
 
-Please review our [Service Authoring Guidelines](GUIDELINES.md) which detail the style and structure that services should follow.
+Please review our [Service Authoring Guidelines](GUIDELINES.md) which detail the code conventions, language, style and structure that services should follow.
 
 # Code Structure
 
@@ -71,22 +71,6 @@ service_name
 ```
 
 The service expects files to remain in their default locations, so try not to move things around unless you know what you are doing.
-
-# Code Conventions
-
-You'll notice that we use the following code conventions, and services should be written to adhere to these guidelines:
-
-- Indent with 2 spaces
-- Use single quote marks
-- Line length no longer than 80 characters
-- Always use semicolons
-- Always wrap `if` statements in curly braces
-
-A `.jshintrc` file is scaffolded by the generator into the root of the service module. This can be used in conjunction with [JSHint](http://jshint.com/) to ensure your code conforms to the expected code conventions. You can also run `grunt jshint` to check that your code conforms.
-
-You can also automatically 'beautify' your code to fit these code conventions. Run `grunt jsbeautifier` to apply this to your code.
-
-If in doubt, consult the example services for more details on the conventions that we expect.
 
 # Requiring the SDK
 
@@ -478,7 +462,6 @@ var formattedStr = date.parsed.format('{yyyy}-{MM}-{dd}');
 ```
 
 _Note: by default, sugar.js also enhances other JavaScript objects, such as `Number`, `String` and `Array`. Flow XO uses a [customised version](https://github.com/fiznool/sugar-date) of sugar.js which only enhances the `Date` prototype._
-
 
 #### Boolean Fields
 
@@ -1439,3 +1422,7 @@ Before you submit your service to us, please work through this checklist:
 - If there's anything else we need to consider when reviewing your service, it should be included in `README.md`.
 
 To submit, please [email us](mailto:support@flowxo.com) with details of the service you've built and your contact details, and we'll explain what to do next. Thanks for supporting Flow XO!
+
+# Known Issues
+
+- Dependant Fields: Only select type fields may have dependencies, however the SDK does not throw an error if other field types (such as text) are set up with dependent fields.

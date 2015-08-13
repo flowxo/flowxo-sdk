@@ -1,5 +1,21 @@
 # Service Authoring Guidelines
 
+## Code Conventions
+
+You'll notice that we use the following code conventions, and services should be written to adhere to these guidelines:
+
+- Indent with 2 spaces
+- Use single quote marks
+- Line length no longer than 80 characters
+- Always use semicolons
+- Always wrap `if` statements in curly braces
+
+A `.jshintrc` file is scaffolded by the generator into the root of the service module. This can be used in conjunction with [JSHint](http://jshint.com/) to ensure your code conforms to the expected code conventions. You can also run `grunt jshint` to check that your code conforms.
+
+You can also automatically 'beautify' your code to fit these code conventions. Run `grunt jsbeautifier` to apply this to your code.
+
+If in doubt, consult the example services for more details on the conventions that we expect.
+
 ## General
 
 - We only need to support 'transient' business objects, such as contacts, invoices, emails, transactions, etc. We don't generally need to support more fixed objects like users, labels, categories, etc.
