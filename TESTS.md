@@ -79,7 +79,7 @@ describe('A Spec', function() {
 });
 ```
 
-Refer to the example services for more details on how to architect your code to be unit testable. In particular, try to follow these guidelines:
+Refer to the [Trello Example Service](https://github.com/flowxo/flowxo-services-trello-example) for an example of how to architect your code to be unit testable. In particular, try to follow these guidelines:
 
 - Concentrate on providing small blocks of code, which can be fed inputs, and return outputs. This will make unit testing easier.
 - Mock the service's API using a library such as [nock](https://github.com/pgte/nock), so your unit tests do not require 'real' data to run. This will ensure your tests will run fast, as there will be no network latency.
@@ -92,4 +92,38 @@ grunt test
 
 # Watch code for changes, and automatically run specs
 grunt watch
+```
+
+## Mocking API Calls
+
+The integration test runner is designed for and encourages you to connect to your _real_ service in order to validate your service performs as expected. Whilst this is obviously a crucial part of integration testing, it can be undesirable for a unit test to establish a connection to a remote server.
+
+For unit testing, one approach is to try and structure your service code into separate units that can be tested independently. By mocking calls to the API, these individual units can then be tested in isolation, without the need for a connection to the live API.
+
+A useful library for mocking APIs is [nock](https://github.com/pgte/nock). An example test case:
+
+``` js
+'use strict';
+
+var sdk = require('flowxo-sdk'),
+    nock = require('nock');
+
+// Before each test, reset nock
+beforeEach(nock.cleanAll);
+
+describe('Get Person',function(){
+  it('should throw authentication error on 401', function(done){
+    // Setup our mocked 401 response
+    var scope = nock('https://my.service.com')
+                .get('/persons/1')
+                .reply(401);
+
+    this.runner('get_person', 'run', { input: {person_id: 1} }, function(err, output){
+      expect(err).to.be.defined;
+      expect(err).to.be.instanceof(sdk.Error.AuthError);
+      expect(scope.isDone()).to.be.true;
+      done();
+    });
+  });
+});
 ```

@@ -1137,7 +1137,7 @@ There are two types of testing that are supported by the SDK, unit tests (option
 
 [Integration testing](http://en.wikipedia.org/wiki/Integration_testing) emulates how the Flow XO platform will use your service, using the live API. You complete the input data and the method's `input.js`, `output.js` and `run.js` scripts are run in order, passing the provided data through and displaying the results. You can also record a series of integration tests, and replay them in order.
 
-You'll need to record a series of integration tests to demonstrate that the service is operating correctly. These will be replayed and validated when you submit the service. For this reason, integration testing is mandatory.
+You'll need to record a series of integration tests to demonstrate that the service is operating correctly. These will be replayed and validated when you submit (or update) the service. For this reason, integration testing is mandatory.
 
 ## Setup
 
@@ -1426,40 +1426,6 @@ ServiceClient.prototype.createPerson = function(person, done) {
   };
   this._request(options, done);
 };
-```
-
-## Mocking API Calls
-
-The integration test runner is designed for and encourages you to connect to your _real_ service in order to validate your service performs as expected. Whilst this is obviously a crucial part of integration testing, it can be undesirable for a unit test to establish a connection to a remote server.
-
-For unit testing, one approach is to try and structure your service code into separate units that can be tested independently. By mocking calls to the API, these individual units can then be tested in isolation, without the need for a connection to the live API.
-
-A useful library for mocking APIs is [nock](https://github.com/pgte/nock). An example test case:
-
-``` js
-'use strict';
-
-var sdk = require('flowxo-sdk'),
-    nock = require('nock');
-
-// Before each test, reset nock
-beforeEach(nock.cleanAll);
-
-describe('Get Person',function(){
-  it('should throw authentication error on 401', function(done){
-    // Setup our mocked 401 response
-    var scope = nock('https://my.service.com')
-                .get('/persons/1')
-                .reply(401);
-
-    this.runner('get_person', 'run', { input: {person_id: 1} }, function(err, output){
-      expect(err).to.be.defined;
-      expect(err).to.be.instanceof(sdk.Error.AuthError);
-      expect(scope.isDone()).to.be.true;
-      done();
-    });
-  });
-});
 ```
 
 # Submitting your Service
