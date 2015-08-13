@@ -44,9 +44,9 @@ If you select an _OAuth1_ or _OAuth2_ service, some skeleton configuration will 
 
 You should now have a populated directory with some scripts. Next, we'll take a look at what we've generated.
 
-# Coding Conventions and Guidelines
+# Service Authoring Guidelines
 
-Please review the following [guidelines](GUIDELINES.md) when creating services.
+Please review our [Service Authoring Guidelines](GUIDELINES.md) which detail the style and structure that services should follow.
 
 # Code Structure
 
