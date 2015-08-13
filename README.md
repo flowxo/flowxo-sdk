@@ -1425,4 +1425,4 @@ To submit, please [email us](mailto:support@flowxo.com) with details of the serv
 
 # Known Issues
 
-- Dependant Fields: Only select type fields may have dependencies, however the SDK does not throw an error if other field types (such as text) are set up with dependent fields.
+- Field Dependencies: Only `select` type fields may have dependencies, however the SDK does not throw an error if other field types (such as `text`) are set up with dependencies.
