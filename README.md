@@ -1,6 +1,6 @@
 # Introduction
 
-[Flow XO](https://flowxo.com) is a platform that lets users build automated sales & marketing workflows on top of their existing cloud apps.
+[Flow XO](https://flowxo.com) is a platform that lets users build automated workflows on top of their existing cloud apps.
 
 Each supported service is built as a _module_ which is called by the Flow XO _core_. A service is split into separate _methods_, and each method is either a _trigger_ (looks for new records, or receives new records via a webhook) or an _action_ (creates, updates or deletes records).
 
