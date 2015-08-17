@@ -1,6 +1,6 @@
 # Introduction
 
-[Flow XO](https://flowxo.com) is a platform that lets users build automated sales & marketing workflows on top of their existing cloud apps.
+[Flow XO](https://flowxo.com) is a platform that lets users build automated workflows on top of their existing cloud apps.
 
 Each supported service is built as a _module_ which is called by the Flow XO _core_. A service is split into separate _methods_, and each method is either a _trigger_ (looks for new records, or receives new records via a webhook) or an _action_ (creates, updates or deletes records).
 
@@ -19,6 +19,10 @@ As most modules will be fairly thin wrappers around HTTP API's, you should under
 Finally, build and test related tasks are handled by the JavaScript task runner [Grunt](http://gruntjs.com/) so a working knowledge of this is useful.
 
 That's all. The other tools that the SDK uses will be installed locally with `npm install`.
+
+# Service Authoring Guidelines
+
+Please review our [Service Authoring Guidelines](GUIDELINES.md) which detail the code conventions, language, style and structure that services should follow.
 
 # Example Services
 
@@ -44,13 +48,9 @@ If you select an _OAuth1_ or _OAuth2_ service, some skeleton configuration will 
 
 You should now have a populated directory with some scripts. Next, we'll take a look at what we've generated.
 
-# Coding Conventions and Guidelines
-
-Please review the following [guidelines](GUIDELINES.md) when creating services.
-
 # Code Structure
 
-A service is a collection of JavaScript files, with scripts relating to the service as a whole in `/lib`, and a directory for each method beneath that in `/methods`. You will also notice a set of files under `/tests` - these are called when testing your service.
+A service is a collection of JavaScript files, with scripts relating to the service as a whole in `/lib`, and a directory for each method beneath that in `/methods`.
 
 This is how your service will eventually be structured (although you won't have any methods yet):
 
@@ -68,27 +68,9 @@ service_name
       |-- another_method/
         |-- ...
   |-- runs/  - created when test runs are recorded
-  |-- tests/ - contains files used to run service for testing
 ```
-You'll see many other files and directories, for example a `tests` directory where you can store your unit tests.
 
 The service expects files to remain in their default locations, so try not to move things around unless you know what you are doing.
-
-# Code Conventions
-
-You'll notice that we use the following code conventions, and services should be written to adhere to these guidelines:
-
-- Indent with 2 spaces
-- Use single quote marks
-- Line length no longer than 80 characters
-- Always use semicolons
-- Always wrap `if` statements in curly braces
-
-A `.jshintrc` file is scaffolded by the generator into the root of the service module. This can be used in conjunction with [JSHint](http://jshint.com/) to ensure your code conforms to the expected code conventions. You can also run `grunt jshint` to check that your code conforms.
-
-You can also automatically 'beautify' your code to fit these code conventions. Run `grunt jsbeautifier` to apply this to your code.
-
-If in doubt, consult the example services for more details on the conventions that we expect.
 
 # Requiring the SDK
 
@@ -256,9 +238,9 @@ auth: {
 
 Make sure that if the strategy requires any extra configuration, you add it to either the `options` or the `params` object. Refer to the strategy's documentation for more details on this.
 
-_Note: you do not need to add a `callbackURL` to the options object, as the system will automatically generate a callbackURL for you. When testing the service, you'll need to setup your development machine so that the generated callback URL can be reached by the test runner. See the section Testing > Integration Tests > Authentication for more details._
+_Note: you do not need to add a `callbackURL` to the options object, as the system will automatically generate a callbackURL for you. When testing the service, you'll need to setup your development machine so that the generated callback URL can be reached by the test runner. See the section Testing > Authentication for more details._
 
-You'll notice the use of [environment variables](https://nodejs.org/api/process.html#process_process_env) to prevent the hard coding of the key and secret. When configuring the service, we'll provide you with these details for connecting to the service, and you should enter the details into the `.env` file for testing purposes. For more details on setting environment variables, refer to the section _Testing > Integration Tests > Authentication_.
+You'll notice the use of [environment variables](https://nodejs.org/api/process.html#process_process_env) to prevent the hard coding of the key and secret. When configuring the service, we'll provide you with these details for connecting to the service, and you should enter the details into the `.env` file for testing purposes. For more details on setting environment variables, refer to the section _Testing > Authentication_.
 
 When your scripts are run, you'll get the relevant credentials in the `options.credentials` object:
 
@@ -480,7 +462,6 @@ var formattedStr = date.parsed.format('{yyyy}-{MM}-{dd}');
 ```
 
 _Note: by default, sugar.js also enhances other JavaScript objects, such as `Number`, `String` and `Array`. Flow XO uses a [customised version](https://github.com/fiznool/sugar-date) of sugar.js which only enhances the `Date` prototype._
-
 
 #### Boolean Fields
 
@@ -1135,111 +1116,13 @@ Of course, you'll need to submit a Pull Request (PR) to the main `flowxo`-owned 
 
 # Testing
 
-There are two types of testing that are supported by the SDK: unit tests and integration tests.
-
-## Unit Tests
-
-[Unit testing](http://en.wikipedia.org/wiki/Unit_testing) allows you to test each unit of your code in isolation. This facilitates [Test Driven Development](http://en.wikipedia.org/wiki/Test-driven_development), and helps to modularise your codebase. Unit tests stub out the service's API, typically using a library such as [nock](https://github.com/pgte/nock) to mock the response. For this reason unit tests are often fast, and can be run automatically.
-
-Unit tests are for your own benefit, and are not mandatory for the service to be submitted for validation.
-
-### Writing Unit Tests
-
-Unit test files are stored in the `tests/` folder at the root of the service. A test file has the `.spec.js` file suffix. By default, some tests are scaffolded when the service is created, and when new methods are added. These tests will need to be updated by you as, untouched, they will fail.
-
-The default layout is to have one test file per method and additionally one service-level test, but you are welcome to organise them as you wish (all `.spec.js` files under the `tests/` folder will be picked up automatically wherever they are located).
-
-Tests are standard Node.js [mocha](http://mochajs.org/) tests, supported by [chai](http://chaijs.com/api/bdd/), [sinon](http://sinonjs.org/) and [sinon-chai](https://github.com/domenic/sinon-chai).
-
-A number of useful things are available to your test scripts:
-
-``` js
-describe('A Spec', function() {
-  it('is a spec', function() {
-    // Get the service
-    var service = this.service;
-
-    // Check the service configuration is valid.
-    expect(service).to.be.a.flowxo.service;
-
-    // Run a service script
-    var serviceScript = 'ping';
-    var serviceOptions = {
-      input: {
-        // Input data goes here
-      },
-      credentials: {
-        // Credentials go here
-      }
-    }
-    this.runner.run(serviceScript, serviceOptions function(err, output) {
-      // `err` if there was an error running the script
-      // otherwise `output` contains the script's output
-    });
-
-    // Run a service script without options
-    this.runner.run(serviceScript, function(err, output) {
-      // `err` if there was an error running the script
-      // otherwise `output` contains the script's output
-    });
-
-    // Check method configuration is valid
-    var methodSlug = 'some_method';
-    var method = service.getMethod(methodSlug);
-    expect(method).to.be.a.flowxo.method;
-
-    // Run a method script
-    var methodScript = 'run'; // One of 'run', 'input', 'output'
-    var methodOptions = {
-      input: {
-        // Input data goes here
-      },
-      credentials: {
-        // Credentials go here
-      }
-    };
-    this.runner.run(methodSlug, methodScript, methodOptions, function(err, output) {
-      // `err` if there was an error running the script
-      // otherwise `output` contains the script's output
-    });
-
-    // Run a method script without options
-    this.runner.run(methodSlug, methodScript, function(err, output) {
-      // `err` if there was an error running the script
-      // otherwise `output` contains the script's output
-    });
-
-    // Initialise the poll cache with empty data.
-    // Important if you expect a poller method to respond to 'new' data,
-    // since by default the script runner will populate the poll cache
-    // on first run.
-    this.runner.setPollerCache(methodSlug, []);
-  });
-});
-```
-
-Refer to the example services for more details on how to architect your code to be unit testable. In particular, try to follow these guidelines:
-
-- Concentrate on providing small blocks of code, which can be fed inputs, and return outputs. This will make unit testing easier.
-- Mock the service's API using a library such as [nock](https://github.com/pgte/nock), so your unit tests do not require 'real' data to run. This will ensure your tests will run fast, as there will be no network latency.
-
-### Running Unit Tests
-
-```
-# Run your specs
-grunt test
-
-# Watch code for changes, and automatically run specs
-grunt watch
-```
-
-## Integration Tests
+There are two types of testing that are supported by the SDK, unit tests (optional) and integration tests (mandatory).  You can find details of how to write unit tests in our [Unit Testing Guide](TESTS.md).
 
 [Integration testing](http://en.wikipedia.org/wiki/Integration_testing) emulates how the Flow XO platform will use your service, using the live API. You complete the input data and the method's `input.js`, `output.js` and `run.js` scripts are run in order, passing the provided data through and displaying the results. You can also record a series of integration tests, and replay them in order.
 
-You'll need to record a series of integration tests to demonstrate that the service is operating correctly. These will be replayed and validated when you submit the service. For this reason, integration testing is mandatory.
+You'll need to record a series of integration tests to demonstrate that the service is operating correctly. These will be replayed and validated when you submit (or update) the service. For this reason, integration testing is mandatory.
 
-### Setup
+## Setup
 
 Prior to running integration tests, you'll need to initialise the test environment:
 
@@ -1247,7 +1130,7 @@ Prior to running integration tests, you'll need to initialise the test environme
 grunt init
 ```
 
-### Authentication
+## Authentication
 
 Since your integration tests will be hitting the service's real API, before running the tests, it's important to generate some authentication credentials.
 
@@ -1261,13 +1144,13 @@ Once acquired, the `grunt auth` task will automatically populate the credentials
 
 You'll acquire credentials in a different way, depending on the service.
 
-#### Basic Credentials
+### Basic Credentials
 
 If your service authenticates with basic `credentials` (e.g. API key), you'll be prompted to enter the details on the command line.
 
 Once all details have been filled in, the service's `ping.js` script is run, to validate that the credentials are correct. Ensure this has been implemented correctly, otherwise the credentials won't be stored.
 
-#### OAuth
+### OAuth
 
 If your service authenticates via `oauth1` or `oauth2`, running `grunt auth` will open a browser window, where you'll need to enter your username/password to authenticate with the service. We'll provide you with these login details.
 
@@ -1294,7 +1177,6 @@ Typically most OAuth APIs require you to specify your callback hostnames in thei
 
 _Note - you may be wondering why we don't just use `http://localhost:9000` or `http://127.0.0.1:9000`as the `redirect_uri`. Unfortunately, some OAuth providers do not allow `localhost` or `127.0.0.1`, and so we have invented a fake TLD to use instead._
 
-
 _Note regarding cloud-based IDEs_: `grunt auth` defaults to listening on the URL `http://flowxo-dev.cc` at port 9000. You can override this by setting the following environment variables in your `.env` file:
 
 ```
@@ -1305,10 +1187,10 @@ OAUTH_SERVER_PORT=<your_port>
 In addition to this, `grunt auth` also checks for the presence of a `PORT` environment variable to listen on. This allows you to use [Cloud9](https://c9.io) to fetch the credentials:
 
 - Browse to the "Preview" menu in C9 and click "Preview Running Application". You will see a new browser window open with your custom workspace URL.
-- The URL we use must be our custom cloud9 URL *without* https. You should default to http first unless your API provider will only call back to a https URL.
-- Don't forget that you will need to configure your callback URL with the OAuth provider so that they recognise your redirect uri as the same host on cloud9.
+- The URL we use must be our custom Cloud9 URL *without* https. You should default to http first unless your API provider will only call back to a https URL.
+- Don't forget that you will need to configure your callback URL with the OAuth provider so that they recognise your redirect URI as the same host on Cloud9.
 
-### Running Integration Tests
+## Running Integration Tests
 
 You run an integration test with
 
@@ -1324,7 +1206,7 @@ You can also run a single method script:
 grunt run --single
 ```
 
-### Recording Integration Tests
+## Recording Integration Tests
 
 You can record a series of integration tests with
 
@@ -1349,7 +1231,7 @@ Note that subsequent calls to `grunt run --record` will append to your existing 
 
 The `runs/` folder can be committed to version control, allowing others the chance to replay tests you have recorded. Bear in mind that they will often need to be authenticated as the same user as you in order to replay the tests successfully.
 
-### Testing Pollers
+## Testing Pollers
 
 The first time an integration test is run for a poller, you'll see no data returned from the service. This is due to the way that pollers work: the first time the API is hit, the pollcache is filled with all existing data from the service.
 
@@ -1529,40 +1411,6 @@ ServiceClient.prototype.createPerson = function(person, done) {
 };
 ```
 
-## Mocking API Calls
-
-The integration test runner is designed for and encourages you to connect to your _real_ service in order to validate your service performs as expected. Whilst this is obviously a crucial part of integration testing, it can be undesirable for a unit test to establish a connection to a remote server.
-
-For unit testing, one approach is to try and structure your service code into separate units that can be tested independently. By mocking calls to the API, these individual units can then be tested in isolation, without the need for a connection to the live API.
-
-A useful library for mocking APIs is [nock](https://github.com/pgte/nock). An example test case:
-
-``` js
-'use strict';
-
-var sdk = require('flowxo-sdk'),
-    nock = require('nock');
-
-// Before each test, reset nock
-beforeEach(nock.cleanAll);
-
-describe('Get Person',function(){
-  it('should throw authentication error on 401', function(done){
-    // Setup our mocked 401 response
-    var scope = nock('https://my.service.com')
-                .get('/persons/1')
-                .reply(401);
-
-    this.runner('get_person', 'run', { input: {person_id: 1} }, function(err, output){
-      expect(err).to.be.defined;
-      expect(err).to.be.instanceof(sdk.Error.AuthError);
-      expect(scope.isDone()).to.be.true;
-      done();
-    });
-  });
-});
-```
-
 # Submitting your Service
 
 Before you submit your service to us, please work through this checklist:
@@ -1574,3 +1422,7 @@ Before you submit your service to us, please work through this checklist:
 - If there's anything else we need to consider when reviewing your service, it should be included in `README.md`.
 
 To submit, please [email us](mailto:support@flowxo.com) with details of the service you've built and your contact details, and we'll explain what to do next. Thanks for supporting Flow XO!
+
+# Known Issues
+
+- Field Dependencies: Only `select` type fields may have dependencies, however the SDK does not throw an error if other field types (such as `text`) are set up with dependencies.
