@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.0] - 2015-08-18
+### Removed
+Flow XO services are no longer unit testable, instead the preferred way of testing is via the `grunt run` command.
+
+This is a breaking change, hence the major version number bump.
+
 ## [1.5.0] - 2015-08-07
 ### Added
 - `input.js` scripts now receive all collected input fields when being run.
