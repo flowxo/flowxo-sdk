@@ -4,7 +4,7 @@
 
 Each supported service is built as a _module_ which is called by the Flow XO _core_. A service is split into separate _methods_, and each method is either a _trigger_ (looks for new records, or receives new records via a webhook) or an _action_ (creates, updates or deletes records).
 
-We've opened up our SDK so that anyone can build support for their service into Flow XO. The SDK gives you scaffolding for your service, a command-line tool to run your methods locally, tools to write tests and some examples of working services. Not forgetting these docs which should hopefully guide you through the process.
+We've opened up our SDK so that anyone can build support for their service into Flow XO. The SDK gives you scaffolding for your service, a command-line tool to run your methods locally, tools to write integration tests and some examples of working services. Not forgetting these docs which should hopefully guide you through the process.
 
 If you get stuck, just send us an email at [support@flowxo.com](mailto:support@flowxo.com) and we'll try our best to guide you.
 
@@ -67,7 +67,7 @@ service_name
         |-- output.js - optional, returns dynamic output fields
       |-- another_method/
         |-- ...
-  |-- runs/  - created when test runs are recorded
+  |-- runs/  - created when integration test runs are recorded
 ```
 
 The service expects files to remain in their default locations, so try not to move things around unless you know what you are doing.
@@ -82,11 +82,6 @@ The SDK exposes these public properties:
 
 - `Service`: The main service object, return an instance of this in `index.js`.
 - `Error`: Contains a set of Flow XO error objects (see _Handling Errors_).
-
-and these private ones (which you won't need to explicitly use):
-
-- `ScriptRunner`: Used by the test runner. You shouldn't need to explicitly use this, instead, a `runner` is created automatically for you when testing.
-- `Chai`: a set off assertions used for testing.
 
 You'll only be concerned with the public properties when building your service.
 
@@ -240,7 +235,7 @@ Make sure that if the strategy requires any extra configuration, you add it to e
 
 _Note: you do not need to add a `callbackURL` to the options object, as the system will automatically generate a callbackURL for you. When testing the service, you'll need to setup your development machine so that the generated callback URL can be reached by the test runner. See the section Testing > Authentication for more details._
 
-You'll notice the use of [environment variables](https://nodejs.org/api/process.html#process_process_env) to prevent the hard coding of the key and secret. When configuring the service, we'll provide you with these details for connecting to the service, and you should enter the details into the `.env` file for testing purposes. For more details on setting environment variables, refer to the section _Testing > Authentication_.
+You'll notice the use of [environment variables](https://nodejs.org/api/process.html#process_process_env) to prevent the hard coding of the key and secret. When configuring the service, we'll provide you with these details for connecting to the service, and you should enter the details into the `.env` file for integration testing purposes. For more details on setting environment variables, refer to the section _Testing > Authentication_.
 
 When your scripts are run, you'll get the relevant credentials in the `options.credentials` object:
 
@@ -1116,13 +1111,14 @@ Of course, you'll need to submit a Pull Request (PR) to the main `flowxo`-owned 
 
 # Testing
 
-There are two types of testing that are supported by the SDK, unit tests (optional) and integration tests (mandatory).  You can find details of how to write unit tests in our [Unit Testing Guide](TESTS.md).
+Integration tests are mandatory. Unit tests are not required as essentially each service is a wrapper around http calls to an external API. The coverage provided by the integration tests provides sufficent confidence that the service is working correctly.
 
 [Integration testing](http://en.wikipedia.org/wiki/Integration_testing) emulates how the Flow XO platform will use your service, using the live API. You complete the input data and the method's `input.js`, `output.js` and `run.js` scripts are run in order, passing the provided data through and displaying the results. You can also record a series of integration tests, and replay them in order.
 
 You'll need to record a series of integration tests to demonstrate that the service is operating correctly. These will be replayed and validated when you submit (or update) the service. For this reason, integration testing is mandatory.
 
 ## Setup
+
 
 Prior to running integration tests, you'll need to initialise the test environment:
 
@@ -1415,10 +1411,8 @@ ServiceClient.prototype.createPerson = function(person, done) {
 
 Before you submit your service to us, please work through this checklist:
 
-- Share details of a developer/test account with us, ready to run your tests through (include details in `README.md`).
-- Make sure your service has good unit tests.
-- Include a set of `grunt run` tests that we can `grunt run --replay` to see your methods working well.  We need to see your methods dealing with a variety of input (both valid and invalid). It's best to [get in touch](mailto:support@flowxo.com) with us at this stage so we can explain what you need to do here.
-- Run `grunt preflight` to ensure that your unit tests all pass, code conforms to the specified code conventions, and is 'beautified'.
+- Include a set of `grunt run` integration tests that we can `grunt run --replay` to see your methods working well.  We need to see your methods dealing with a variety of input (both valid and invalid). It's best to [get in touch](mailto:support@flowxo.com) with us at this stage so we can explain what you need to do here.
+- Run `grunt preflight` to ensure code conforms to the specified code conventions, and is 'beautified'.
 - If there's anything else we need to consider when reviewing your service, it should be included in `README.md`.
 
 To submit, please [email us](mailto:support@flowxo.com) with details of the service you've built and your contact details, and we'll explain what to do next. Thanks for supporting Flow XO!
