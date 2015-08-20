@@ -28,7 +28,9 @@ Please review our [Service Authoring Guidelines](GUIDELINES.md) which detail the
 
 Use our example services as a reference when building your service:
 
-- [Trello Example](https://github.com/flowxo/flowxo-services-trello-example) - uses OAuth1 for authentication.
+We have created a wealth of examples with some example service repositories. 
+
+[View all Flow XO Service Examples](EXAMPLES.md)
 
 _(We're hoping to bring you more examples soon!)_
 
@@ -1216,16 +1218,33 @@ In this mode, your input actions are captured, so they can be replayed later wit
 grunt run --replay
 ```
 
-Your actions are captured to the `runs/` folder, to a file `runs.json`. You can specify the name of this file to record to / replay from:
+By default your test actions are captured to the `runs/` folder, to a file `runs.json`. 
+
+However, it is preferred that you record integration tests for each method, to a separate file. For example:
 
 ```
-grunt run --record --name=bob
-grunt run --replay --name=bob
+grunt run --record --name=add_customer
+grunt run --replay --name=new_customer
 ```
 
-Note that subsequent calls to `grunt run --record` will append to your existing actions, rather than overwrite them. If you need to start a fresh set of actions, you'll need to clear the file manually.
+Note that subsequent calls to `grunt run --record --name=add_customer` will append to your existing actions, rather than overwrite them. 
+
+If you need to start a fresh set of actions, you'll need to clear the file manually.
 
 The `runs/` folder can be committed to version control, allowing others the chance to replay tests you have recorded. Bear in mind that they will often need to be authenticated as the same user as you in order to replay the tests successfully.
+
+## Integration Test Documentation
+
+Integration test documentation is very important. Without it we cannot verify the stability or correct operation of your service.
+
+[Here is an example](https://github.com/flowxo/flowxo-services-google-sheets-example/blob/master/lib/methods/get_row/readme.md) of the standard that we require.
+
+Integration test documentation should leverage other methods in your service. For instance, if you are testing a trigger called new_customer:
+
+* run the trigger 'new_customer' with grunt run to populate the poller cache
+* run the action 'add_customer' to add a new customer
+* re-run the trigger 'new_customer' to confirm that you see the new customer returned.
+
 
 ## Testing Pollers
 
