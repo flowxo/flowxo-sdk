@@ -1113,7 +1113,7 @@ Of course, you'll need to submit a Pull Request (PR) to the main `flowxo`-owned 
 
 # Testing
 
-Integration tests are mandatory. Unit tests are not required as essentially each service is a wrapper around http calls to an external API. The coverage provided by the integration tests provides sufficent confidence that the service is working correctly.
+Integration tests are mandatory. Unit tests are not required as essentially each service is a wrapper around http calls to an external API. The coverage provided by the integration tests provides sufficient confidence that the service is working correctly.
 
 [Integration testing](http://en.wikipedia.org/wiki/Integration_testing) emulates how the Flow XO platform will use your service, using the live API. You complete the input data and the method's `input.js`, `output.js` and `run.js` scripts are run in order, passing the provided data through and displaying the results. You can also record a series of integration tests, and replay them in order.
 
