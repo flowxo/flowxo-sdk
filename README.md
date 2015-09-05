@@ -121,7 +121,7 @@ Take a look at the example modules to see what kind of code you should be centra
 
 Flow XO supports credential based auth (where the user provides some kind of secret that can be used for authorization) or the [OAuth](http://oauth.net/) protocol, where the user grants access directly through the service being accessed. Both OAuth 1 and OAuth 2 are supported.
 
-## Credentials
+### Credentials
 
 We support authorization with credentials (an API key, token, username/password or actually any combination of fields) which are passed into your scripts at runtime and can then be used to authorize requests.
 
@@ -157,7 +157,7 @@ See the section _Input Fields_ for a list of the field types you can use here.
 
 When your scripts are run, you'll get the credentials in `options.credentials`.
 
-### ping.js
+#### ping.js
 
 A `credentials` service will be scaffolded with a `lib/ping.js` script, which needs to be implemented to check that the details provided by the user are valid. After the user has provided their credentials to connect to a new account, the core will call `ping.js` to check those credentials work.
 
@@ -178,7 +178,7 @@ module.exports = function(options, done) {
 }
 ```
 
-## OAuth
+### OAuth
 
 Most external APIs now support authentication using OAuth and typically offer OAuth 2. This is the preferred method of authentication so you should always investigate if OAuth 2 is supported by the API you are working with.
 
@@ -370,7 +370,7 @@ The description is displayed underneath the field.
 
 You can also use text areas, select boxes, special date/time fields and boolean fields.
 
-## Text Areas
+### Text Areas
 
 ``` js
 {
@@ -380,7 +380,7 @@ You can also use text areas, select boxes, special date/time fields and boolean 
 }
 ```
 
-## Select Boxes
+### Select Boxes
 
 ``` js
 {
@@ -403,7 +403,7 @@ You can also use text areas, select boxes, special date/time fields and boolean 
 
 Notice that the `default` field references the `value` of the matching `input_options`. So, in the example above, the select box will show the 'Low' item by default.
 
-## Date/Time Fields
+### Date/Time Fields
 
 ``` js
 {
@@ -446,7 +446,7 @@ var formattedStr = date.parsed.format('{yyyy}-{MM}-{dd}');
 
 _Note: by default, sugar.js also enhances other JavaScript objects, such as `Number`, `String` and `Array`. Flow XO uses a [customised version](https://github.com/fiznool/sugar-date) of sugar.js which only enhances the `Date` prototype._
 
-## Boolean Fields
+### Boolean Fields
 
 ``` js
 {
@@ -618,13 +618,13 @@ You'll see that arrays are indexed from 0 - so `people__0__name` refers to the `
 
 _Note: when implementing your scripts, expect and return data in regular 'nested' form, i.e. don't worry about flattening or unflattening data. The double underscore notation is only used for the output configuration._
 
-# input.js (Custom Input Fields)
+# input.js
 
-Sometimes it's necessary to generate fields at runtime. As an example, if our method has an input _User_, then it's usually best to load up a list of users into a select box rather than expect a user ID. We won't know who those users are until the account has been authorized, and that list might change from time to time.
+Sometimes it's necessary to generate fields at runtime (custom input fields). As an example, if our method has an input _User_, then it's usually best to load up a list of users into a select box rather than expect a user ID. We won't know who those users are until the account has been authorized, and that list might change from time to time.
 
 So the way forward is to use an `input.js` script. The script is very similar to `run.js`, except it either returns an error, or an array of input fields on success. See the section _Input Fields_ for the format of the array you should return.
 
-## Dependant Fields
+### Dependant Fields
 
 A dependant field is an input field whose range of values is dependant on the value selected in another input field.
 
@@ -748,9 +748,9 @@ module.exports = function(options, done) {
 
 Notice that the script either returns the `league` OR `team` field, never both.
 
-# output.js (Custom Output Fields)
+# output.js
 
-`output.js` scripts are executed at runtime and augment the static output fields defined in the `config.js`.
+`output.js` (custom output field) scripts are executed at runtime and augment the static output fields defined in the `config.js`.
 
 Use an output script where the service supports 'custom fields'. For example, many [CRMs](http://en.wikipedia.org/wiki/Customer_relationship_management) allow administrators to define extra data fields alongside standard fields such as name, phone, etc.
 
@@ -901,11 +901,11 @@ var config = {
 
 This configuration will automatically be scaffolded when you choose a _Webhook Trigger_ from the list when running `yo flowxo:method`.
 
-## Fields
+### Fields
 
 A webhook trigger cannot supply any input fields, but it should define its expected output fields in the configuration. This should match up with the format expected to be sent by the service.
 
-## Handling The Webhook
+### Handling The Webhook
 
 Notice that a webhook trigger also has a `run.js` file, just like a poller trigger or an action. This allows you to manipulate the data received from the webhook before triggering a workflow, into the format defined by the output fields config.
 
@@ -945,7 +945,7 @@ module.exports = function(options, done) {
 };
 ```
 
-## Help Instructions
+### Help Instructions
 
 You should provide a `help` property to tell the user how to configure the webhook in your service. `help.webhook.config` and `help.webhook.test` accept an array of paragraphs which will be displayed to the user when the service is being set up.
 
@@ -996,7 +996,7 @@ The built-in validator applies some sane defaults to `validate.js`, namely:
 - format: 'flat'
 - fullMessages: true
 
-## Validating Datetime and Boolean Fields
+### Validating Datetime and Boolean Fields
 
 The SDK also provides two custom validators for dealing with Flow XO Datetime and Boolean fields. Use them as follows:
 
@@ -1024,7 +1024,7 @@ module.exports = function(options, done){
 
 The callback for your script expects either an error (if the request failed) or an object (on success). This section will help you to understand how to construct your errors.
 
-## Retryable Errors
+### Retryable Errors
 
 These occur when you can't access a service or you get a response back in a format that you don't recognise, and are the default error type. They're usually recoverable, and so the platform will retry the request later.
 
@@ -1049,7 +1049,7 @@ The core will retry the request up to 5 times (with exponential back-off), and i
 
 If you are in doubt about what error to return, use a retryable error, to give the script the best possible chance to succeed.
 
-## Service Errors
+### Service Errors
 
 Service errors are where a user's request can't be completed for operational reasons. This includes validation errors, objects not being found, quotas being exceeded, etc.
 
@@ -1069,7 +1069,7 @@ cb(new sdk.Error.ServiceError('You must provide a value.', err))
 
 Take care with the tone and style of the message passed to your `ServiceError`, as it will be displayed directly to the user.
 
-## Auth Errors
+### Auth Errors
 
 A special case is where the API returns an error relating to authorization (usually when a REST API returns a status code `401`).
 
@@ -1085,7 +1085,7 @@ Integration tests are mandatory. Unit tests are not required as essentially each
 
 You'll need to record a series of integration tests to demonstrate that the service is operating correctly. These will be replayed and validated when you submit (or update) the service. For this reason, integration testing is mandatory.
 
-## Setup
+### Setup
 
 Prior to running integration tests, you'll need to initialise the test environment:
 
@@ -1093,7 +1093,7 @@ Prior to running integration tests, you'll need to initialise the test environme
 grunt init
 ```
 
-## Authentication
+### Authentication
 
 Since your integration tests will be hitting the service's real API, before running the tests, it's important to generate some authentication credentials.
 
@@ -1107,13 +1107,13 @@ Once acquired, the `grunt auth` task will automatically populate the credentials
 
 You'll acquire credentials in a different way, depending on the service.
 
-### Basic Credentials
+#### Basic Credentials
 
 If your service authenticates with basic `credentials` (e.g. API key), you'll be prompted to enter the details on the command line.
 
 Once all details have been filled in, the service's `ping.js` script is run, to validate that the credentials are correct. Ensure this has been implemented correctly, otherwise the credentials won't be stored.
 
-### OAuth
+#### OAuth
 
 If your service authenticates via OAuth, running `grunt auth` will open a browser window, where you'll need to enter your username/password to authenticate with the service. We'll provide you with these login details.
 
@@ -1142,7 +1142,7 @@ _Note - you may be wondering why we don't just use `http://localhost:9000` or `h
 
 You can change the URL and port used for OAuth with the `OAUTH_SERVER_URL`, `OAUTH_SERVER_PORT` and `PORT` settings in your `.env` file.
 
-## Running Tests
+### Running Tests
 
 You run an integration test with
 
@@ -1158,7 +1158,7 @@ You can also run a single method script:
 grunt run --single
 ```
 
-## Recording Tests
+### Recording Tests
 
 You can record a series of integration tests with
 
@@ -1187,13 +1187,13 @@ If you need to start a fresh set of actions, you'll need to clear the file manua
 
 The `runs/` folder can be committed to version control, allowing others the chance to replay tests you have recorded. Bear in mind that they will often need to be authenticated as the same user as you in order to replay the tests successfully.
 
-## Test Documentation
+### Test Documentation
 
 Integration test documentation is very important. Without it we cannot verify that your service works as expected.
 
 [Here is an example](https://github.com/flowxo/flowxo-services-trello-example#integration-tests) of how to document your integration tests in the `README.md` file.
 
-## Testing Pollers
+### Testing Pollers
 
 The first time an integration test is run for a poller, you'll see no data returned from the service. This is due to the way that pollers work.  The first time the API is hit, the poll cache is filled with all existing data from the service.
 
@@ -1207,13 +1207,13 @@ The poll cache is stored in memory for the duration of the `grunt run --record` 
 
 # Examples
 
-## Example Services
+### Example Services
 
 - [Flow XO Trello Service Example](https://github.com/flowxo/flowxo-services-trello-example)
 - [Flow XO Stripe Service Example](https://github.com/flowxo/flowxo-services-stripe-example)
 - [Flow XO Google Sheets Service Example](https://github.com/flowxo/flowxo-services-google-sheets-example)
 
-## Code Sample Index
+### Code Sample Index
 
 This index will help you to drill down into our example services and find code relating to all the concepts described in this documentation.
 
