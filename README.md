@@ -1024,70 +1024,76 @@ Use an instance of `AuthError`, which is very similar to `ServiceError`. If the 
 
 Take care with the tone and style of the message passed to your `AuthError`, as it will be displayed directly to the user.
 
-## Example
+# Input Validation
 
-Here's a commonly used pattern for dealing with errors in a `request` callback. In this case, our API broadly follows [REST](http://en.wikipedia.org/wiki/Representational_state_transfer) principles, and uses OAuth:
+Where possible, we recommend that you leave detailed input validation up to the API you are dealing with - just send the data you've got and ensure that your response handling code covers any validation errors.
+
+However there can be times when some simple validation of the input will immediately reveal an error is going to occur before continuing, saving a roundtrip to the service.
+
+For example, if you are writing a `get_person` method, and your `run.js` script is going to construct the following URL to query:
 
 ``` js
-var ServiceError = sdk.Error.ServiceError,
-    AuthError = sdk.Error.AuthError;
-
-request(options, function(err, response, body) {
-  if(err) {
-    // Pass back the error. This will be classed as 'retryable';
-    return done(err);
-  }
-
-  if(response.statusCode >= 200 && response.statusCode <= 299) {
-    // 2xx means it was a success!
-    return done(null, body);
-  }
-
-  var errorMessage = body && body.message;
-
-  if(response.statusCode === 401) {
-    // A 401 is an Unauthorized error.
-    // By passing back an AuthError, if the service is OAuth 2,
-    // an attempt will be made to refresh the access token,
-    // and the script will be retried. Otherwise, the error
-    // will be logged and the workflow request will be aborted.
-    return done(new AuthError(errorMessage || 'Authorization error'));
-  }
-
-  if(response.statusCode >= 400 && response.statusCode <= 499) {
-    // 4xx is a client error. There was probably an issue
-    // with the input data, so it does not make sense to retry
-    // the request.
-    return done(new ServiceError(errorMessage || 'An error occurred when sending data to the service.'));
-  }
-
-  // Count any other status code range as a retryable error,
-  // giving the script the best possible chance to succeed.
-  // This could include:
-  //  - 3xx: redirects.
-  //  - 5xx: a server error. This is usually temporary.
-  done(new Error(errorMessage || body || 'unknown error'));
-});
+var personUrl = 'https://my.service.com/persons/' + options.person_id
 ```
 
-In practice, you'll probably want to wrap this logic up into a centralised `errorHandler` function in `lib/index.js`.
+If `options.person_id` is `undefined`, or contains spaces, or isn't alphanumeric, we should immediately abort.
 
-# Authorized Libraries
+To perform this sort of validation, the SDK provides a set of helper methods based on the [validate.js](http://validatejs.org/) library.
 
-Each service is manually reviewed before we make it available in Flow XO, and part of that process is making sure that only authorized libraries are used in your scripts.
+There are two methods available on the service:
 
-We do this for security and stability reasons, and also so that we can help developers without having to learn a different library each time.
+- `service.validate`: exposes the `validate.js` object and therefore provides the entire `validate.js` API.
+- `service.validateScriptInput(data, constrainsts, options)`: runs the passed data through the validator, returning any errors as an instance of `sdk.Error.ServiceError`. This is a convenience wrapper around the `service.validate` method, which is useful for validating script input data, as any returned error can be passed straight to the `done` handler of the script.
 
-If you need a library that isn't on this list, please get in touch so we can review it.
+Here is an example of using the `validateScriptInput` method in a script.
 
-- [async](https://github.com/caolan/async) - Async utilities
-- [request](https://github.com/request/request) - Simplified HTTP request client
-- [xml2js](https://github.com/Leonidas-from-XIV/node-xml2js) - XML to object conversion
-- [validate.js](http://validatejs.org/) - Validating javascript objects (commonly the input data)
-- [q](https://github.com/kriskowal/q) - Promise library
-- [lodash](https://lodash.com/) - JavaScript utility library
+``` js
 
-If you are developing an OAuth service, you'll also need to use a passport strategy. Find yours from the [list of providers](http://passportjs.org/guide/providers/).
+// run.js
+
+module.exports = function(options, done){
+  // Input validation
+  var inputErr = this.validateScriptInput(options.input, {
+    person_id: { presence: true, numericality: true }
+  });
+
+  if(inputErr){
+    return done(inputErr);
+  }
+
+  // Else carry on safe in the knowledge options.person_id is
+  // there and is a number
+}
+```
+
+The built-in validator applies some sane defaults to `validate.js`, namely:
+
+- format: 'flat'
+- fullMessages: true
+
+### Validating Datetime and Boolean Fields
+
+The SDK also provides two custom validators for dealing with Flow XO Datetime and Boolean fields. Use them as follows:
+
+``` js
+// run.js
+
+module.exports = function(options, done){
+  // Input validation
+  var inputErr = this.validateScriptInput(options.input, {
+    required_due_date: { fxoDatetime: { required: true } },
+    optional_due_date: { fxoDatetime: true },
+    required_boolean: { fxoBoolean: { required: true } },
+    optional_boolean: { fxoBoolean: true },
+  });
+
+  if(inputErr){
+    return done(inputErr);
+  }
+
+  // ...
+}
+```
 
 # Testing
 
@@ -1218,162 +1224,6 @@ To simulate a poller finding new data, you will need to:
 
 The poll cache is stored in memory for the duration of the `grunt run --record` or `grunt run --replay` session.  As soon as you exit `grunt run`, the poll cache is lost.
 
-# Recipes
-
-The Flow XO SDK and the services scaffolded by the Flow XO Generator try to be as non-opioniated as possible, not forcing you to take one approach over another. Below are some common 'recipes' you may find helpful in your code.
-
-## Input Validation
-
-Where possible, we recommend that you leave detailed input validation up to the API you are dealing with - just send the data you've got and ensure that your response handling code covers any validation errors.
-
-However there can be times when some simple validation of the input will immediately reveal an error is going to occur before continuing, saving a roundtrip to the service.
-
-For example, if you are writing a `get_person` method, and your `run.js` script is going to construct the following URL to query:
-
-``` js
-var personUrl = 'https://my.service.com/persons/' + options.person_id
-```
-
-If `options.person_id` is `undefined`, or contains spaces, or isn't alphanumeric, we should immediately abort.
-
-To perform this sort of validation, the SDK provides a set of helper methods based on the [validate.js](http://validatejs.org/) library.
-
-There are two methods available on the service:
-
-- `service.validate`: exposes the `validate.js` object and therefore provides the entire `validate.js` API.
-- `service.validateScriptInput(data, constrainsts, options)`: runs the passed data through the validator, returning any errors as an instance of `sdk.Error.ServiceError`. This is a convenience wrapper around the `service.validate` method, which is useful for validating script input data, as any returned error can be passed straight to the `done` handler of the script.
-
-Here is an example of using the `validateScriptInput` method in a script.
-
-``` js
-
-// run.js
-
-module.exports = function(options, done){
-  // Input validation
-  var inputErr = this.validateScriptInput(options.input, {
-    person_id: { presence: true, numericality: true }
-  });
-
-  if(inputErr){
-    return done(inputErr);
-  }
-
-  // Else carry on safe in the knowledge options.person_id is
-  // there and is a number
-}
-```
-
-The built-in validator applies some sane defaults to `validate.js`, namely:
-
-- format: 'flat'
-- fullMessages: true
-
-### Validating Datetime and Boolean Fields
-
-The SDK also provides two custom validators for dealing with Flow XO Datetime and Boolean fields. Use them as follows:
-
-``` js
-// run.js
-
-module.exports = function(options, done){
-  // Input validation
-  var inputErr = this.validateScriptInput(options.input, {
-    required_due_date: { fxoDatetime: { required: true } },
-    optional_due_date: { fxoDatetime: true },
-    required_boolean: { fxoBoolean: { required: true } },
-    optional_boolean: { fxoBoolean: true },
-  });
-
-  if(inputErr){
-    return done(inputErr);
-  }
-
-  // ...
-}
-```
-
-## Request Client
-
-If the service you are accessing has a RESTful API, it can often be beneficial to streamline the request sending and response handling into a single function, and pass in parameters depending on the endpoint to be reached.
-
-We call this a 'client' connector. See below for an example.
-
-``` js
-// client.js
-
-var request = require('request'); // npm install --save request
-
-function ServiceClient(credentials) {
-  this.credentials = credentials;
-}
-
-ServiceClient.prototype._request = function(options, done) {
-  var opt = {
-    url: url.format({
-      protocol: 'https',
-      host: 'my.service.com',
-      pathname: options.path,
-      query: options.query || {}
-    }),
-    oauth: this.credentials,
-    headers: {
-      Accept: 'application/json',
-    },
-    method: options.method || 'GET',
-    json: options.json || true
-  };
-
-  request(opt, function(err, res, body) {
-    if(err) {
-      // Retryable error - possibly network related.
-      return done(err);
-    }
-
-    if(res.statusCode >= 200 && res.statusCode <= 299) {
-      // 2xx means it was a success!
-      return done(null, body);
-    }
-
-    if(res.statusCode === 401) {
-      // 401 is an auth error.
-      return done(new AuthError('Your service connection is not valid, please renew.'));
-    }
-
-    if(res.statusCode >= 400 && res.statusCode <= 499) {
-      // Any other 4xx is a client error.
-      // Return a ServiceError - don't run again.
-      return done(new ServiceError(body || 'Something unexpected happened and the request didn\'t succeed.'));
-    }
-
-    // Some other, retryable error occurred.
-    done(new Error(body || 'An unexpected error occurred.'));
-  });
-};
-
-ServiceClient.prototype.getAllPersons = function(done) {
-  var options = {
-    path: '/persons'
-  };
-  this._request(options, done);
-};
-
-ServiceClient.prototype.getPerson = function(personId, done) {
-  var options = {
-    path: '/persons/' + personId
-  };
-  this._request(options, done);
-};
-
-ServiceClient.prototype.createPerson = function(person, done) {
-  var options = {
-    path: '/persons',
-    json: person
-  };
-  this._request(options, done);
-};
-```
-
 # Example Services
 
 - [Flow XO Trello Service Example](https://github.com/flowxo/flowxo-services-trello-example)
@@ -1406,6 +1256,23 @@ This index will help you to drill down into our example services and find code r
 - [Poller Trigger - No Inputs](https://github.com/flowxo/flowxo-services-stripe-example/tree/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer)
 - [Poller Trigger - With Inputs](https://github.com/flowxo/flowxo-services-trello-example/tree/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/new_card)
 - [Validation](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/run.js#L5-L54)
+
+# Authorized Libraries
+
+Each service is manually reviewed before we make it available in Flow XO, and part of that process is making sure that only authorized libraries are used in your scripts.
+
+We do this for security and stability reasons, and also so that we can help developers without having to learn a different library each time.
+
+If you need a library that isn't on this list, please get in touch so we can review it.
+
+- [async](https://github.com/caolan/async) - Async utilities
+- [request](https://github.com/request/request) - Simplified HTTP request client
+- [xml2js](https://github.com/Leonidas-from-XIV/node-xml2js) - XML to object conversion
+- [validate.js](http://validatejs.org/) - Validating javascript objects (commonly the input data)
+- [q](https://github.com/kriskowal/q) - Promise library
+- [lodash](https://lodash.com/) - JavaScript utility library
+
+If you are developing an OAuth service, you'll also need to use a passport strategy. Find yours from the [list of providers](http://passportjs.org/guide/providers/).
 
 # Updating a Method
 
