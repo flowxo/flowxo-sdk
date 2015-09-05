@@ -26,15 +26,15 @@ Please review our [Service Authoring Guidelines](GUIDELINES.md) which detail the
 
 # Example Services
 
-1. [Flow XO Trello Service Example](https://github.com/flowxo/flowxo-services-trello-example)
-2. [Flow XO Stripe Service Example](https://github.com/flowxo/flowxo-services-stripe-example)
-3. [Flow XO Google Sheets Service Example](https://github.com/flowxo/flowxo-services-google-sheets-example)
+- [Flow XO Trello Service Example](https://github.com/flowxo/flowxo-services-trello-example)
+- [Flow XO Stripe Service Example](https://github.com/flowxo/flowxo-services-stripe-example)
+- [Flow XO Google Sheets Service Example](https://github.com/flowxo/flowxo-services-google-sheets-example)
 
 # Example Code Index
 
 This index will help you to drill down into our example services and find code relating to all the concepts described in this documentation.
 
-- [Authentication - OAuth 1](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L12-L38)
+- [Authentication - OAuth 1](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L12-L51)
 - [Authentication - OAuth 2](https://github.com/flowxo/flowxo-services-stripe-example/blob/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/index.js#L9-L41)
 - Authentication - Key/Credentials
 - [Errors - Authentication](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L90-L95)
@@ -46,11 +46,11 @@ This index will help you to drill down into our example services and find code r
 - [Input Fields - Datetime](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/config.js#L33-L37)
 - [Input Fields - Datetime (Handling)](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/run.js#L44-L62)
 - [Input Fields - Dependant Fields](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/input.js)
-- [Input Fields - Select](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/config.js#L23-L32)
+- [Input Fields - Select](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/config.js#L22-L33)
 - [Integration Tests](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/README.md#integration-tests)
 - [Output Fields - Custom Fields](https://github.com/flowxo/flowxo-services-google-sheets-example/blob/8c3f7a752935e8f92186e1a2bb81898bbdc9b28d/lib/methods/get_row/output.js)
-- [Output Fields - Dealing with Arrays](https://github.com/flowxo/flowxo-services-stripe-example/blob/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer/config.js#L137-L138)
-- [Output Fields - Dealing with Nested Properties](https://github.com/flowxo/flowxo-services-stripe-example/blob/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer/config.js#L131-L132)
+- [Output Fields - Dealing with Arrays](https://github.com/flowxo/flowxo-services-stripe-example/blob/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer/config.js#L136-L139)
+- [Output Fields - Dealing with Nested Properties](https://github.com/flowxo/flowxo-services-stripe-example/blob/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer/config.js#L130-L133)
 - [Poller Trigger - No Inputs](https://github.com/flowxo/flowxo-services-stripe-example/tree/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer)
 - [Poller Trigger - With Inputs](https://github.com/flowxo/flowxo-services-trello-example/tree/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/new_card)
 - [Validation](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/run.js#L5-L54)
