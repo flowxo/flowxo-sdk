@@ -153,7 +153,7 @@ auth: {
 }
 ```
 
-See the section _Creating Methods > Input Fields_ for a list of the field types you can use here.
+See the section _Input Fields_ for a list of the field types you can use here.
 
 When your scripts are run, you'll get the credentials in `options.credentials`.
 
@@ -266,7 +266,7 @@ The [Flow XO Generator](https://github.com/flowxo/generator-flowxo) contains a g
 
 Methods are stored in the `lib/methods/` folder. Each method has its own folder with the name being the `slug` of the method. Inside each method folder you'll find `config.js`, `run.js`, and if you selected these during the scaffold, `input.js` and/or `output.js`.
 
-## config.js
+# config.js
 
 Each method has its own `config.js` file, which defines the method's name, what type of method it is, and describes its input/output fields.
 
@@ -300,7 +300,7 @@ module.exports = function(service) {
 - `scripts` - All methods should have a `run` script. You can reference an `input` and/or an `output` script too. Use input/output scripts to dynamically define fields that are generated at runtime and show alongside the static fields you define in the `fields` property. See the _input.js_ and _output.js_ sections for more details.
 - `fields` - Contains `input` and `output` objects, defining arrays of fields that will be available for input to the script, and the properties that your script will output (on success). See the sections on _Input Fields_ and _Output Fields_ below.
 
-## Input Fields
+# Input Fields
 
 Input fields should be provided as an array of objects that describe what type of data the input field accepts and how it is to behave in the UI.
 
@@ -370,7 +370,7 @@ The description is displayed underneath the field.
 
 You can also use text areas, select boxes, special date/time fields and boolean fields.
 
-### Text Areas
+## Text Areas
 
 ``` js
 {
@@ -380,7 +380,7 @@ You can also use text areas, select boxes, special date/time fields and boolean 
 }
 ```
 
-### Select Boxes
+## Select Boxes
 
 ``` js
 {
@@ -403,7 +403,7 @@ You can also use text areas, select boxes, special date/time fields and boolean 
 
 Notice that the `default` field references the `value` of the matching `input_options`. So, in the example above, the select box will show the 'Low' item by default.
 
-### Date/Time Fields
+## Date/Time Fields
 
 ``` js
 {
@@ -446,7 +446,7 @@ var formattedStr = date.parsed.format('{yyyy}-{MM}-{dd}');
 
 _Note: by default, sugar.js also enhances other JavaScript objects, such as `Number`, `String` and `Array`. Flow XO uses a [customised version](https://github.com/fiznool/sugar-date) of sugar.js which only enhances the `Date` prototype._
 
-### Boolean Fields
+## Boolean Fields
 
 ``` js
 {
@@ -479,7 +479,7 @@ You'll find the original value in `input`, a flag to say whether the boolean is 
 
 Boolean fields are most useful for custom inputs, where the `input_options` are generated from the connected service's API.
 
-## Output Fields
+# Output Fields
 
 Output fields should be provided as an array of objects that describe what data the script will output (its output 'properties').
 
@@ -551,13 +551,13 @@ You will not know in advance how many array items there will be in the output da
 
 Simply refer to your nested data using the double underscore notation, and the SDK will take care of the rest. See the section _Double Underscore Notation_ for more details.
 
-## input.js (Custom Input Fields)
+# input.js (Custom Input Fields)
 
 Sometimes it's necessary to generate fields at runtime. As an example, if our method has an input _User_, then it's usually best to load up a list of users into a select box rather than expect a user ID. We won't know who those users are until the account has been authorized, and that list might change from time to time.
 
 So the way forward is to use an `input.js` script. The script is very similar to `run.js`, except it either returns an error, or an array of input fields on success. See the section _Input Fields_ for the format of the array you should return.
 
-### Dependant Fields
+## Dependant Fields
 
 A dependant field is an input field whose range of values is dependant on the value selected in another input field.
 
@@ -681,7 +681,7 @@ module.exports = function(options, done) {
 
 Notice that the script either returns the `league` OR `team` field, never both.
 
-## output.js (Custom Output Fields)
+# output.js (Custom Output Fields)
 
 `output.js` scripts are executed at runtime and augment the static output fields defined in the `config.js`.
 
@@ -691,7 +691,7 @@ The script is very similar to `run.js`, except it either returns an error, or an
 
 Note that `options.input` will hold the input values that the user has given to the method. Any `{{outputs}}` from other tasks in those values will be replaced with empty strings.
 
-## run.js
+# run.js
 
 This is the primary script of the method. Like every other script, you'll be passed an `options` object and `done` (a callback). The script should do its work and either call `done(err)` or `done(null, output)`.
 
@@ -751,7 +751,7 @@ For actions, return a single object of data.
 
 All the keys that your script might output should be included in the output fields described in the method's `config.js` (or `output.js`). Remember that nested data should be described using double underscore notation, e.g. `some__nested` (for the object above).
 
-## Double Underscore Notation
+# Double Underscore Notation
 
 Output data in Flow XO can be referenced in your output fields using _double underscore notation_.  For example, take this data returned from an API:
 
@@ -818,7 +818,7 @@ You'll see that arrays are indexed from 0 - so `people__0__name` refers to the `
 
 _Note: when implementing your scripts, expect and return data in regular 'nested' form, i.e. don't worry about flattening or unflattening data. The double underscore notation is only used for the output configuration._
 
-## Polling
+# Polling
 
 Flow XO supports 2 trigger mechanisms: __polling__ and __webhooks__. Polling involves hitting an API periodically to check for new items, and is the most popular way of building a trigger. Polling is more resource intensive than webhooks, but they're much easier for users to set up (currently users have to manually configure webhooks).
 
@@ -860,7 +860,7 @@ Internally, the `options.poller` function asks the database whether each key has
 
 To see polling triggers in action, study our example services (see the _Example Services_ section).
 
-## Webhooks
+# Webhooks
 
 Flow XO has general [webhooks support](http://support.flowxo.com/article/22-webhooks), but methods within services can be triggered by webhooks too.
 
@@ -901,11 +901,11 @@ var config = {
 
 This configuration will automatically be scaffolded when you choose a _Webhook Trigger_ from the list when running `yo flowxo:method`.
 
-### Fields
+## Fields
 
 A webhook trigger cannot supply any input fields, but it should define its expected output fields in the configuration. This should match up with the format expected to be sent by the service.
 
-### Run Script
+## Handling The Webhook
 
 Notice that a webhook trigger also has a `run.js` file, just like a poller trigger or an action. This allows you to manipulate the data received from the webhook before triggering a workflow, into the format defined by the output fields config.
 
@@ -945,11 +945,11 @@ module.exports = function(options, done) {
 };
 ```
 
-### Help Instructions
+## Help Instructions
 
 You should provide a `help` property to tell the user how to configure the webhook in your service. `help.webhook.config` and `help.webhook.test` accept an array of paragraphs which will be displayed to the user when the service is being set up.
 
-## Input Validation
+# Input Validation
 
 Where possible, we recommend that you leave detailed input validation up to the API you are dealing with - just send the data you've got and ensure that your response handling code covers any validation errors.
 
@@ -996,7 +996,7 @@ The built-in validator applies some sane defaults to `validate.js`, namely:
 - format: 'flat'
 - fullMessages: true
 
-### Validating Datetime and Boolean Fields
+## Validating Datetime and Boolean Fields
 
 The SDK also provides two custom validators for dealing with Flow XO Datetime and Boolean fields. Use them as follows:
 
@@ -1020,11 +1020,11 @@ module.exports = function(options, done){
 }
 ```
 
-## Handling Errors
+# Handling Errors
 
 The callback for your script expects either an error (if the request failed) or an object (on success). This section will help you to understand how to construct your errors.
 
-### Retryable Errors
+## Retryable Errors
 
 These occur when you can't access a service or you get a response back in a format that you don't recognise, and are the default error type. They're usually recoverable, and so the platform will retry the request later.
 
@@ -1049,7 +1049,7 @@ The core will retry the request up to 5 times (with exponential back-off), and i
 
 If you are in doubt about what error to return, use a retryable error, to give the script the best possible chance to succeed.
 
-### Service Errors
+## Service Errors
 
 Service errors are where a user's request can't be completed for operational reasons. This includes validation errors, objects not being found, quotas being exceeded, etc.
 
@@ -1069,7 +1069,7 @@ cb(new sdk.Error.ServiceError('You must provide a value.', err))
 
 Take care with the tone and style of the message passed to your `ServiceError`, as it will be displayed directly to the user.
 
-### Auth Errors
+## Auth Errors
 
 A special case is where the API returns an error relating to authorization (usually when a REST API returns a status code `401`).
 
