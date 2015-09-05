@@ -51,8 +51,8 @@ service_name
       |-- method_name/
         |-- config.js - describes the method & input/output fields
         |-- run.js - the core calls this script to run the method
-        |-- input.js - optional, returns dynamic input fields
-        |-- output.js - optional, returns dynamic output fields
+        |-- input.js - optional, returns custom input fields
+        |-- output.js - optional, returns custom output fields
       |-- another_method/
         |-- ...
   |-- runs/  - created when integration test runs are recorded
@@ -551,7 +551,7 @@ You will not know in advance how many array items there will be in the output da
 
 Simply refer to your nested data using the double underscore notation, and the SDK will take care of the rest. See the section _Double Underscore Notation_ for more details.
 
-## input.js (Custom Fields)
+## input.js (Custom Input Fields)
 
 Sometimes it's necessary to generate fields at runtime. As an example, if our method has an input _User_, then it's usually best to load up a list of users into a select box rather than expect a user ID. We won't know who those users are until the account has been authorized, and that list might change from time to time.
 
@@ -681,7 +681,7 @@ module.exports = function(options, done) {
 
 Notice that the script either returns the `league` OR `team` field, never both.
 
-## output.js
+## output.js (Custom Output Fields)
 
 `output.js` scripts are executed at runtime and augment the static output fields defined in the `config.js`.
 
@@ -1077,7 +1077,7 @@ module.exports = function(options, done){
 }
 ```
 
-# Testing
+# Testing & Development Environment
 
 Integration tests are mandatory. Unit tests are not required as essentially each service is a wrapper around http calls to an external API. The coverage provided by the integration tests provides sufficient confidence that the service is working correctly.
 
@@ -1086,7 +1086,6 @@ Integration tests are mandatory. Unit tests are not required as essentially each
 You'll need to record a series of integration tests to demonstrate that the service is operating correctly. These will be replayed and validated when you submit (or update) the service. For this reason, integration testing is mandatory.
 
 ## Setup
-
 
 Prior to running integration tests, you'll need to initialise the test environment:
 
@@ -1143,7 +1142,7 @@ _Note - you may be wondering why we don't just use `http://localhost:9000` or `h
 
 You can change the URL and port used for OAuth with the `OAUTH_SERVER_URL`, `OAUTH_SERVER_PORT` and `PORT` settings in your `.env` file.
 
-## Running Integration Tests
+## Running Tests
 
 You run an integration test with
 
@@ -1159,7 +1158,7 @@ You can also run a single method script:
 grunt run --single
 ```
 
-## Recording Integration Tests
+## Recording Tests
 
 You can record a series of integration tests with
 
@@ -1188,7 +1187,7 @@ If you need to start a fresh set of actions, you'll need to clear the file manua
 
 The `runs/` folder can be committed to version control, allowing others the chance to replay tests you have recorded. Bear in mind that they will often need to be authenticated as the same user as you in order to replay the tests successfully.
 
-## Integration Test Documentation
+## Test Documentation
 
 Integration test documentation is very important. Without it we cannot verify that your service works as expected.
 
@@ -1206,13 +1205,15 @@ To simulate a poller finding new data, you will need to:
 
 The poll cache is stored in memory for the duration of the `grunt run --record` or `grunt run --replay` session.  As soon as you exit `grunt run`, the poll cache is lost.
 
-# Example Services
+# Examples
+
+## Example Services
 
 - [Flow XO Trello Service Example](https://github.com/flowxo/flowxo-services-trello-example)
 - [Flow XO Stripe Service Example](https://github.com/flowxo/flowxo-services-stripe-example)
 - [Flow XO Google Sheets Service Example](https://github.com/flowxo/flowxo-services-google-sheets-example)
 
-# Example Code Index
+## Code Sample Index
 
 This index will help you to drill down into our example services and find code relating to all the concepts described in this documentation.
 
@@ -1264,7 +1265,7 @@ To deprecate a method, simply set `{ deprecated: true }` in the `config.js`. You
 
 Of course, you'll need to submit a Pull Request (PR) to the main `flowxo`-owned repo to have the changes made live.
 
-# Submitting your Service
+# Submitting Your Service
 
 Before you submit your service to us, please work through this checklist:
 
