@@ -20,10 +20,6 @@ Finally, build and test related tasks are handled by the JavaScript task runner 
 
 That's all. The other tools that the SDK uses will be installed locally with `npm install`.
 
-# Service Authoring Guidelines
-
-Please review our [Service Authoring Guidelines](GUIDELINES.md) which detail the code conventions, language, style and structure that services should follow.
-
 # Example Services
 
 - [Flow XO Trello Service Example](https://github.com/flowxo/flowxo-services-trello-example)
@@ -47,10 +43,12 @@ This index will help you to drill down into our example services and find code r
 - [Input Fields - Datetime (Handling)](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/run.js#L44-L62)
 - [Input Fields - Dependant Fields](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/input.js)
 - [Input Fields - Select](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/config.js#L22-L33)
+- [Input Fields - Static](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/config.js#L13-L52)
 - [Integration Tests](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/README.md#integration-tests)
 - [Output Fields - Custom Fields](https://github.com/flowxo/flowxo-services-google-sheets-example/blob/8c3f7a752935e8f92186e1a2bb81898bbdc9b28d/lib/methods/get_row/output.js)
 - [Output Fields - Dealing with Arrays](https://github.com/flowxo/flowxo-services-stripe-example/blob/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer/config.js#L136-L139)
 - [Output Fields - Dealing with Nested Properties](https://github.com/flowxo/flowxo-services-stripe-example/blob/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer/config.js#L130-L133)
+- [Output Fields - Static](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/new_card/config.js#L13-L172)
 - [Poller Trigger - No Inputs](https://github.com/flowxo/flowxo-services-stripe-example/tree/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer)
 - [Poller Trigger - With Inputs](https://github.com/flowxo/flowxo-services-trello-example/tree/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/new_card)
 - [Validation](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/run.js#L5-L54)
@@ -65,9 +63,9 @@ npm install -g yo generator-flowxo
 
 You should now be able to run `yo flowxo` to generate a service.
 
-If you select a _Credentials_ service, you'll be asked to define the fields that the user must complete. Normally this would be a username, password, API key, token, account name, etc. Just define all the fields you'll need to collect in order to access and authorize against your service's API. See the _Authorization > Credentials_ section for more information.
+If you select credentials authorization, you'll be asked to define the fields that the user must complete. Normally this would be a username, password, API key, token, account name, etc. Just define all the fields you'll need to collect in order to access and authorize against your service's API. See the _Authorization > Credentials_ section for more information.
 
-If you select an _OAuth1_ or _OAuth2_ service, some skeleton configuration will be created that will need to be updated later. See the _Authorization > OAuth_ section for how to do this.
+If you select OAuth, some skeleton configuration will be created that will need to be updated later. See the _Authorization > OAuth_ section for how to do this.
 
 You should now have a populated directory with some scripts. Next, we'll take a look at what we've generated.
 
@@ -154,7 +152,7 @@ Take a look at the example modules to see what kind of code you should be centra
 
 # Authorization
 
-Flow XO supports credential based auth (where the user provides some kind of secret that can be used for authorization) or the [OAuth](http://oauth.net/) protocol, where the user grants access directly through the service being accessed. Both OAuth1 and OAuth2 are supported.
+Flow XO supports credential based auth (where the user provides some kind of secret that can be used for authorization) or the [OAuth](http://oauth.net/) protocol, where the user grants access directly through the service being accessed. Both OAuth 1 and OAuth 2 are supported.
 
 ## Credentials
 
@@ -215,15 +213,15 @@ module.exports = function(options, done) {
 
 ## OAuth
 
-Most external APIs now support authentication using OAuth and typically offer OAuth2. This is the preferred method of authentication so you should always investigate if OAuth2 is supported by the API you are working with.
+Most external APIs now support authentication using OAuth and typically offer OAuth 2. This is the preferred method of authentication so you should always investigate if OAuth 2 is supported by the API you are working with.
 
 We support [OAuth](http://oauth.net/) (versions [1.0a](http://oauth.net/core/1.0a/) and [2.0](http://oauth.net/2/)).
 
 If there's a choice between credentials and OAuth, it's usually better to use OAuth, as instead of copying and pasting credentials, the user will be prompted with a browser window, asking for their username/password for the connecting service.
 
-Flow XO relies on the [Passport](http://passportjs.org/) library for managing OAuth1 and OAuth2 authentication. If you have created an OAuth service, the generated `lib/index.js` file contains a skeleton auth configuration with enough helper text to get you started. You should update the `strategy` property with a valid Passport strategy (remember to install it first with `npm install --save`), and configure the options (`consumerKey`/`consumerSecret` for OAuth1, `clientID`/`clientSecret` for OAuth2) and params (scope, state, etc) that you need.
+Flow XO relies on the [Passport](http://passportjs.org/) library for managing OAuth 1 and OAuth 2 authentication. If you have created an OAuth service, the generated `lib/index.js` file contains a skeleton auth configuration with enough helper text to get you started. You should update the `strategy` property with a valid Passport strategy (remember to install it first with `npm install --save`), and configure the options (`consumerKey`/`consumerSecret` for OAuth 1, `clientID`/`clientSecret` for OAuth 2) and params (scope, state, etc) that you need.
 
-Twitter uses OAuth1, and so an example for a Twitter service might look like:
+Twitter uses OAuth 1, and so an example for a Twitter service might look like:
 
 ``` js
 auth: {
@@ -236,7 +234,7 @@ auth: {
 }
 ```
 
-Facebook uses OAuth2, and so an example for a Facebook service might look like:
+Facebook uses OAuth 2, and so an example for a Facebook service might look like:
 
 ``` js
 auth: {
@@ -282,7 +280,7 @@ When your scripts are run, you'll get the relevant credentials in the `options.c
 }
 ```
 
-The credentials object for OAuth1 matches the structure expected by the [request](https://github.com/request/request#oauth-signing) library, which means you can pass `options.credentials` straight into the request options:
+The credentials object for OAuth 1 matches the structure expected by the [request](https://github.com/request/request#oauth-signing) library, which means you can pass `options.credentials` straight into the request options:
 
 ``` js
 var options = {
@@ -293,7 +291,7 @@ var options = {
 request(options, done);
 ```
 
-You'll need to take special care to use an _Auth Error_ when the API reports an authorization problem. That way, if the service is an OAuth2 service, the core knows to try and refresh the access token and try your script again (when possible). See the section _Handling Errors > Auth Errors_ for details.
+You'll need to take special care to use an _Auth Error_ when the API reports an authorization problem. That way, if the service is an OAuth 2 service, the core knows to try and refresh the access token and try your script again (when possible). See the section _Handling Errors > Auth Errors_ for details.
 
 # Creating Methods
 
@@ -1055,7 +1053,7 @@ Take care with the tone and style of the message passed to your `ServiceError`, 
 
 A special case is where the API returns an error relating to authorization (usually when a REST API returns a status code `401`).
 
-Use an instance of `AuthError`, which is very similar to `ServiceError`. If the service is authorized with OAuth2, the platform will attempt to refresh the OAuth token and retry the request once. If that doesn't succeed, or if the service is not authorized with OAuth2, the error will be written to the workflow log.
+Use an instance of `AuthError`, which is very similar to `ServiceError`. If the service is authorized with OAuth 2, the platform will attempt to refresh the OAuth token and retry the request once. If that doesn't succeed, or if the service is not authorized with OAuth 2, the error will be written to the workflow log.
 
 Take care with the tone and style of the message passed to your `AuthError`, as it will be displayed directly to the user.
 
@@ -1082,7 +1080,7 @@ request(options, function(err, response, body) {
 
   if(response.statusCode === 401) {
     // A 401 is an Unauthorized error.
-    // By passing back an AuthError, if the service is OAuth2,
+    // By passing back an AuthError, if the service is OAuth 2,
     // an attempt will be made to refresh the access token,
     // and the script will be retried. Otherwise, the error
     // will be logged and the workflow request will be aborted.
@@ -1171,13 +1169,13 @@ Once all details have been filled in, the service's `ping.js` script is run, to 
 
 ### OAuth
 
-If your service authenticates via `oauth1` or `oauth2`, running `grunt auth` will open a browser window, where you'll need to enter your username/password to authenticate with the service. We'll provide you with these login details.
+If your service authenticates via OAuth, running `grunt auth` will open a browser window, where you'll need to enter your username/password to authenticate with the service. We'll provide you with these login details.
 
 Prior to running `grunt auth`, there are a few things you'll need to configure.
 
-Firstly, configure the consumer key and secret (for OAuth1) or client ID and secret (for OAuth2). We'll provide you with this information, which you should add to the `.env` file. It's important that these details are only added to the `.env` file, and nowhere else - they should be treated as confidential and __not committed to version control__.
+Firstly, configure the consumer key and secret (for OAuth 1) or client ID and secret (for OAuth 2). We'll provide you with this information, which you should add to the `.env` file. It's important that these details are only added to the `.env` file, and nowhere else - they should be treated as confidential and __not committed to version control__.
 
-A typical .env file for OAuth2 will look like this:
+A typical .env file for OAuth 2 will look like this:
 
 ```
 GOOGLE_SHEETS_ID=asdasd55151211515.apps.googleusercontent.com
@@ -1196,18 +1194,7 @@ Typically most OAuth APIs require you to specify your callback hostnames in thei
 
 _Note - you may be wondering why we don't just use `http://localhost:9000` or `http://127.0.0.1:9000`as the `redirect_uri`. Unfortunately, some OAuth providers do not allow `localhost` or `127.0.0.1`, and so we have invented a fake TLD to use instead._
 
-_Note regarding cloud-based IDEs_: `grunt auth` defaults to listening on the URL `http://flowxo-dev.cc` at port 9000. You can override this by setting the following environment variables in your `.env` file:
-
-```
-OAUTH_SERVER_URL=<your_url>
-OAUTH_SERVER_PORT=<your_port>
-```
-
-In addition to this, `grunt auth` also checks for the presence of a `PORT` environment variable to listen on. This allows you to use [Cloud9](https://c9.io) to fetch the credentials:
-
-- Browse to the "Preview" menu in C9 and click "Preview Running Application". You will see a new browser window open with your custom workspace URL.
-- The URL we use must be our custom Cloud9 URL *without* https. You should default to http first unless your API provider will only call back to a https URL.
-- Don't forget that you will need to configure your callback URL with the OAuth provider so that they recognise your redirect URI as the same host on Cloud9.
+You can change the URL and port used for OAuth with the `OAUTH_SERVER_URL`, `OAUTH_SERVER_PORT` and `PORT` settings in your `.env` file.
 
 ## Running Integration Tests
 
@@ -1256,40 +1243,21 @@ The `runs/` folder can be committed to version control, allowing others the chan
 
 ## Integration Test Documentation
 
-Integration test documentation is very important. Without it we cannot verify the stability or correct operation of your service.
+Integration test documentation is very important. Without it we cannot verify that your service works as expected.
 
-[Here is an example](https://github.com/flowxo/flowxo-services-google-sheets-example/blob/master/lib/methods/get_row/readme.md) of the standard that we require.
-
-Integration test documentation should leverage other methods in your service. For instance, if you are testing a trigger called new_customer:
-
-* run the trigger 'new_customer' with grunt run to populate the poller cache
-* run the action 'add_customer' to add a new customer
-* re-run the trigger 'new_customer' to confirm that you see the new customer returned.
-
+[Here is an example](https://github.com/flowxo/flowxo-services-trello-example#integration-tests) of how to document your integration tests in the `README.md` file.
 
 ## Testing Pollers
 
-The first time an integration test is run for a poller, you'll see no data returned from the service. This is due to the way that pollers work: the first time the API is hit, the pollcache is filled with all existing data from the service.
+The first time an integration test is run for a poller, you'll see no data returned from the service. This is due to the way that pollers work.  The first time the API is hit, the poll cache is filled with all existing data from the service.
 
-To simulate a poller finding new data, you will therefore need to:
+To simulate a poller finding new data, you will need to:
 
 - Run a poller method.
 - Run a 'create data' method, or manually create new data in the service.
 - Run the poller method again.
 
-The pollcache is stored in memory, one per method. This has the following implications:
-
-- If you end a `grunt run`, the pollcache will be cleared.
-- Poller methods will use their own individual caches, meaning that you need to run each poller method once to initialise its pollcache.
-
-For example, imagine you have a method called `new_data` that you want to test. Follow this process to receive new data:
-
-- Begin by running `grunt run`.
-- Select the `new_data` method. No output will be displayed in the console, because the poller has now been populated with the initial set of data.
-- The command prompt will be asking you if you want to run another method. Choose `Y`.
-- By running a 'create data' method, or by manually creating data in the third party service, add some new data that can be retrieved by the `new_data` method.
-- Run the `new_data` method again.
-- You should now see the data that you recently added. The poller has recognised the new data as `new` since the initial cache was populated.
+The poll cache is stored in memory for the duration of the `grunt run --record` or `grunt run --replay` session.  As soon as you exit `grunt run`, the poll cache is lost.
 
 # Recipes
 
@@ -1456,7 +1424,3 @@ Before you submit your service to us, please work through this checklist:
 - If there's anything else we need to consider when reviewing your service, it should be included in `README.md`.
 
 To submit, please [email us](mailto:support@flowxo.com) with details of the service you've built and your contact details, and we'll explain what to do next. Thanks for supporting Flow XO!
-
-# Known Issues
-
-- Field Dependencies: Only `select` type fields may have dependencies, however the SDK does not throw an error if other field types (such as `text`) are set up with dependencies.
