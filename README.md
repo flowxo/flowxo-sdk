@@ -949,64 +949,7 @@ module.exports = function(options, done) {
 
 You should provide a `help` property to tell the user how to configure the webhook in your service. `help.webhook.config` and `help.webhook.test` accept an array of paragraphs which will be displayed to the user when the service is being set up.
 
-# Handling Errors
-
-The callback for your script expects either an error (if the request failed) or an object (on success). This section will help you to understand how to construct your errors.
-
-## Retryable Errors
-
-These occur when you can't access a service or you get a response back in a format that you don't recognise, and are the default error type. They're usually recoverable, and so the platform will retry the request later.
-
-When you encounter a retryable error, return a regular JavaScript error as the error argument in your callback. Either create a new one (`new Error()`) or hand back the error object passed in from a library such as `request`.
-
-You should use a retryable error in situations like these:
-
-- HTTP requests fail. For example, where you use `request.post()` to call the API and your callback receives an error object.
-- Where you receive a 500 status code from the API, and you were expecting 200.
-- If you receive a 200 status code (as expected) and test for the presence of a `result` JSON key in the body, but find that it's not there.
-- A `JSON.parse` of the API's response throws an error.
-
-Depending on the situation, you can either return an error object directly, or create a new error:
-
-- `done(err)` (problem connecting to API)
-- `done(new Error(response.statusCode + ' ' + body))` (some kind of temporary error reported by API)
-- `done(new Error('Could not parse: ' + body))` (API returns invalid JSON)
-
-It's up to you what information your error contains, but make sure it describes the problem. The user will never see these error messages, they're logged and monitored by Flow XO.
-
-The core will retry the request up to 5 times (with exponential back-off), and if after the 5th attempt a retryable error still occurs, it will be written to the workflow log as "The request failed because something unexpected happened.".
-
-If you are in doubt about what error to return, use a retryable error, to give the script the best possible chance to succeed.
-
-## Service Errors
-
-Service errors are where a user's request can't be completed for operational reasons. This includes validation errors, objects not being found, quotas being exceeded, etc.
-
-The core does not make any attempt to retry after a `ServiceError`. Instead, the error message provided with the `ServiceError` is written to the workflow log, and the error object is logged and monitored by the core.
-
-If you run into an error, create a `ServiceError` object and return it as the error argument in your callback:
-
-``` js
-cb(new sdk.Error.ServiceError('You must provide a value.'))
-```
-
-There might also be times where you'd like to include an error object along with your message for debugging purposes, although the error itself won't be shown to the user:
-
-``` js
-cb(new sdk.Error.ServiceError('You must provide a value.', err))
-```
-
-Take care with the tone and style of the message passed to your `ServiceError`, as it will be displayed directly to the user.
-
-## Auth Errors
-
-A special case is where the API returns an error relating to authorization (usually when a REST API returns a status code `401`).
-
-Use an instance of `AuthError`, which is very similar to `ServiceError`. If the service is authorized with OAuth 2, the platform will attempt to refresh the OAuth token and retry the request once. If that doesn't succeed, or if the service is not authorized with OAuth 2, the error will be written to the workflow log.
-
-Take care with the tone and style of the message passed to your `AuthError`, as it will be displayed directly to the user.
-
-# Input Validation
+## Input Validation
 
 Where possible, we recommend that you leave detailed input validation up to the API you are dealing with - just send the data you've got and ensure that your response handling code covers any validation errors.
 
@@ -1053,7 +996,7 @@ The built-in validator applies some sane defaults to `validate.js`, namely:
 - format: 'flat'
 - fullMessages: true
 
-## Validating Datetime and Boolean Fields
+### Validating Datetime and Boolean Fields
 
 The SDK also provides two custom validators for dealing with Flow XO Datetime and Boolean fields. Use them as follows:
 
@@ -1076,6 +1019,63 @@ module.exports = function(options, done){
   // ...
 }
 ```
+
+## Handling Errors
+
+The callback for your script expects either an error (if the request failed) or an object (on success). This section will help you to understand how to construct your errors.
+
+### Retryable Errors
+
+These occur when you can't access a service or you get a response back in a format that you don't recognise, and are the default error type. They're usually recoverable, and so the platform will retry the request later.
+
+When you encounter a retryable error, return a regular JavaScript error as the error argument in your callback. Either create a new one (`new Error()`) or hand back the error object passed in from a library such as `request`.
+
+You should use a retryable error in situations like these:
+
+- HTTP requests fail. For example, where you use `request.post()` to call the API and your callback receives an error object.
+- Where you receive a 500 status code from the API, and you were expecting 200.
+- If you receive a 200 status code (as expected) and test for the presence of a `result` JSON key in the body, but find that it's not there.
+- A `JSON.parse` of the API's response throws an error.
+
+Depending on the situation, you can either return an error object directly, or create a new error:
+
+- `done(err)` (problem connecting to API)
+- `done(new Error(response.statusCode + ' ' + body))` (some kind of temporary error reported by API)
+- `done(new Error('Could not parse: ' + body))` (API returns invalid JSON)
+
+It's up to you what information your error contains, but make sure it describes the problem. The user will never see these error messages, they're logged and monitored by Flow XO.
+
+The core will retry the request up to 5 times (with exponential back-off), and if after the 5th attempt a retryable error still occurs, it will be written to the workflow log as "The request failed because something unexpected happened.".
+
+If you are in doubt about what error to return, use a retryable error, to give the script the best possible chance to succeed.
+
+### Service Errors
+
+Service errors are where a user's request can't be completed for operational reasons. This includes validation errors, objects not being found, quotas being exceeded, etc.
+
+The core does not make any attempt to retry after a `ServiceError`. Instead, the error message provided with the `ServiceError` is written to the workflow log, and the error object is logged and monitored by the core.
+
+If you run into an error, create a `ServiceError` object and return it as the error argument in your callback:
+
+``` js
+cb(new sdk.Error.ServiceError('You must provide a value.'))
+```
+
+There might also be times where you'd like to include an error object along with your message for debugging purposes, although the error itself won't be shown to the user:
+
+``` js
+cb(new sdk.Error.ServiceError('You must provide a value.', err))
+```
+
+Take care with the tone and style of the message passed to your `ServiceError`, as it will be displayed directly to the user.
+
+### Auth Errors
+
+A special case is where the API returns an error relating to authorization (usually when a REST API returns a status code `401`).
+
+Use an instance of `AuthError`, which is very similar to `ServiceError`. If the service is authorized with OAuth 2, the platform will attempt to refresh the OAuth token and retry the request once. If that doesn't succeed, or if the service is not authorized with OAuth 2, the error will be written to the workflow log.
+
+Take care with the tone and style of the message passed to your `AuthError`, as it will be displayed directly to the user.
 
 # Testing & Development Environment
 
