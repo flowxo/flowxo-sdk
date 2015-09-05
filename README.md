@@ -479,39 +479,6 @@ You'll find the original value in `input`, a flag to say whether the boolean is 
 
 Boolean fields are most useful for custom inputs, where the `input_options` are generated from the connected service's API.
 
-#### Field Dependencies
-
-An input field can be configured as a dependant of another field. This signals to the dependant field that its configuration should be loaded _dynamically_ - that is, according to the value of the parent field.
-
-This is useful for relational data, where the value of one field governs the options and/or default value of the other. You'll mostly be configuring Select Boxes as dynamic fields.
-
-This concept is best explained with an example:
-
-- Consider a set of sports leagues, with each league containing different teams. This can be modelled with two select boxes: _league_ and _team_.
-- The options for the _league_ select box are fixed. The options for the _team_ select box are dynamic, and depend upon the value of _league_.
-- Initially, the _league_ select box has no value selected, and so the _team_ select box has no options (and will be automatically hidden by the core UI).
-- When a value is selected for the _league_ select box, this value is used to calculate the options for the _team_ select box.
-- Each time the _league_ value is changed, new options are loaded for the _team_ select box.
-
-To signal that a field has dependencies, include the `dependants` property:
-
-``` js
-{
-  key: 'league',
-  label: 'League',
-  type: 'select',
-  input_options: [
-    { value: 'prem', label: 'Premier League' },
-    { value: 'champ', label: 'Championship' }
-  ],
-  dependants: true
-}
-```
-
-You'll be using the `input.js` script to calcluate and return the dependant field, rather than listing it in `config.js`. See the section _input.js > Loading dependant fields_ for more details.
-
-_Note: the dependant fields are not defined in the config, instead they are returned by `input.js`. This allows you to return different dependant fields according to the value of the parent field._
-
 ### Output Fields
 
 Output fields should be provided as an array of objects that describe what data the script will output (its output 'properties').
@@ -584,19 +551,34 @@ You will not know in advance how many array items there will be in the output da
 
 Simply refer to your nested data using the double underscore notation, and the SDK will take care of the rest. See the section _Double Underscore Notation_ for more details.
 
-## input.js
+## input.js (Custom Fields)
 
 Sometimes it's necessary to generate fields at runtime. As an example, if our method has an input _User_, then it's usually best to load up a list of users into a select box rather than expect a user ID. We won't know who those users are until the account has been authorized, and that list might change from time to time.
 
 So the way forward is to use an `input.js` script. The script is very similar to `run.js`, except it either returns an error, or an array of input fields on success. See the section _Input Fields_ for the format of the array you should return.
 
-### Loading Dependant Fields
+### Dependant Fields
 
 A dependant field is an input field whose range of values is dependant on the value selected in another input field.
 
 For example, imagine you have 2 input fields, _Football League_ and _Football Team_. You want the user to select a League and then choose a Team from that League, but you cannot determine the list of teams to present to the user, until the user has actually chosen a particular league.
 
-This is solved by using the `input.js` script. You'll know that `input.js` is being run to load a dependant field by the presence of a `target` property in the input data. If `target` is present:
+To signal that a field has dependencies, include the `dependants` property:
+
+``` js
+{
+  key: 'league',
+  label: 'League',
+  type: 'select',
+  input_options: [
+    { value: 'prem', label: 'Premier League' },
+    { value: 'champ', label: 'Championship' }
+  ],
+  dependants: true
+}
+```
+
+When a value is selected in a field that has a dependancy, `input.js` is called. You'll know that `input.js` is being run to load a dependant field by the presence of a `target` property in the input data. If `target` is present:
 
 - check the `target` property to determine the field that changed
 - use the `fields` property to get the value of the `target` field. `fields` will contain all input fields collected so far
@@ -1071,7 +1053,7 @@ The built-in validator applies some sane defaults to `validate.js`, namely:
 - format: 'flat'
 - fullMessages: true
 
-### Validating Datetime and Boolean Fields
+## Validating Datetime and Boolean Fields
 
 The SDK also provides two custom validators for dealing with Flow XO Datetime and Boolean fields. Use them as follows:
 
