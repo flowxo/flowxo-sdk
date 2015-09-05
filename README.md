@@ -551,6 +551,73 @@ You will not know in advance how many array items there will be in the output da
 
 Simply refer to your nested data using the double underscore notation, and the SDK will take care of the rest. See the section _Double Underscore Notation_ for more details.
 
+# Double Underscore Notation
+
+Output data in Flow XO can be referenced in your output fields using _double underscore notation_.  For example, take this data returned from an API:
+
+``` js
+{
+  name: 'My deal',
+  people: [
+    {
+      name: 'John Doe',
+      phone: '0207 000 0000',
+      email: 'john.doe@example.com'
+    },
+    {
+      name: 'Jane Doe',
+      phone: '0208 000 0000',
+      email: 'jane.doe@example.com'
+    },
+    {
+      name: 'Jim Smith',
+      phone: '0800 000 000',
+      email: 'jim.smith@example.com'
+    }
+  ],
+  meta: {
+    status: 'Open',
+    assigned: true
+  }
+}
+```
+
+This object's data can be referenced using these keys:
+
+``` js
+{
+  name: 'My deal',
+  people__0__name: 'John Doe',
+  people__0__phone: '0207 000 0000',
+  people__0__email: 'john.doe@example.com',
+  people__1__name: 'Jane Doe',
+  people__1__phone: '0208 000 0000',
+  people__1__email: 'jane.doe@example.com',
+  people__2__name: 'Jim Smith',
+  people__2__phone: '0800 000 0000',
+  people__2__email: 'jim.smith@example.com',
+  meta__status: 'Open',
+  meta__assigned: true
+}
+```
+
+So to include output fields for _Deal Name_ and _Deal Person_ in your method's `config.js` or `output.js`, you would use:
+
+```
+[{
+  key: 'name',
+  label: 'Deal Name'
+},
+{
+  key: 'people__0__name',
+  label: 'Deal Person'
+}]
+```
+
+You'll see that arrays are indexed from 0 - so `people__0__name` refers to the `name` property in the first item of the `people` array. Some APIs may return an arbitrary number of items in an array, but the config only supports addressing a fixed amount. Enter as many indexes as is reasonable for the particular service you are developing.
+
+_Note: when implementing your scripts, expect and return data in regular 'nested' form, i.e. don't worry about flattening or unflattening data. The double underscore notation is only used for the output configuration._
+
 # input.js (Custom Input Fields)
 
 Sometimes it's necessary to generate fields at runtime. As an example, if our method has an input _User_, then it's usually best to load up a list of users into a select box rather than expect a user ID. We won't know who those users are until the account has been authorized, and that list might change from time to time.
@@ -750,73 +817,6 @@ For actions, return a single object of data.
 ```
 
 All the keys that your script might output should be included in the output fields described in the method's `config.js` (or `output.js`). Remember that nested data should be described using double underscore notation, e.g. `some__nested` (for the object above).
-
-# Double Underscore Notation
-
-Output data in Flow XO can be referenced in your output fields using _double underscore notation_.  For example, take this data returned from an API:
-
-``` js
-{
-  name: 'My deal',
-  people: [
-    {
-      name: 'John Doe',
-      phone: '0207 000 0000',
-      email: 'john.doe@example.com'
-    },
-    {
-      name: 'Jane Doe',
-      phone: '0208 000 0000',
-      email: 'jane.doe@example.com'
-    },
-    {
-      name: 'Jim Smith',
-      phone: '0800 000 000',
-      email: 'jim.smith@example.com'
-    }
-  ],
-  meta: {
-    status: 'Open',
-    assigned: true
-  }
-}
-```
-
-This object's data can be referenced using these keys:
-
-``` js
-{
-  name: 'My deal',
-  people__0__name: 'John Doe',
-  people__0__phone: '0207 000 0000',
-  people__0__email: 'john.doe@example.com',
-  people__1__name: 'Jane Doe',
-  people__1__phone: '0208 000 0000',
-  people__1__email: 'jane.doe@example.com',
-  people__2__name: 'Jim Smith',
-  people__2__phone: '0800 000 0000',
-  people__2__email: 'jim.smith@example.com',
-  meta__status: 'Open',
-  meta__assigned: true
-}
-```
-
-So to include output fields for _Deal Name_ and _Deal Person_ in your method's `config.js` or `output.js`, you would use:
-
-```
-[{
-  key: 'name',
-  label: 'Deal Name'
-},
-{
-  key: 'people__0__name',
-  label: 'Deal Person'
-}]
-```
-
-You'll see that arrays are indexed from 0 - so `people__0__name` refers to the `name` property in the first item of the `people` array. Some APIs may return an arbitrary number of items in an array, but the config only supports addressing a fixed amount. Enter as many indexes as is reasonable for the particular service you are developing.
-
-_Note: when implementing your scripts, expect and return data in regular 'nested' form, i.e. don't worry about flattening or unflattening data. The double underscore notation is only used for the output configuration._
 
 # Polling
 
