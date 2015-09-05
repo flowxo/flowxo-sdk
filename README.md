@@ -113,7 +113,7 @@ This `index.js` file is also a great place to hold or link to your shared code, 
 
 In the example above you'll see two important fields for defining the service. The `name` field is how the service will be presented to the user in the UI. The `slug` field is used internally by the Flow XO core, and should be a lowercase underscore-delimited string uniquely representing your service. Normally you should not need to change these generated values.
 
-It's common to create a module that abstracts the handling of HTTP requests, and perhaps a function that handles errors. See _Recipes > Input Validation_ for an example of creating a common `service.validate` function that you can use throughout your scripts.
+It's common to create a module that abstracts the handling of HTTP requests, and perhaps a function that handles errors. See _Input Validation_ for an example of creating a common `service.validate` function that you can use throughout your scripts.
 
 Take a look at the example modules to see what kind of code you should be centralising here.
 
@@ -153,7 +153,7 @@ auth: {
 }
 ```
 
-See the section _Creating Methods > config.js > Input Fields_ for a list of the field types you can use here.
+See the section _Creating Methods > Input Fields_ for a list of the field types you can use here.
 
 When your scripts are run, you'll get the credentials in `options.credentials`.
 
@@ -221,9 +221,9 @@ auth: {
 
 Make sure that if the strategy requires any extra configuration, you add it to either the `options` or the `params` object. Refer to the strategy's documentation for more details on this.
 
-_Note: you do not need to add a `callbackURL` to the options object, as the system will automatically generate a callbackURL for you. When testing the service, you'll need to setup your development machine so that the generated callback URL can be reached by the test runner. See the section Testing > Authentication for more details._
+_Note: you do not need to add a `callbackURL` to the options object, as the system will automatically generate a callbackURL for you. When testing the service, you'll need to setup your development machine so that the generated callback URL can be reached by the test runner. See the section Testing & Environment > Authentication for more details._
 
-You'll notice the use of [environment variables](https://nodejs.org/api/process.html#process_process_env) to prevent the hard coding of the key and secret. When configuring the service, we'll provide you with these details for connecting to the service, and you should enter the details into the `.env` file for integration testing purposes. For more details on setting environment variables, refer to the section _Testing > Authentication_.
+You'll notice the use of [environment variables](https://nodejs.org/api/process.html#process_process_env) to prevent the hard coding of the key and secret. When configuring the service, we'll provide you with these details for connecting to the service, and you should enter the details into the `.env` file for integration testing purposes. For more details on setting environment variables, refer to the section _Testing & Environment > Authentication_.
 
 When your scripts are run, you'll get the relevant credentials in the `options.credentials` object:
 
@@ -300,7 +300,7 @@ module.exports = function(service) {
 - `scripts` - All methods should have a `run` script. You can reference an `input` and/or an `output` script too. Use input/output scripts to dynamically define fields that are generated at runtime and show alongside the static fields you define in the `fields` property. See the _input.js_ and _output.js_ sections for more details.
 - `fields` - Contains `input` and `output` objects, defining arrays of fields that will be available for input to the script, and the properties that your script will output (on success). See the sections on _Input Fields_ and _Output Fields_ below.
 
-### Input Fields
+## Input Fields
 
 Input fields should be provided as an array of objects that describe what type of data the input field accepts and how it is to behave in the UI.
 
@@ -370,7 +370,7 @@ The description is displayed underneath the field.
 
 You can also use text areas, select boxes, special date/time fields and boolean fields.
 
-#### Text Areas
+### Text Areas
 
 ``` js
 {
@@ -380,7 +380,7 @@ You can also use text areas, select boxes, special date/time fields and boolean 
 }
 ```
 
-#### Select Boxes
+### Select Boxes
 
 ``` js
 {
@@ -403,7 +403,7 @@ You can also use text areas, select boxes, special date/time fields and boolean 
 
 Notice that the `default` field references the `value` of the matching `input_options`. So, in the example above, the select box will show the 'Low' item by default.
 
-#### Date/Time Fields
+### Date/Time Fields
 
 ``` js
 {
@@ -446,7 +446,7 @@ var formattedStr = date.parsed.format('{yyyy}-{MM}-{dd}');
 
 _Note: by default, sugar.js also enhances other JavaScript objects, such as `Number`, `String` and `Array`. Flow XO uses a [customised version](https://github.com/fiznool/sugar-date) of sugar.js which only enhances the `Date` prototype._
 
-#### Boolean Fields
+### Boolean Fields
 
 ``` js
 {
@@ -479,7 +479,7 @@ You'll find the original value in `input`, a flag to say whether the boolean is 
 
 Boolean fields are most useful for custom inputs, where the `input_options` are generated from the connected service's API.
 
-### Output Fields
+## Output Fields
 
 Output fields should be provided as an array of objects that describe what data the script will output (its output 'properties').
 
@@ -1077,7 +1077,7 @@ Use an instance of `AuthError`, which is very similar to `ServiceError`. If the 
 
 Take care with the tone and style of the message passed to your `AuthError`, as it will be displayed directly to the user.
 
-# Testing & Development Environment
+# Testing & Environment
 
 Integration tests are mandatory. Unit tests are not required as essentially each service is a wrapper around http calls to an external API. The coverage provided by the integration tests provides sufficient confidence that the service is working correctly.
 
