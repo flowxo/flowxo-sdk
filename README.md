@@ -20,39 +20,6 @@ Finally, build and test related tasks are handled by the JavaScript task runner 
 
 That's all. The other tools that the SDK uses will be installed locally with `npm install`.
 
-# Example Services
-
-- [Flow XO Trello Service Example](https://github.com/flowxo/flowxo-services-trello-example)
-- [Flow XO Stripe Service Example](https://github.com/flowxo/flowxo-services-stripe-example)
-- [Flow XO Google Sheets Service Example](https://github.com/flowxo/flowxo-services-google-sheets-example)
-
-# Example Code Index
-
-This index will help you to drill down into our example services and find code relating to all the concepts described in this documentation.
-
-- [Authentication - OAuth 1](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L12-L51)
-- [Authentication - OAuth 2](https://github.com/flowxo/flowxo-services-stripe-example/blob/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/index.js#L9-L41)
-- Authentication - Key/Credentials
-- [Errors - Authentication](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L90-L95)
-- [Errors - Retryable](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L78-L83)
-- [Errors - Service](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L97-L116)
-- Input Fields - Boolean
-- Input Fields - Boolean (Handling)
-- [Input Fields - Custom Fields](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/new_card/input.js)
-- [Input Fields - Datetime](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/config.js#L33-L37)
-- [Input Fields - Datetime (Handling)](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/run.js#L44-L62)
-- [Input Fields - Dependant Fields](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/input.js)
-- [Input Fields - Select](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/config.js#L22-L33)
-- [Input Fields - Static](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/config.js#L13-L52)
-- [Integration Tests](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/README.md#integration-tests)
-- [Output Fields - Custom Fields](https://github.com/flowxo/flowxo-services-google-sheets-example/blob/8c3f7a752935e8f92186e1a2bb81898bbdc9b28d/lib/methods/get_row/output.js)
-- [Output Fields - Dealing with Arrays](https://github.com/flowxo/flowxo-services-stripe-example/blob/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer/config.js#L136-L139)
-- [Output Fields - Dealing with Nested Properties](https://github.com/flowxo/flowxo-services-stripe-example/blob/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer/config.js#L130-L133)
-- [Output Fields - Static](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/new_card/config.js#L13-L172)
-- [Poller Trigger - No Inputs](https://github.com/flowxo/flowxo-services-stripe-example/tree/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer)
-- [Poller Trigger - With Inputs](https://github.com/flowxo/flowxo-services-trello-example/tree/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/new_card)
-- [Validation](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/run.js#L5-L54)
-
 # Scaffolding Your Service
 
 To make it easy to build your service, we've written a [Yeoman](http://yeoman.io/) generator, which complements this SDK. You should install and use this to scaffold your service:
@@ -1122,14 +1089,6 @@ If you need a library that isn't on this list, please get in touch so we can rev
 
 If you are developing an OAuth service, you'll also need to use a passport strategy. Find yours from the [list of providers](http://passportjs.org/guide/providers/).
 
-# Updating a Method
-
-Once a method is made available, it can't be changed or deleted, only deprecated (and usually replaced with a newer version). This is because there may be users which have workflows configured with the old method, and we don't want to break their workflows by removing it.
-
-To deprecate a method, simply set `{ deprecated: true }` in the `config.js`. You can then create a replacement method with a versioned slug `{ slug: 'a_method_v2' }` (it's OK to use the exact same `name` in your new version, only the `slug` needs to be unique). A deprecated method will not be available for selection when the user is configuring a new trigger or action, but will still be available for existing workflows.
-
-Of course, you'll need to submit a Pull Request (PR) to the main `flowxo`-owned repo to have the changes made live.
-
 # Testing
 
 Integration tests are mandatory. Unit tests are not required as essentially each service is a wrapper around http calls to an external API. The coverage provided by the integration tests provides sufficient confidence that the service is working correctly.
@@ -1414,6 +1373,47 @@ ServiceClient.prototype.createPerson = function(person, done) {
   this._request(options, done);
 };
 ```
+
+# Example Services
+
+- [Flow XO Trello Service Example](https://github.com/flowxo/flowxo-services-trello-example)
+- [Flow XO Stripe Service Example](https://github.com/flowxo/flowxo-services-stripe-example)
+- [Flow XO Google Sheets Service Example](https://github.com/flowxo/flowxo-services-google-sheets-example)
+
+# Example Code Index
+
+This index will help you to drill down into our example services and find code relating to all the concepts described in this documentation.
+
+- [Authentication - OAuth 1](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L12-L51)
+- [Authentication - OAuth 2](https://github.com/flowxo/flowxo-services-stripe-example/blob/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/index.js#L9-L41)
+- Authentication - Key/Credentials
+- [Errors - Authentication](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L90-L95)
+- [Errors - Retryable](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L78-L83)
+- [Errors - Service](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L97-L116)
+- Input Fields - Boolean
+- Input Fields - Boolean (Handling)
+- [Input Fields - Custom Fields](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/new_card/input.js)
+- [Input Fields - Datetime](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/config.js#L33-L37)
+- [Input Fields - Datetime (Handling)](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/run.js#L44-L62)
+- [Input Fields - Dependant Fields](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/input.js)
+- [Input Fields - Select](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/config.js#L22-L33)
+- [Input Fields - Static](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/config.js#L13-L52)
+- [Integration Tests](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/README.md#integration-tests)
+- [Output Fields - Custom Fields](https://github.com/flowxo/flowxo-services-google-sheets-example/blob/8c3f7a752935e8f92186e1a2bb81898bbdc9b28d/lib/methods/get_row/output.js)
+- [Output Fields - Dealing with Arrays](https://github.com/flowxo/flowxo-services-stripe-example/blob/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer/config.js#L136-L139)
+- [Output Fields - Dealing with Nested Properties](https://github.com/flowxo/flowxo-services-stripe-example/blob/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer/config.js#L130-L133)
+- [Output Fields - Static](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/new_card/config.js#L13-L172)
+- [Poller Trigger - No Inputs](https://github.com/flowxo/flowxo-services-stripe-example/tree/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer)
+- [Poller Trigger - With Inputs](https://github.com/flowxo/flowxo-services-trello-example/tree/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/new_card)
+- [Validation](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/run.js#L5-L54)
+
+# Updating a Method
+
+Once a method is made available, it can't be changed or deleted, only deprecated (and usually replaced with a newer version). This is because there may be users which have workflows configured with the old method, and we don't want to break their workflows by removing it.
+
+To deprecate a method, simply set `{ deprecated: true }` in the `config.js`. You can then create a replacement method with a versioned slug `{ slug: 'a_method_v2' }` (it's OK to use the exact same `name` in your new version, only the `slug` needs to be unique). A deprecated method will not be available for selection when the user is configuring a new trigger or action, but will still be available for existing workflows.
+
+Of course, you'll need to submit a Pull Request (PR) to the main `flowxo`-owned repo to have the changes made live.
 
 # Submitting your Service
 
