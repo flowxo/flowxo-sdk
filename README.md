@@ -1217,8 +1217,10 @@ The poll cache is stored in memory for the duration of the `grunt run --record` 
 
 This index will help you to drill down into our example services and find code relating to all the concepts described in this documentation.
 
+- [API Access - Using Node Request](https://github.com/flowxo/flowxo-services-trello-example/tree/master/lib)
+- [API Access - Using a Wrapper Library](https://github.com/flowxo/flowxo-services-stripe-example/tree/master/lib)
 - [Authentication - OAuth 1](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L12-L51)
-- [Authentication - OAuth 2](https://github.com/flowxo/flowxo-services-stripe-example/blob/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/index.js#L9-L41)
+- [Authentication - OAuth 2](https://github.com/flowxo/flowxo-services-stripe-example/blob/4c308d3e8517e0ad05dffd2de9bb4dfc1eac2c8f/lib/index.js#L9-L44)
 - Authentication - Key/Credentials
 - [Errors - Authentication](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L90-L95)
 - [Errors - Retryable](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L78-L83)
@@ -1233,11 +1235,11 @@ This index will help you to drill down into our example services and find code r
 - [Input Fields - Static](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/config.js#L13-L52)
 - [Integration Tests](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/README.md#integration-tests)
 - [Output Fields - Custom Fields](https://github.com/flowxo/flowxo-services-google-sheets-example/blob/8c3f7a752935e8f92186e1a2bb81898bbdc9b28d/lib/methods/get_row/output.js)
-- [Output Fields - Dealing with Arrays](https://github.com/flowxo/flowxo-services-stripe-example/blob/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer/config.js#L136-L139)
-- [Output Fields - Dealing with Nested Properties](https://github.com/flowxo/flowxo-services-stripe-example/blob/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer/config.js#L130-L133)
+- [Output Fields - Dealing with Arrays](https://github.com/flowxo/flowxo-services-stripe-example/blob/4c308d3e8517e0ad05dffd2de9bb4dfc1eac2c8f/lib/methods/new_customer/config.js#L133-L136)
+- [Output Fields - Dealing with Nested Properties](https://github.com/flowxo/flowxo-services-stripe-example/blob/4c308d3e8517e0ad05dffd2de9bb4dfc1eac2c8f/lib/methods/new_customer/config.js#L130-L133)
 - [Output Fields - Static](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/new_card/config.js#L13-L172)
-- [Poller Trigger - No Inputs](https://github.com/flowxo/flowxo-services-stripe-example/tree/9d9bcc067ee636db9495ac10e20eb2ce3c9316c2/lib/methods/new_customer)
-- [Poller Trigger - With Inputs](https://github.com/flowxo/flowxo-services-trello-example/tree/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/new_card)
+- [Poller Trigger - No Inputs](https://github.com/flowxo/flowxo-services-stripe-example/tree/master/lib/methods/new_customer)
+- [Poller Trigger - With Inputs](https://github.com/flowxo/flowxo-services-trello-example/tree/master/lib/methods/new_card)
 - [Validation](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/run.js#L5-L54)
 
 # Authorized Libraries
@@ -1246,7 +1248,7 @@ Each service is manually reviewed before we make it available in Flow XO, and pa
 
 We do this for security and stability reasons, and also so that we can help developers without having to learn a different library each time.
 
-If you need a library that isn't on this list, please get in touch so we can review it.
+If you need a library that isn't on this list, please get in touch so we can review it (we'll usually accept well written and maintained API wrapper libraries).
 
 - [async](https://github.com/caolan/async) - Async utilities
 - [request](https://github.com/request/request) - Simplified HTTP request client
