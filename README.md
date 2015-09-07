@@ -1217,8 +1217,8 @@ The poll cache is stored in memory for the duration of the `grunt run --record` 
 
 This index will help you to drill down into our example services and find code relating to all the concepts described in this documentation.
 
-- [API Access - Using Node Request](https://github.com/flowxo/flowxo-services-trello-example/tree/master/lib)
 - [API Access - Using a Wrapper Library](https://github.com/flowxo/flowxo-services-stripe-example/tree/master/lib)
+- [API Access - Using Node Request](https://github.com/flowxo/flowxo-services-trello-example/tree/master/lib)
 - [Authentication - OAuth 1](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L12-L51)
 - [Authentication - OAuth 2](https://github.com/flowxo/flowxo-services-stripe-example/blob/4c308d3e8517e0ad05dffd2de9bb4dfc1eac2c8f/lib/index.js#L9-L44)
 - Authentication - Key/Credentials
