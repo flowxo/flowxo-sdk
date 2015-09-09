@@ -1211,7 +1211,6 @@ The poll cache is stored in memory for the duration of the `grunt run --record` 
 
 - [Flow XO Trello Service Example](https://github.com/flowxo/flowxo-services-trello-example)
 - [Flow XO Stripe Service Example](https://github.com/flowxo/flowxo-services-stripe-example)
-- [Flow XO Google Sheets Service Example](https://github.com/flowxo/flowxo-services-google-sheets-example)
 
 ### Code Sample Index
 
@@ -1234,7 +1233,7 @@ This index will help you to drill down into our example services and find code r
 - [Input Fields - Select](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/config.js#L22-L33)
 - [Input Fields - Static](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/config.js#L13-L52)
 - [Integration Tests](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/README.md#integration-tests)
-- [Output Fields - Custom Fields](https://github.com/flowxo/flowxo-services-google-sheets-example/blob/8c3f7a752935e8f92186e1a2bb81898bbdc9b28d/lib/methods/get_row/output.js)
+- [Output Fields - Custom Fields](https://gist.github.com/johnmjackson/df14aaf8863d3b42ad0d#file-example-output-js)
 - [Output Fields - Dealing with Arrays](https://github.com/flowxo/flowxo-services-stripe-example/blob/4c308d3e8517e0ad05dffd2de9bb4dfc1eac2c8f/lib/methods/new_customer/config.js#L133-L136)
 - [Output Fields - Dealing with Nested Properties](https://github.com/flowxo/flowxo-services-stripe-example/blob/4c308d3e8517e0ad05dffd2de9bb4dfc1eac2c8f/lib/methods/new_customer/config.js#L130-L133)
 - [Output Fields - Static](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/new_card/config.js#L13-L172)
