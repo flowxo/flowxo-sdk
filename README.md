@@ -1220,7 +1220,7 @@ This index will help you to drill down into our example services and find code r
 - [API Access - Using Node Request](https://github.com/flowxo/flowxo-services-trello-example/tree/master/lib)
 - [Authentication - OAuth 1](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L12-L51)
 - [Authentication - OAuth 2](https://github.com/flowxo/flowxo-services-stripe-example/blob/4c308d3e8517e0ad05dffd2de9bb4dfc1eac2c8f/lib/index.js#L9-L44)
-- Authentication - Key/Credentials
+- [Authentication - Key/Credentials](https://gist.github.com/johnmjackson/515dcd24d9fb2389e647)
 - [Errors - Authentication](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L90-L95)
 - [Errors - Retryable](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L78-L83)
 - [Errors - Service](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L97-L116)
