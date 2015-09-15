@@ -19,7 +19,7 @@ Init.runTask = function() {
     cwd: __dirname
   })
   .on('error', function(err) {
-    console.err(err);
+    console.error(err);
   })
   .on('exit', function(code) {
     done(!code);
