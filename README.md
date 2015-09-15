@@ -1224,8 +1224,7 @@ This index will help you to drill down into our example services and find code r
 - [Errors - Authentication](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L90-L95)
 - [Errors - Retryable](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L78-L83)
 - [Errors - Service](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/index.js#L97-L116)
-- Input Fields - Boolean
-- Input Fields - Boolean (Handling)
+- [Input Fields - Boolean](https://gist.github.com/johnmjackson/47280df7f1ad6202c0c7)
 - [Input Fields - Custom Fields](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/new_card/input.js)
 - [Input Fields - Datetime](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/config.js#L33-L37)
 - [Input Fields - Datetime (Handling)](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/run.js#L44-L62)
