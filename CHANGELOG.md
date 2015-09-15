@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.1] - 2015-09-15
+### Fixed
+- `console.err` should have been `console.error`
+
+### Changed
+ - Improved documentation.
+
 ## [2.0.0] - 2015-08-18
 ### Removed
 Flow XO services are no longer unit testable, instead the preferred way of testing is via the `grunt run` command.
@@ -82,6 +89,8 @@ This is a breaking change, hence the major version number bump.
 ### Added
 - Initial release of the SDK.
 
+[2.0.1]: https://github.com/flowxo/flowxo-sdk/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/flowxo/flowxo-sdk/compare/v1.5.0...v2.0.0
 [1.5.0]: https://github.com/flowxo/flowxo-sdk/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/flowxo/flowxo-sdk/compare/v1.3.5...v1.4.0
 [1.3.5]: https://github.com/flowxo/flowxo-sdk/compare/v1.3.4...v1.3.5
