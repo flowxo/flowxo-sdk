@@ -34,31 +34,16 @@ RunUtil.displayScriptData = function(grunt, data) {
 
 /**
  * Processes the data returned from a script
- * into a format suitable for outputing
+ * into a format suitable for outputting.
  * @param  {Array} outputs Flow XO Output Field objects
  * @param  {Object} data Data returned from script
  * @return {Array} Processed data - either an array of fields, or an
  * array of arrays if the incoming data
  */
 RunUtil.formatScriptOutput = function(outputs, data) {
-
-  // Flatten the output.
-  var flattened = FxoUtils.getFlattenedFields(data);
-
-  var flattenedIdx = flattened.reduce(function(result, field) {
-    result[field.key] = field;
-    return result;
-  }, {});
-
-  return outputs.reduce(function(result, output) {
-    // Lookup the field from the data
-    var field = flattenedIdx[output.key];
-    result.push({
-      label: output.label,
-      value: field && field.value
-    });
-    return result;
-  }, []);
+  return FxoUtils.annotateOutputData(data, outputs, {
+    includeEmptyFields: true
+  });
 };
 
 RunUtil.displayScriptOutput = function(grunt, outputs, data) {

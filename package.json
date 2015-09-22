@@ -30,7 +30,7 @@
     }
   ],
   "dependencies": {
-    "flowxo-utils": "^1.0.1",
+    "flowxo-utils": "^1.1.0",
     "lodash": "^3.10.1",
     "validate.js": "^0.8.0",
     "winston": "^1.0.1"
@@ -46,13 +46,13 @@
     "grunt-contrib-jshint": "^0.11.2",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-mocha-test": "^0.12.7",
-    "inquirer": "^0.9.0",
+    "inquirer": "^0.10.0",
     "jshint-stylish": "^2.0.1",
     "load-grunt-tasks": "^3.2.0",
     "mocha": "^2.2.5",
     "ngrok": "^0.1.99",
     "open": "0.0.5",
-    "passport": "^0.2.2",
+    "passport": "^0.3.0",
     "passport-oauth2-refresh": "^0.4.0",
     "time-grunt": "^1.2.1"
   },
