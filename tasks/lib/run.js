@@ -590,7 +590,7 @@ RunUtil.runWebhook = function(grunt, options, method, callback) {
 
     app.post('/', function(req, res) {
       res.status(200).send();
-      callback(null, req.body);
+      options.runner.run(method.slug, 'run', { input: req.body }, callback);
     });
     app.listen(options.webhookPort);
 
