@@ -1,6 +1,6 @@
 {
   "name": "flowxo-sdk",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "SDK for developing Flow XO Services.",
   "main": "index.js",
   "scripts": {
@@ -27,6 +27,10 @@
     {
       "name": "Roberto Oliveros",
       "email": "robertooliveros@mac.com"
+    },
+    {
+      "name": "Mariano Pardo",
+      "email": "marianomdq1@gmail.com"
     }
   ],
   "dependencies": {
