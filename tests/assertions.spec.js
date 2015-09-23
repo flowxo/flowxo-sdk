@@ -138,5 +138,41 @@ describe('Assertions', function() {
       }).to.throw('Must have valid auth type');
     });
 
+    it('should validate dependants', function() {
+      var input = [{
+        key: 'bob',
+        type: 'datetime',
+        label: 'Test',
+        dependants: true
+      }, {
+        key: 'rob',
+        type: 'select',
+        label: 'Test',
+        dependants: true,
+        input_options: []
+      }, {
+        key: 'ron',
+        type: 'datetime',
+        label: 'Test',
+        dependants: false
+      }, {
+        key: 'renne',
+        type: 'select',
+        label: 'Test',
+        dependants: false,
+        input_options: []
+      }];
+      expect(input).to.be.flowxo.input;
+      expect(function() {
+        expect(input[0]).to.be.flowxo.input.field;
+      }).to.throw('Only \'select\' fields are allowed to have dependants');
+      expect(function() {
+        expect(input).to.be.flowxo.input.fields;
+      }).to.throw('Only \'select\' fields are allowed to have dependants');
+      expect(input[1]).to.be.flowxo.input.field;
+      expect(input[2]).to.be.flowxo.input.field;
+      expect(input[3]).to.be.flowxo.input.field;
+    });
+
   });
 });
