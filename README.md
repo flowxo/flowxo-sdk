@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/flowxo/flowxo-sdk.svg?branch=master)](https://travis-ci.org/flowxo/flowxo-sdk)
+
 # Introduction
 
 [Flow XO](https://flowxo.com) is a platform that lets users build automated workflows on top of their existing cloud apps.
@@ -1172,7 +1174,7 @@ In this mode, your input actions are captured, so they can be replayed later wit
 grunt run --replay
 ```
 
-By default your test actions are captured to the `runs/` folder, to a file `runs.json`. 
+By default your test actions are captured to the `runs/` folder, to a file `runs.json`.
 
 However, it is preferred that you record integration tests for each method, to a separate file. For example:
 
@@ -1181,7 +1183,7 @@ grunt run --record --name=add_customer
 grunt run --replay --name=new_customer
 ```
 
-Note that subsequent calls to `grunt run --record --name=add_customer` will append to your existing actions, rather than overwrite them. 
+Note that subsequent calls to `grunt run --record --name=add_customer` will append to your existing actions, rather than overwrite them.
 
 If you need to start a fresh set of actions, you'll need to clear the file manually.
 
