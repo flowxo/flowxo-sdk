@@ -1,6 +1,10 @@
+# Flow XO SDK
+
+An SDK to build services for the Flow XO platform.
+
 [![Build Status](https://travis-ci.org/flowxo/flowxo-sdk.svg?branch=master)](https://travis-ci.org/flowxo/flowxo-sdk)
 
-# Introduction
+## Introduction
 
 [Flow XO](https://flowxo.com) is a platform that lets users build automated workflows on top of their existing cloud apps.
 
@@ -10,7 +14,7 @@ We've opened up our SDK so that anyone can build support for their service into 
 
 If you get stuck, just send us an email at [support@flowxo.com](mailto:support@flowxo.com) and we'll try our best to guide you.
 
-# Prerequisites
+## Prerequisites
 
 Flow XO runs on [Node.js](https://nodejs.org/). If you don't have Node.js, you can [download it here](https://nodejs.org/download/). Make sure you're using Node.js v0.12.x as that's the version we run.
 
@@ -22,7 +26,7 @@ Finally, build and test related tasks are handled by the JavaScript task runner 
 
 That's all. The other tools that the SDK uses will be installed locally with `npm install`.
 
-# Scaffolding Your Service
+## Scaffolding Your Service
 
 To make it easy to build your service, we've written a [Yeoman](http://yeoman.io/) generator, which complements this SDK. You should install and use this to scaffold your service:
 
@@ -38,7 +42,7 @@ If you select OAuth, some skeleton configuration will be created that will need 
 
 You should now have a populated directory with some scripts. Next, we'll take a look at what we've generated.
 
-# Code Structure
+## Code Structure
 
 A service is a collection of JavaScript files, with scripts relating to the service as a whole in `/lib`, and a directory for each method beneath that in `/methods`.
 
@@ -62,7 +66,7 @@ service_name
 
 The service expects files to remain in their default locations, so try not to move things around unless you know what you are doing.
 
-# Requiring the SDK
+## Requiring the SDK
 
 ``` js
 var sdk = require('flowxo-sdk');
@@ -75,7 +79,7 @@ The SDK exposes these public properties:
 
 You'll only be concerned with the public properties when building your service.
 
-# Scripts
+## Scripts
 
 A Flow XO service is built up of some configuration plus a number of _scripts_. `ping.js`, `run.js`, `input.js` and `output.js` all work in a similar way.
 
@@ -92,7 +96,7 @@ Your script receives the input and does whatever work is necessary. If all is we
 
 Each type of script will be explained in more detail later.
 
-# Service Index
+## Service Index
 
 The `lib/index.js` file defines the service. It looks something like this:
 
@@ -119,7 +123,7 @@ It's common to create a module that abstracts the handling of HTTP requests, and
 
 Take a look at the example modules to see what kind of code you should be centralising here.
 
-# Authorization
+## Authorization
 
 Flow XO supports credential based auth (where the user provides some kind of secret that can be used for authorization) or the [OAuth](http://oauth.net/) protocol, where the user grants access directly through the service being accessed. Both OAuth 1 and OAuth 2 are supported.
 
@@ -262,13 +266,13 @@ request(options, done);
 
 You'll need to take special care to use an _Auth Error_ when the API reports an authorization problem. That way, if the service is an OAuth 2 service, the core knows to try and refresh the access token and try your script again (when possible). See the section _Handling Errors > Auth Errors_ for details.
 
-# Creating Methods
+## Creating Methods
 
 The [Flow XO Generator](https://github.com/flowxo/generator-flowxo) contains a generator to scaffold individual methods as well as entire services. Simply run `yo flowxo:method` and follow the steps to generate a new method.
 
 Methods are stored in the `lib/methods/` folder. Each method has its own folder with the name being the `slug` of the method. Inside each method folder you'll find `config.js`, `run.js`, and if you selected these during the scaffold, `input.js` and/or `output.js`.
 
-# config.js
+### config.js
 
 Each method has its own `config.js` file, which defines the method's name, what type of method it is, and describes its input/output fields.
 
@@ -302,7 +306,7 @@ module.exports = function(service) {
 - `scripts` - All methods should have a `run` script. You can reference an `input` and/or an `output` script too. Use input/output scripts to dynamically define fields that are generated at runtime and show alongside the static fields you define in the `fields` property. See the _input.js_ and _output.js_ sections for more details.
 - `fields` - Contains `input` and `output` objects, defining arrays of fields that will be available for input to the script, and the properties that your script will output (on success). See the sections on _Input Fields_ and _Output Fields_ below.
 
-# Input Fields
+### Input Fields
 
 Input fields should be provided as an array of objects that describe what type of data the input field accepts and how it is to behave in the UI.
 
@@ -372,7 +376,7 @@ The description is displayed underneath the field.
 
 You can also use text areas, select boxes, special date/time fields and boolean fields.
 
-### Text Areas
+#### Text Areas
 
 ``` js
 {
@@ -382,7 +386,7 @@ You can also use text areas, select boxes, special date/time fields and boolean 
 }
 ```
 
-### Select Boxes
+#### Select Boxes
 
 ``` js
 {
@@ -405,7 +409,7 @@ You can also use text areas, select boxes, special date/time fields and boolean 
 
 Notice that the `default` field references the `value` of the matching `input_options`. So, in the example above, the select box will show the 'Low' item by default.
 
-### Date/Time Fields
+#### Date/Time Fields
 
 ``` js
 {
@@ -448,7 +452,7 @@ var formattedStr = date.parsed.format('{yyyy}-{MM}-{dd}');
 
 _Note: by default, sugar.js also enhances other JavaScript objects, such as `Number`, `String` and `Array`. Flow XO uses a [customised version](https://github.com/fiznool/sugar-date) of sugar.js which only enhances the `Date` prototype._
 
-### Boolean Fields
+#### Boolean Fields
 
 ``` js
 {
@@ -481,7 +485,7 @@ You'll find the original value in `input`, a flag to say whether the boolean is 
 
 Boolean fields are most useful for custom inputs, where the `input_options` are generated from the connected service's API.
 
-# Output Fields
+### Output Fields
 
 Output fields should be provided as an array of objects that describe what data the script will output (its output 'properties').
 
@@ -553,7 +557,7 @@ You will not know in advance how many array items there will be in the output da
 
 Simply refer to your nested data using the double underscore notation, and the SDK will take care of the rest. See the section _Double Underscore Notation_ for more details.
 
-# Double Underscore Notation
+#### Double Underscore Notation
 
 Output data in Flow XO can be referenced in your output fields using _double underscore notation_.  For example, take this data returned from an API:
 
@@ -620,13 +624,13 @@ You'll see that arrays are indexed from 0 - so `people__0__name` refers to the `
 
 _Note: when implementing your scripts, expect and return data in regular 'nested' form, i.e. don't worry about flattening or unflattening data. The double underscore notation is only used for the output configuration._
 
-# input.js
+### input.js
 
 Sometimes it's necessary to generate fields at runtime (custom input fields). As an example, if our method has an input _User_, then it's usually best to load up a list of users into a select box rather than expect a user ID. We won't know who those users are until the account has been authorized, and that list might change from time to time.
 
 So the way forward is to use an `input.js` script. The script is very similar to `run.js`, except it either returns an error, or an array of input fields on success. See the section _Input Fields_ for the format of the array you should return.
 
-### Dependant Fields
+#### Dependant Fields
 
 A dependant field is an input field whose range of values is dependant on the value selected in another input field.
 
@@ -750,7 +754,7 @@ module.exports = function(options, done) {
 
 Notice that the script either returns the `league` OR `team` field, never both.
 
-# output.js
+### output.js
 
 `output.js` (custom output field) scripts are executed at runtime and augment the static output fields defined in the `config.js`.
 
@@ -760,7 +764,7 @@ The script is very similar to `run.js`, except it either returns an error, or an
 
 Note that `options.input` will hold the input values that the user has given to the method. Any `{{outputs}}` from other tasks in those values will be replaced with empty strings.
 
-# run.js
+### run.js
 
 This is the primary script of the method. Like every other script, you'll be passed an `options` object and `done` (a callback). The script should do its work and either call `done(err)` or `done(null, output)`.
 
@@ -820,7 +824,7 @@ For actions, return a single object of data.
 
 All the keys that your script might output should be included in the output fields described in the method's `config.js` (or `output.js`). Remember that nested data should be described using double underscore notation, e.g. `some__nested` (for the object above).
 
-# Polling
+### Polling
 
 Flow XO supports 2 trigger mechanisms: __polling__ and __webhooks__. Polling involves hitting an API periodically to check for new items, and is the most popular way of building a trigger. Polling is more resource intensive than webhooks, but they're much easier for users to set up (currently users have to manually configure webhooks).
 
@@ -862,7 +866,7 @@ Internally, the `options.poller` function asks the database whether each key has
 
 To see polling triggers in action, study our example services (see the _Example Services_ section).
 
-# Webhooks
+### Webhooks
 
 Flow XO has general [webhooks support](http://support.flowxo.com/article/22-webhooks), but methods within services can be triggered by webhooks too.
 
@@ -903,11 +907,11 @@ var config = {
 
 This configuration will automatically be scaffolded when you choose a _Webhook Trigger_ from the list when running `yo flowxo:method`.
 
-### Fields
+#### Fields
 
 A webhook trigger cannot supply any input fields, but it should define its expected output fields in the configuration. This should match up with the format expected to be sent by the service.
 
-### Handling The Webhook
+#### Handling The Webhook
 
 Notice that a webhook trigger also has a `run.js` file, just like a poller trigger or an action. This allows you to manipulate the data received from the webhook before triggering a workflow, into the format defined by the output fields config.
 
@@ -947,11 +951,11 @@ module.exports = function(options, done) {
 };
 ```
 
-### Help Instructions
+##### Help Instructions
 
 You should provide a `help` property to tell the user how to configure the webhook in your service. `help.webhook.config` and `help.webhook.test` accept an array of paragraphs which will be displayed to the user when the service is being set up.
 
-# Input Validation
+### Input Validation
 
 Where possible, we recommend that you leave detailed input validation up to the API you are dealing with - just send the data you've got and ensure that your response handling code covers any validation errors.
 
@@ -998,7 +1002,7 @@ The built-in validator applies some sane defaults to `validate.js`, namely:
 - format: 'flat'
 - fullMessages: true
 
-### Validating Datetime and Boolean Fields
+#### Validating Datetime and Boolean Fields
 
 The SDK also provides two custom validators for dealing with Flow XO Datetime and Boolean fields. Use them as follows:
 
@@ -1022,11 +1026,11 @@ module.exports = function(options, done){
 }
 ```
 
-# Handling Errors
+### Handling Errors
 
 The callback for your script expects either an error (if the request failed) or an object (on success). This section will help you to understand how to construct your errors.
 
-### Retryable Errors
+#### Retryable Errors
 
 These occur when you can't access a service or you get a response back in a format that you don't recognise, and are the default error type. They're usually recoverable, and so the platform will retry the request later.
 
@@ -1051,7 +1055,7 @@ The core will retry the request up to 5 times (with exponential back-off), and i
 
 If you are in doubt about what error to return, use a retryable error, to give the script the best possible chance to succeed.
 
-### Service Errors
+#### Service Errors
 
 Service errors are where a user's request can't be completed for operational reasons. This includes validation errors, objects not being found, quotas being exceeded, etc.
 
@@ -1071,7 +1075,7 @@ cb(new sdk.Error.ServiceError('You must provide a value.', err))
 
 Take care with the tone and style of the message passed to your `ServiceError`, as it will be displayed directly to the user.
 
-### Auth Errors
+#### Auth Errors
 
 A special case is where the API returns an error relating to authorization (usually when a REST API returns a status code `401`).
 
@@ -1079,7 +1083,7 @@ Use an instance of `AuthError`, which is very similar to `ServiceError`. If the 
 
 Take care with the tone and style of the message passed to your `AuthError`, as it will be displayed directly to the user.
 
-# Testing & Environment
+## Testing & Environment
 
 Integration tests are mandatory. Unit tests are not required as essentially each service is a wrapper around http calls to an external API. The coverage provided by the integration tests provides sufficient confidence that the service is working correctly.
 
@@ -1207,7 +1211,7 @@ To simulate a poller finding new data, you will need to:
 
 The poll cache is stored in memory for the duration of the `grunt run --record` or `grunt run --replay` session.  As soon as you exit `grunt run`, the poll cache is lost.
 
-# Examples
+## Examples
 
 ### Example Services
 
@@ -1242,7 +1246,7 @@ This index will help you to drill down into our example services and find code r
 - [Poller Trigger - With Inputs](https://github.com/flowxo/flowxo-services-trello-example/tree/master/lib/methods/new_card)
 - [Validation](https://github.com/flowxo/flowxo-services-trello-example/blob/2c43b37b9d56d03f7226db47103a0db7ad5c55b7/lib/methods/add_card/run.js#L5-L54)
 
-# Authorized Libraries
+## Authorized Libraries
 
 Each service is manually reviewed before we make it available in Flow XO, and part of that process is making sure that only authorized libraries are used in your scripts.
 
@@ -1259,7 +1263,7 @@ If you need a library that isn't on this list, please get in touch so we can rev
 
 If you are developing an OAuth service, you'll also need to use a passport strategy. Find yours from the [list of providers](http://passportjs.org/guide/providers/).
 
-# Updating a Method
+## Updating a Method
 
 Once a method is made available, it can't be changed or deleted, only deprecated (and usually replaced with a newer version). This is because there may be users which have workflows configured with the old method, and we don't want to break their workflows by removing it.
 
@@ -1267,7 +1271,7 @@ To deprecate a method, simply set `{ deprecated: true }` in the `config.js`. You
 
 Of course, you'll need to submit a Pull Request (PR) to the main `flowxo`-owned repo to have the changes made live.
 
-# Submitting Your Service
+## Submitting Your Service
 
 Before you submit your service to us, please work through this checklist:
 
