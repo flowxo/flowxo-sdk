@@ -3,6 +3,7 @@
 require('./check-deps');
 
 var chalk = require('chalk'),
+    _ = require('lodash'),
     inquirer = require('inquirer');
 
 var CommonUtil = {};
@@ -39,39 +40,55 @@ CommonUtil.createPrompt = function(input, options) {
     }
   }
 
-  // Select type
-  if(input.type === 'select') {
-    prompt.type = 'list';
-    if(input.input_options) {
-      prompt.choices = input.input_options.map(function(choice) {
-        return {
-          name: choice.label,
-          value: choice.value
-        };
-      });
-      if(!input.required || !options.validateRequired) {
-        prompt.choices.unshift({
-          name: '(none)',
-          value: ''
+  var isDict;
+
+  switch(input.type) {
+    case 'select':
+      prompt.type = 'list';
+      if(input.input_options) {
+        prompt.choices = input.input_options.map(function(choice) {
+          return {
+            name: choice.label,
+            value: choice.value
+          };
         });
+        if(!input.required || !options.validateRequired) {
+          prompt.choices.unshift({
+            name: '(none)',
+            value: ''
+          });
+        }
       }
-    }
+      break;
 
-  } else if(input.type === 'dictionary') {
-    // A dictionary prompt.
-    prompt.message += '\n  - Enter \'key=value\' pairs separated by \'&\'.\n  - To use \'=\' or \'&\' in a key or value, precede with \'\\\'.';
+    case 'dictionary':
+      isDict = true;
+      prompt.message += '\n  - Enter \'key=value\' pairs separated by \'&\'.\n  - To use \'=\' or \'&\' in a key or value, precede with \'\\\'.';
+      break;
 
-  } else if(input.type === 'datetime') {
-    prompt.message += ' ⌚ ';
+    case 'datetime':
+      prompt.message += ' ⌚ ';
+      break;
 
-  } else if(input.type === 'boolean') {
-    prompt.message += ' ☯ ';
+    case 'boolean':
+      prompt.message += ' ☯ ';
+      break;
   }
 
   prompt.message = prompt.message += ':';
 
   if(input.default) {
     prompt.default = input.default;
+
+    if(isDict) {
+      // Convert to key=val pairs.
+      prompt.default = _(prompt.default)
+        .reduce(function(arr, val, key) {
+          arr.push(key + '=' + val);
+          return arr;
+        }, [])
+        .join('&');
+    }
   }
 
   return prompt;
