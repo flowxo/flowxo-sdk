@@ -155,7 +155,11 @@ RunUtil.checkRunScriptResult = function(result, method) {
 };
 
 RunUtil.getCredentials = function(grunt, credentialsPath) {
-  return grunt.file.readJSON(credentialsPath);
+  try {
+    return grunt.file.readJSON(credentialsPath);
+  } catch(e) {
+    return {};
+  }
 };
 
 RunUtil.getRunFile = function(grunt) {
@@ -609,7 +613,7 @@ RunUtil.runTask = function(grunt, options) {
   }
 
   var runner = new ScriptRunner(service, {
-    credentials: grunt.file.readJSON(options.credentialsFile)
+    credentials: RunUtil.getCredentials(grunt, options.credentialsFile)
   });
 
   var runOpts = {
