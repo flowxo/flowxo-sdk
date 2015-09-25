@@ -3,6 +3,9 @@
 An SDK to build services for the Flow XO platform.
 
 [![Build Status](https://travis-ci.org/flowxo/flowxo-sdk.svg?branch=master)](https://travis-ci.org/flowxo/flowxo-sdk)
+[![npm version](https://badge.fury.io/js/flowxo-sdk.svg)](http://badge.fury.io/js/flowxo-sdk)
+[![Dependency Status](https://david-dm.org/flowxo/flowxo-sdk.svg)](https://david-dm.org/flowxo/flowxo-sdk)
+[![devDependency Status](https://david-dm.org/flowxo/flowxo-sdk/dev-status.svg)](https://david-dm.org/flowxo/flowxo-sdk#info=devDependencies)
 
 ## Introduction
 
