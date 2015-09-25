@@ -57,8 +57,13 @@ CommonUtil.createPrompt = function(input, options) {
       }
     }
 
+  } else if(input.type === 'dictionary') {
+    // A dictionary prompt.
+    prompt.message += '\n  - Enter \'key=value\' pairs separated by \'&\'.\n  - To use \'=\' or \'&\' in a key or value, precede with \'\\\'.';
+
   } else if(input.type === 'datetime') {
     prompt.message += ' ⌚ ';
+
   } else if(input.type === 'boolean') {
     prompt.message += ' ☯ ';
   }

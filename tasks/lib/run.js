@@ -166,6 +166,39 @@ RunUtil.getRunFile = function(grunt) {
   return(grunt.option('name') || 'runs') + '.json';
 };
 
+RunUtil.splitWithEscaped = function(input, delimiter) {
+  var parts = [];
+
+  if(_.isString(input)) {
+    var matcher = new RegExp('(\\\\.|[^' + delimiter + '])+', 'g');
+    var replacer = new RegExp('\\\\' + delimiter + '', 'g');
+
+    parts = input.match(matcher) || [];
+    parts = parts.map(function(str) {
+      return str.replace(replacer, delimiter);
+    });
+  }
+
+  return parts;
+};
+
+RunUtil.convertDictInputToObject = function(input) {
+  if(!_.isString(input)) {
+    return {};
+  }
+
+  var parts = RunUtil.splitWithEscaped(input, '&');
+  return parts.reduce(function(hash, part) {
+    var pair = RunUtil.splitWithEscaped(part, '=');
+    var key = pair[0];
+    if(key && !(key in hash) && pair.length > 1) {
+      pair.shift();
+      hash[key] = pair.join('=');
+    }
+    return hash;
+  }, {});
+};
+
 RunUtil.harvestInputs = function(grunt, runner, method, inputs, callback) {
   var fieldPromptOptions = {
     validateRequired: false
@@ -216,6 +249,10 @@ RunUtil.harvestInputs = function(grunt, runner, method, inputs, callback) {
         var i = _.clone(input);
         i.value = answers[input.key];
         i.type = input.type || 'text';
+        if(i.type === 'dictionary') {
+          // Convert to a JSON object.
+          i.value = RunUtil.convertDictInputToObject(i.value);
+        }
         inputs.push(i);
       });
 

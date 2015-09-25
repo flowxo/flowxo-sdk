@@ -71,4 +71,52 @@ describe('RunUtil', function() {
       expect(result[1].value).to.equal(nested_data.nested.value);
     });
   });
+
+  describe('#convertDictInputToObject', function() {
+    it('should convert a single key-val pair', function() {
+      var input = 'key=val';
+      var obj = RunUtil.convertDictInputToObject(input);
+
+      expect(obj).to.eql({
+        key: 'val'
+      });
+    });
+
+    it('should convert multiple key-val pairs', function() {
+      var input = 'key1=val&key2=val';
+      var obj = RunUtil.convertDictInputToObject(input);
+
+      expect(obj).to.eql({
+        key1: 'val',
+        key2: 'val'
+      });
+    });
+
+    it('should ignore escaped ampersands', function() {
+      var input = 'key\\&1=va\\&l&key2=val';
+      var obj = RunUtil.convertDictInputToObject(input);
+
+      expect(obj).to.eql({
+        'key\&1': 'va\&l',
+        key2: 'val'
+      });
+    });
+
+    it('should ignore escaped equals', function() {
+      var input = 'key\\=1=va\\=l&key2=val';
+      var obj = RunUtil.convertDictInputToObject(input);
+
+      expect(obj).to.eql({
+        'key\=1': 'va\=l',
+        key2: 'val'
+      });
+    });
+
+    it('should return an empty object if there are no key-val pairs', function() {
+      ['', 'key', null, undefined]
+        .forEach(function(input) {
+          expect(RunUtil.convertDictInputToObject(input)).to.eql({});
+      });
+    });
+  });
 });
