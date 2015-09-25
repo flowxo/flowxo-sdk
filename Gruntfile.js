@@ -20,6 +20,31 @@ module.exports = function(grunt) {
         src: ['tests/**/*.spec.js']
       }
     },
+    mocha_istanbul: {
+      coverage: {
+        src: ['tests/**/*.spec.js'],
+        options: {
+          mask: '*.spec.js',
+          reporter: 'spec',
+          quiet: false,
+          clearRequireCache: false,
+          require: './tests/helpers/chai'
+        }
+      }
+    },
+    istanbul_check_coverage: {
+      default: {
+        options: {
+          coverageFolder: 'coverage/**',
+          check: {
+            lines: 80,
+            statements: 80,
+            branches: 80,
+            functions: 80
+          }
+        }
+      }
+    },
     jshint: {
       options: {
         jshintrc: true,
@@ -45,6 +70,12 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask('test', ['mochaTest']);
+  grunt.registerTask('test', function(target) {
+    var tasks = ['mocha_istanbul'];
+    if(target === 'coverage') {
+      tasks.push('istanbul_check_coverage');
+    }
+    grunt.task.run(tasks);
+  });
   grunt.registerTask('default', ['test', 'watch']);
 };
