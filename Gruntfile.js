@@ -9,20 +9,9 @@ module.exports = function(grunt) {
   require('time-grunt')(grunt);
 
   grunt.initConfig({
-    mochaTest: {
-      test: {
-        options: {
-          reporter: 'spec',
-          quiet: false,
-          clearRequireCache: false,
-          require: './tests/helpers/chai'
-        },
-        src: ['tests/**/*.spec.js']
-      }
-    },
     mocha_istanbul: {
       coverage: {
-        src: ['tests/**/*.spec.js'],
+        src: ['tests/specs/**/*.spec.js'],
         options: {
           mask: '*.spec.js',
           reporter: 'spec',

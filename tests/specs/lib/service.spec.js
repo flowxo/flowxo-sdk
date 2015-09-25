@@ -1,5 +1,5 @@
 'use strict';
-var sdk = require('../');
+var sdk = require('../../../');
 
 describe('FlowXO SDK Service', function() {
   var service;

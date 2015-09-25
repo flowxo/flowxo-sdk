@@ -9,7 +9,7 @@ var open = require('open'),
     url = require('url'),
     passport = require('passport'),
     refresh = require('passport-oauth2-refresh'),
-    SDK = require('../../index.js'),
+    ScriptRunner = require('../../lib/scriptRunner.js'),
     fs = require('fs'),
     https = require('https');
 
@@ -182,7 +182,7 @@ AuthUtil.handlers.credentials = function(grunt, service, cb) {
     if(err) { return cb(err); }
 
     // Check the creds are valid
-    var runner = new SDK.ScriptRunner(service, {
+    var runner = new ScriptRunner(service, {
       credentials: credentials
     });
 

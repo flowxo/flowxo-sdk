@@ -1,6 +1,6 @@
 {
   "name": "flowxo-sdk",
-  "version": "2.1.0",
+  "version": "3.0.0-alpha",
   "description": "SDK for developing Flow XO Services.",
   "main": "index.js",
   "scripts": {
@@ -33,7 +33,6 @@
     "grunt-contrib-jshint": "^0.11.2",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-mocha-istanbul": "^3.0.1",
-    "grunt-mocha-test": "^0.12.7",
     "inquirer": "^0.10.0",
     "istanbul": "^0.3.21",
     "jshint-stylish": "^2.0.1",

@@ -1,6 +1,6 @@
 'use strict';
 
-var RunUtil = require('../tasks/lib/run.js');
+var RunUtil = require('../../../tasks/lib/run.js');
 
 describe('RunUtil', function() {
   describe('#formatScriptOutput', function() {

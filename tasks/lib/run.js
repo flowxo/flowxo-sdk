@@ -10,12 +10,13 @@ var util = require('util'),
   _ = require('lodash'),
   chai = require('chai'),
   FxoUtils = require('flowxo-utils'),
-  SDK = require('../../index.js'),
+  Assertions = require('../../lib/assertions.js'),
+  ScriptRunner = require('../../lib/scriptRunner.js'),
   ngrok = require('ngrok'),
   express = require('express'),
   bodyParser = require('body-parser');
 
-chai.use(SDK.Chai);
+chai.use(Assertions);
 
 var CommonUtil = require('./common');
 
@@ -607,7 +608,7 @@ RunUtil.runTask = function(grunt, options) {
     grunt.fail.fatal('You have no methods to run! Create new methods with `yo flowxo:method`');
   }
 
-  var runner = new SDK.ScriptRunner(service, {
+  var runner = new ScriptRunner(service, {
     credentials: grunt.file.readJSON(options.credentialsFile)
   });
 

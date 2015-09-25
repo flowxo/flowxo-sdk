@@ -1,8 +1,8 @@
 'use strict';
-var sdk = require('../');
+var sdk = require('../../..');
 var chai = require('chai');
 
-chai.use(require('../lib/chai'));
+chai.use(require('../../../lib/assertions'));
 
 describe('Assertions', function() {
   describe('Field Validation', function() {
