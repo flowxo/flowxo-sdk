@@ -336,8 +336,10 @@ RunUtil.run = function(grunt, options, cb) {
       // If we've been given them, just set and move on
       if(inputsPredefined) {
         inputs.forEach(function(input) {
+          // Not actually a prompt:
+          // instead just display to the screen.
           var prompt = CommonUtil.createPrompt(input);
-          grunt.log.writeln(chalk.magenta(' ' + prompt.message + ' ' + input.value));
+          grunt.log.writeln(chalk.magenta(' ' + prompt.message + ' ' + prompt.value));
         });
         return callback();
       }

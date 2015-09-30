@@ -17,6 +17,15 @@ CommonUtil.header = function(grunt, msg, color) {
   grunt.log.writeln(line);
 };
 
+CommonUtil.dictToString = function(dict) {
+  return _(dict)
+    .reduce(function(arr, val, key) {
+      arr.push(key + '=' + val);
+      return arr;
+    }, [])
+    .join('&');
+};
+
 CommonUtil.createPrompt = function(input, options) {
   options = options || {};
 
@@ -82,12 +91,16 @@ CommonUtil.createPrompt = function(input, options) {
 
     if(isDict) {
       // Convert to key=val pairs.
-      prompt.default = _(prompt.default)
-        .reduce(function(arr, val, key) {
-          arr.push(key + '=' + val);
-          return arr;
-        }, [])
-        .join('&');
+      prompt.default = CommonUtil.dictToString(prompt.default);
+    }
+  }
+
+  if(input.value) {
+    prompt.value = input.value;
+
+    if(isDict) {
+      // Convert to key=val pairs.
+      prompt.value = CommonUtil.dictToString(prompt.value);
     }
   }
 
