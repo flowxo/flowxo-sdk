@@ -97,6 +97,8 @@ module.exports = function(options, done) {
 
 Your script receives the input and does whatever work is necessary. If all is well, the script should call `done(null, object)`. If there's a problem, tell the core about it by returning `done(err)` (see the section on _Handling Errors_).
 
+**Important:** There's no shared state between scripts.  Every script should be capable of running independently and relying only on the `options` object for its input.  In production, every script is run in its own context.
+
 Each type of script will be explained in more detail later.
 
 ## Service Index
