@@ -488,6 +488,33 @@ You'll find the original value in `input`, a flag to say whether the boolean is 
 
 Boolean fields are most useful for custom inputs, where the `input_options` are generated from the connected service's API.
 
+#### Dictionary Fields
+
+``` js
+{
+  key: 'metadata',
+  label: 'Metadata',
+  type: 'dictionary'
+}
+```
+
+A dictionary field helps the user to define key/value pairs, a dictionary 'object'.  In Flow XO, the user constructs the object through a dictionary UI control.  In the SDK (when using `grunt run`), you'll need to use `key=val&key2=val2` format, escaping `\=` and `\&` where necessary.
+
+The value passed to your script will always be an object:
+
+``` js
+{
+  key: 'val',
+  key2: 'val2'
+}
+```
+
+It's important to note that whilst the user will be able to define duplicate keys, when the object is passed into the script, **keys will be unique**.  We take the last value we find for a key if it's defined more than once.
+
+Empty values are allowed and so your script should be able to deal with that.  Empty keys are filtered out before they reach your script.
+
+Setting this field type to `required` ensures that the user provides at least one key, however this key could be an output value from a previous task and ultimately could be empty, so you might still receive an empty object.  It should only be used to coerce the user, not to validate input.
+
 ### Output Fields
 
 Output fields should be provided as an array of objects that describe what data the script will output (its output 'properties').
