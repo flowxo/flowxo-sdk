@@ -72,7 +72,7 @@ CommonUtil.createPrompt = function(input, options) {
 
     case 'dictionary':
       isDict = true;
-      prompt.message += '\n  - Enter \'key=value\' pairs separated by \'&\'.\n  - To use \'=\' or \'&\' in a key or value, precede with \'\\\'.';
+      prompt.message += ' 🕮  ';
       break;
 
     case 'datetime':
