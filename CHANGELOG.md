@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.0] - 2015-10-05
+### Added
+- Dictionary input field.
+- Test code coverage.
+- Travis CI integration.
+
+### Removed
+- Private API objects `SDK.ScriptRunner` and `SDK.Chai`, which are no longer needed for service development.
+
+### Fixed
+- `credentials.json` file no longer needs to be generated prior to using `grunt run`.
+
 ## [2.1.0] - 2015-09-23
 ### Added
 - Validation for dependant fields: should only belong to a select field.
@@ -101,6 +113,7 @@ This is a breaking change, hence the major version number bump.
 ### Added
 - Initial release of the SDK.
 
+[3.0.0]: https://github.com/flowxo/flowxo-sdk/compare/v2.1.0...v3.0.0
 [2.1.0]: https://github.com/flowxo/flowxo-sdk/compare/v2.0.3...v2.1.0
 [2.0.3]: https://github.com/flowxo/flowxo-sdk/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/flowxo/flowxo-sdk/compare/v2.0.1...v2.0.2
