@@ -1,6 +1,6 @@
 {
   "name": "flowxo-sdk",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "SDK for developing Flow XO Services.",
   "main": "index.js",
   "scripts": {
