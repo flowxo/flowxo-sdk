@@ -511,7 +511,7 @@ The value passed to your script will always be an object:
 }
 ```
 
-It's important to note that whilst the user will be able to define duplicate keys, when the object is passed into the script, **keys will be unique**.  We take the last value we find for a key if it's defined more than once.
+It's important to note that whilst the user will be able to define duplicate keys, when the object is passed into the script, **keys will be unique**.  We take the *first* value we find for a key if it's defined more than once.
 
 Empty values are allowed and so your script should be able to deal with that.  Empty keys are filtered out before they reach your script.
 
