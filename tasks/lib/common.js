@@ -72,7 +72,7 @@ CommonUtil.createPrompt = function(input, options) {
 
     case 'dictionary':
       isDict = true;
-      prompt.message += ' 🕮  ';
+      prompt.message += ' ◫ ';
       break;
 
     case 'datetime':
