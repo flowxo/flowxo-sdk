@@ -1180,6 +1180,16 @@ _Note - you may be wondering why we don't just use `http://localhost:9000` or `h
 
 You can change the URL and port used for OAuth with the `OAUTH_SERVER_URL`, `OAUTH_SERVER_PORT` and `PORT` settings in your `.env` file.
 
+#### SSL
+
+If your service requires a secure URL (https) for the `redirect_uri` callback, please just add the following entry to your `.env` file:
+
+```
+OAUTH_SERVER_URL=https://flowxo-dev.cc
+```
+
+Also make sure you copy the `cert.pem` and `key.pem` files to your service's root directory. You can find both in [here](certs/).
+
 ### Running Tests
 
 You run an integration test with
