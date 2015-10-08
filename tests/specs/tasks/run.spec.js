@@ -119,4 +119,158 @@ describe('RunUtil', function() {
       });
     });
   });
+
+  describe('#processInput', function() {
+    it('should process an input', function() {
+      var input = {
+        key: 'input',
+        type: 'text'
+      };
+      var answers = {
+        input: 'val'
+      };
+
+      var processed = RunUtil.processInput(input, answers);
+
+      expect(processed).to.eql({
+        key: 'input',
+        type: 'text',
+        value: 'val'
+      });
+      expect(processed).not.to.equal(input);
+    });
+
+    it('should assume an input without a type is a text input', function() {
+      var input = {
+        key: 'input'
+      };
+      var answers = {
+        input: 'val'
+      };
+
+      var processed = RunUtil.processInput(input, answers);
+
+      expect(processed).to.eql({
+        key: 'input',
+        type: 'text',
+        value: 'val'
+      });
+      expect(processed).not.to.equal(input);
+    });
+
+    it('should process a text input with a single-quote empty string value', function() {
+      var input = {
+        key: 'input',
+        type: 'text'
+      };
+      var answers = {
+        input: '\'\''
+      };
+
+      var processed = RunUtil.processInput(input, answers);
+
+      expect(processed).to.eql({
+        key: 'input',
+        type: 'text',
+        value: ''
+      });
+      expect(processed).not.to.equal(input);
+    });
+
+    it('should process a text input with a double-quote empty string value', function() {
+      var input = {
+        key: 'input',
+        type: 'text'
+      };
+      var answers = {
+        input: '""'
+      };
+
+      var processed = RunUtil.processInput(input, answers);
+
+      expect(processed).to.eql({
+        key: 'input',
+        type: 'text',
+        value: ''
+      });
+      expect(processed).not.to.equal(input);
+    });
+
+    it('should process a textarea input with a single-quote empty string value', function() {
+      var input = {
+        key: 'input',
+        type: 'textarea'
+      };
+      var answers = {
+        input: '\'\''
+      };
+
+      var processed = RunUtil.processInput(input, answers);
+
+      expect(processed).to.eql({
+        key: 'input',
+        type: 'textarea',
+        value: ''
+      });
+      expect(processed).not.to.equal(input);
+    });
+
+    it('should process a textarea input with a double-quote empty string value', function() {
+      var input = {
+        key: 'input',
+        type: 'textarea'
+      };
+      var answers = {
+        input: '""'
+      };
+
+      var processed = RunUtil.processInput(input, answers);
+
+      expect(processed).to.eql({
+        key: 'input',
+        type: 'textarea',
+        value: ''
+      });
+      expect(processed).not.to.equal(input);
+    });
+
+    it('should process a dictionary input', function() {
+      var input = {
+        key: 'input',
+        type: 'dictionary'
+      };
+      var answers = {
+        input: 'key=val'
+      };
+
+      var processed = RunUtil.processInput(input, answers);
+
+      expect(processed).to.eql({
+        key: 'input',
+        type: 'dictionary',
+        value: {
+          key: 'val'
+        }
+      });
+      expect(processed).not.to.equal(input);
+    });
+
+    it('should return an object without a value if there was no answer for the input', function() {
+      var input = {
+        key: 'input',
+        type: 'text'
+      };
+      var answers = {
+        input: ''
+      };
+
+      var processed = RunUtil.processInput(input, answers);
+
+      expect(processed).to.eql({
+        key: 'input',
+        type: 'text'
+      });
+      expect(processed).not.to.equal(input);
+    });
+  });
 });

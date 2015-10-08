@@ -22,9 +22,9 @@ var CommonUtil = require('./common');
 
 var RunUtil = {};
 
-RunUtil.filterInputs = function(inputs) {
+RunUtil.filterEmptyInputs = function(inputs) {
   return inputs.filter(function(input) {
-    return input.value !== null && input.value !== '';
+    return 'value' in input;
   });
 };
 
@@ -199,6 +199,36 @@ RunUtil.convertDictInputToObject = function(input) {
   }, {});
 };
 
+RunUtil.processInput = function(input, answers) {
+  // Add each field to the return object,
+  // along with the answer.
+  var i = _.assign({}, input, {
+    type: input.type || 'text'
+  });
+
+  if(answers[input.key]) {
+    i.value = answers[input.key];
+    // Perform some post-processing on the value,
+    // according to the field type.
+    switch(i.type) {
+      case 'text':
+      case 'textarea':
+        // Handle empty string
+        if(i.value === '\'\'' || i.value === '""') {
+          i.value = '';
+        }
+        break;
+
+      case 'dictionary':
+        // Convert to a JSON object.
+        i.value = RunUtil.convertDictInputToObject(i.value);
+        break;
+    }
+  }
+
+  return i;
+};
+
 RunUtil.harvestInputs = function(grunt, runner, method, inputs, callback) {
   var fieldPromptOptions = {
     validateRequired: false
@@ -245,15 +275,8 @@ RunUtil.harvestInputs = function(grunt, runner, method, inputs, callback) {
       }
 
       inputSet.forEach(function(input) {
-        // Add each field to the inputs, along with the answer.
-        var i = _.clone(input);
-        i.value = answers[input.key];
-        i.type = input.type || 'text';
-        if(i.type === 'dictionary') {
-          // Convert to a JSON object.
-          i.value = RunUtil.convertDictInputToObject(i.value);
-        }
-        inputs.push(i);
+        // Concatenate to the master `inputs`.
+        inputs.push(RunUtil.processInput(input, answers));
       });
 
       // If there are any extra questions, ask them.
@@ -352,7 +375,7 @@ RunUtil.run = function(grunt, options, cb) {
 
     function(callback) {
       // Filter out any empty inputs
-      filteredInputs = RunUtil.filterInputs(inputs);
+      filteredInputs = RunUtil.filterEmptyInputs(inputs);
 
       // output.js
       if(method.fields.output) {
@@ -473,7 +496,7 @@ RunUtil.runSingleScript = function(grunt, options, cb) {
     // Run the script
     function(inputs, callback) {
       // Remove any empty inputs
-      var filteredInputs = RunUtil.filterInputs(inputs || []);
+      var filteredInputs = RunUtil.filterEmptyInputs(inputs || []);
       runner.run(method.slug, script, {
         input: filteredInputs
       }, function(err, result) {

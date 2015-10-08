@@ -1190,6 +1190,8 @@ grunt run
 
 This will prompt you for the method to run, along with the input data, and will then run the `input.js`, `output.js` and `run.js` scripts, in that order, if available. The end result will be displayed to the screen, with the option to run another method, or end.
 
+_Note: when entering input data, if you don't enter a value for a text, textarea or dictionary input, the `run.js` script will not include an item in the `options.input` object for that particular input. In order to test blank string entry into the run script, type `''` or `""` for that particular input._
+
 You can also run a single method script:
 
 ```

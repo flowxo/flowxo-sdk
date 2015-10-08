@@ -95,7 +95,7 @@ CommonUtil.createPrompt = function(input, options) {
     }
   }
 
-  if(input.value) {
+  if('value' in input) {
     prompt.value = input.value;
 
     if(isDict) {
