@@ -104,6 +104,11 @@ CommonUtil.createPrompt = function(input, options) {
     }
   }
 
+  var progress = function(results, cb) { cb(); };
+
+  prompt.before = input.before || progress;
+  prompt.after = input.after || progress;
+
   return prompt;
 };
 
@@ -133,17 +138,12 @@ CommonUtil.promptFields = function(inputs, options, cb) {
     var input = inputs[i];
     var prompt = CommonUtil.createPrompt(input, options);
 
-    var progress = function(results, cb) { cb(); };
-
-    prompt.before = input.before || progress;
-    prompt.after = input.after || progress;
-
     var next = function() {
       i++;
       doPrompt();
     };
 
-    prompt.before(results, function(skip) {
+    prompt.before(prompt, function(skip) {
       if(skip) {
         return next();
       }

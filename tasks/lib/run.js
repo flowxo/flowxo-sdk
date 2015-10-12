@@ -239,7 +239,9 @@ RunUtil.harvestInputs = function(grunt, runner, method, inputs, callback) {
     // we need to run the input.js when they change.
     var extraSet = [];
 
-    inputSet.forEach(function(input) {
+    inputSet = inputSet.map(function(input) {
+      input = _.cloneDeep(input);
+
       if(input.dependants) {
         input.after = function(results, done) {
           var dataToSend = {
@@ -266,7 +268,35 @@ RunUtil.harvestInputs = function(grunt, runner, method, inputs, callback) {
             done();
           });
         };
+
+      } else if(input.type === 'select') {
+        // Add an extra option to the list.
+        var key = input.key;
+        var manualOption = '__fxo_select_manual_' + key + '_' + Date.now() + '__';
+        input.input_options.push({
+          label: '<enter manually>',
+          value: manualOption
+        });
+
+        // After the prompt, check if it was selected.
+        // If so, create an input field to overwrite.
+        input.after = function(results, done) {
+          if(results[key] !== manualOption) {
+            return done();
+          }
+
+          inquirer.prompt({
+            name: key,
+            type: 'input',
+            message: input.label + ' (enter manually):'
+          }, function(r) {
+            results[key] = r[key];
+            done();
+          });
+        };
       }
+
+      return input;
     });
 
     CommonUtil.promptFields(inputSet, fieldPromptOptions, function(err, answers) {
