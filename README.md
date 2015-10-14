@@ -473,7 +473,7 @@ You can also use text areas, select boxes, special date/time fields and boolean 
 
 Notice that the `default` field references the `value` of the matching `input_options`. So, in the example above, the select box will show the 'Low' item by default.
 
-Users can still provide an output or text instead of selecting a value (they have an option in the UI to switch the select box into a text field), so it's important to validate properly, or at least make sure the API handles the validation.
+Users can still provide an output or text instead of selecting a value (they have an option in the UI to switch the select box into a text field), so it's important to validate properly, or at least make sure the API handles the validation.  Select boxes that have dependant fields are *not* editable.
 
 #### Date/Time Fields
 
