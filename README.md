@@ -1,3 +1,12 @@
+# Flow XO SDK
+
+An SDK to build services for the Flow XO platform.
+
+[![Build Status](https://travis-ci.org/flowxo/flowxo-sdk.svg?branch=master)](https://travis-ci.org/flowxo/flowxo-sdk)
+[![npm version](https://badge.fury.io/js/flowxo-sdk.svg)](http://badge.fury.io/js/flowxo-sdk)
+[![Dependency Status](https://david-dm.org/flowxo/flowxo-sdk.svg)](https://david-dm.org/flowxo/flowxo-sdk)
+[![devDependency Status](https://david-dm.org/flowxo/flowxo-sdk/dev-status.svg)](https://david-dm.org/flowxo/flowxo-sdk#info=devDependencies)
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
@@ -56,15 +65,6 @@
   - [Submitting Your Service](#submitting-your-service)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-# Flow XO SDK
-
-An SDK to build services for the Flow XO platform.
-
-[![Build Status](https://travis-ci.org/flowxo/flowxo-sdk.svg?branch=master)](https://travis-ci.org/flowxo/flowxo-sdk)
-[![npm version](https://badge.fury.io/js/flowxo-sdk.svg)](http://badge.fury.io/js/flowxo-sdk)
-[![Dependency Status](https://david-dm.org/flowxo/flowxo-sdk.svg)](https://david-dm.org/flowxo/flowxo-sdk)
-[![devDependency Status](https://david-dm.org/flowxo/flowxo-sdk/dev-status.svg)](https://david-dm.org/flowxo/flowxo-sdk#info=devDependencies)
 
 ## Introduction
 
