@@ -1,3 +1,62 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Flow XO SDK](#flow-xo-sdk)
+  - [Introduction](#introduction)
+  - [Prerequisites](#prerequisites)
+  - [Scaffolding Your Service](#scaffolding-your-service)
+  - [Code Structure](#code-structure)
+  - [Requiring the SDK](#requiring-the-sdk)
+  - [Scripts](#scripts)
+  - [Service Index](#service-index)
+  - [Authorization](#authorization)
+    - [Credentials](#credentials)
+      - [ping.js](#pingjs)
+    - [OAuth](#oauth)
+  - [Creating Methods](#creating-methods)
+    - [config.js](#configjs)
+    - [Input Fields](#input-fields)
+      - [Text Areas](#text-areas)
+      - [Select Boxes](#select-boxes)
+      - [Date/Time Fields](#datetime-fields)
+      - [Boolean Fields](#boolean-fields)
+      - [Dictionary Fields](#dictionary-fields)
+    - [Output Fields](#output-fields)
+      - [Double Underscore Notation](#double-underscore-notation)
+    - [input.js](#inputjs)
+      - [Dependant Fields](#dependant-fields)
+    - [output.js](#outputjs)
+    - [run.js](#runjs)
+    - [Polling](#polling)
+    - [Webhooks](#webhooks)
+      - [Fields](#fields)
+      - [Handling The Webhook](#handling-the-webhook)
+        - [Help Instructions](#help-instructions)
+    - [Input Validation](#input-validation)
+      - [Validating Datetime and Boolean Fields](#validating-datetime-and-boolean-fields)
+    - [Handling Errors](#handling-errors)
+      - [Retryable Errors](#retryable-errors)
+      - [Service Errors](#service-errors)
+      - [Auth Errors](#auth-errors)
+  - [Testing & Environment](#testing-&-environment)
+    - [Setup](#setup)
+    - [Authentication](#authentication)
+      - [Basic Credentials](#basic-credentials)
+      - [OAuth](#oauth-1)
+    - [Running Tests](#running-tests)
+    - [Recording Tests](#recording-tests)
+    - [Test Documentation](#test-documentation)
+    - [Testing Pollers](#testing-pollers)
+  - [Examples](#examples)
+    - [Example Services](#example-services)
+    - [Code Sample Index](#code-sample-index)
+  - [Authorized Libraries](#authorized-libraries)
+  - [Updating a Method](#updating-a-method)
+  - [Submitting Your Service](#submitting-your-service)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Flow XO SDK
 
 An SDK to build services for the Flow XO platform.
@@ -414,6 +473,8 @@ You can also use text areas, select boxes, special date/time fields and boolean 
 
 Notice that the `default` field references the `value` of the matching `input_options`. So, in the example above, the select box will show the 'Low' item by default.
 
+Users can still provide an output or text instead of selecting a value (they have an option in the UI to switch the select box into a text field), so it's important to validate properly, or at least make sure the API handles the validation.
+
 #### Date/Time Fields
 
 ``` js
@@ -473,6 +534,8 @@ _Note: by default, sugar.js also enhances other JavaScript objects, such as `Num
 
 If you don't specify `input_options`, the options will default to _Yes_ and _No_.
 
+Users can provide an output or text instead of selecting a value (they have an option in the UI to switch the select box into a text field).
+
 A boolean field type will attempt to coerce a select box value into `true` or `false`. It can handle the values `true`, `false`, `yes`, `no`, `1` or `0`.
 
 It's similar to date/time in that the value passed to your script will always be an object:
@@ -487,8 +550,6 @@ It's similar to date/time in that the value passed to your script will always be
 ```
 
 You'll find the original value in `input`, a flag to say whether the boolean is `valid`, and `parsed` which will either contain `null`, `true` or `false`.
-
-Boolean fields are most useful for custom inputs, where the `input_options` are generated from the connected service's API.
 
 #### Dictionary Fields
 
