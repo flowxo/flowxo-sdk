@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.2.0] - 2015-10-14
+### Added
+- Select fields that do not have `dependants: true` can now be input manually, instead of forcing an option to be chosen.
+
 ## [3.1.0] - 2015-10-08
 ### Added
 - Support for entering an empty string input for the `grunt run` task. Enter `''` or `""` as input data for a field to enable this behaviour.
@@ -125,6 +129,7 @@ This is a breaking change, hence the major version number bump.
 ### Added
 - Initial release of the SDK.
 
+[3.2.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.1.0...v3.2.0
 [3.1.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.0.2...v3.1.0
 [3.0.2]: https://github.com/flowxo/flowxo-sdk/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/flowxo/flowxo-sdk/compare/v3.0.0...v3.0.1
