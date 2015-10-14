@@ -19,7 +19,7 @@ If you get stuck, just send us an email at [support@flowxo.com](mailto:support@f
 
 ## Prerequisites
 
-Flow XO runs on [Node.js](https://nodejs.org/). If you don't have Node.js, you can [download it here](https://nodejs.org/download/). We'd prefer you to use v4.x as this is what we use in production, but v0.12.x will also work fine.
+Flow XO runs on [Node.js](https://nodejs.org/). If you don't have Node.js, you can [download it here](https://nodejs.org/download/). We'd prefer you to use v4.x as this is what we use in production, but v0.12.x will also work fine. Note that we haven't tested the SDK on Windows, and so it may not work correctly for this OS.
 
 You'll also need to be familiar with [Git](http://git-scm.com/) as you'll be using it to submit your service for review. We use [GitHub](http://github.com) to host the services code, and you'll need to be familiar with forking and creating pull requests, as this is the workflow we will be using to validate your service.
 
