@@ -19,7 +19,7 @@
   "dependencies": {
     "flowxo-utils": "^1.1.0",
     "lodash": "^3.10.1",
-    "validate.js": "^0.8.0",
+    "validate.js": "^0.9.0",
     "winston": "^1.0.1"
   },
   "devDependencies": {
