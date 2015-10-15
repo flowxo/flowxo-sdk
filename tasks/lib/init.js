@@ -5,7 +5,7 @@
 // as by nature, the SDK's dependencies may not
 // be available yet.
 
-var spawn = require('child_process').spawn;
+var spawn = require('cross-spawn');
 
 var Init = {};
 
