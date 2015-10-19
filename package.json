@@ -27,6 +27,7 @@
     "body-parser": "^1.13.3",
     "chai": "^3.2.0",
     "chalk": "^1.1.0",
+    "cross-spawn": "^2.0.0",
     "express": "^4.13.3",
     "express-session": "^1.11.3",
     "grunt": "^0.4.5",
