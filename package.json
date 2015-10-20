@@ -39,7 +39,7 @@
     "jshint-stylish": "^2.0.1",
     "load-grunt-tasks": "^3.2.0",
     "mocha": "^2.2.5",
-    "ngrok": "^0.1.99",
+    "ngrok": "^0.2.1",
     "open": "0.0.5",
     "passport": "^0.3.0",
     "passport-oauth2-refresh": "^0.4.0",
