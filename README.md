@@ -1095,7 +1095,7 @@ The built-in validator applies some sane defaults to `validate.js`, namely:
 - format: 'flat'
 - fullMessages: true
 
-#### Validating Datetime and Boolean Fields
+#### Validating Flow XO Datetime and Boolean Fields
 
 The SDK also provides two custom validators for dealing with Flow XO Datetime and Boolean fields. Use them as follows:
 
@@ -1118,6 +1118,12 @@ module.exports = function(options, done){
   // ...
 }
 ```
+
+#### Validating String Fields containing Dates
+
+The vast majority of the time, you'll be expecting a `datetime` in a Flow XO field, and so you'll set the `type` to `datetime`. You then use the `fxoDatetime` validator as described above.
+
+If, however, your regular `text` field contains a datetime string, you may wish to use the built-in _datetime_ validator from the `validate.js` library. The parsing engine for the built-in `datetime` validator uses the [`#parseDateTimeField` function in the `flowxo-utils` module](https://github.com/flowxo/flowxo-utils/blob/master/lib/index.js#L306).
 
 ### Handling Errors
 
