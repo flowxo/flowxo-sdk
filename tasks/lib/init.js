@@ -1,11 +1,14 @@
 'use strict';
 
 // Used to load the modules devDependencies.
-// Be careful to only use the node core modules here,
-// as by nature, the SDK's dependencies may not
-// be available yet.
 
-var spawn = require('cross-spawn');
+// Any required modules must be available
+// at run-time when the SDK is used as part
+// of a service. This means they need to be
+// either node core modules, or included
+// in the `dependencies` map in the SDK's
+// `package.json`.
+var spawn = require('cross-spawn-async');
 
 var Init = {};
 
