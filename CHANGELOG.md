@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.2.2] - 2015-10-27
+### Fixed
+- Use `cross-spawn-async` to prevent build toolchain requirement.
+- Moved `cross-spawn-async` to `dependencies` map so it can be used by service when `grunt init` is called.
+
+### Updated
+- Dependencies.
+
 ## [3.2.1] - 2015-10-19
 ### Fixed
 - Use `cross-spawn` for better Windows compatibility.
