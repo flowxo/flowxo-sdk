@@ -2,7 +2,8 @@
 
 require('./check-deps');
 
-var open = require('open'),
+var path = require('path'),
+    open = require('open'),
     express = require('express'),
     session = require('express-session'),
     crypto = require('crypto'),
@@ -33,18 +34,90 @@ var cloneObject = function(obj) {
 AuthUtil.handlers = {};
 
 /**
- * Generic handler for OAuth
+ * Handler for OAuth1
  */
-AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
+AuthUtil.handlers.oauth1 = function(grunt, service, options, cb) {
+  var slug = service.slug.toUpperCase();
+
+  var envs = [{
+    option: 'consumerKey',
+    key: slug + '_KEY'
+  }, {
+    option: 'consumerSecret',
+    key: slug + '_SECRET'
+  }];
+
+  var formatter = function(token, token_secret, profile, done) {
+    done(null, {
+      token: token,
+      token_secret: token_secret,
+      consumer_key: service.auth.options.consumerKey,
+      consumer_secret: service.auth.options.consumerSecret,
+      user_profile: profile
+    });
+  };
+
+  AuthUtil.doOAuth(grunt, service, options, envs, formatter, cb);
+};
+
+/**
+ * Handler for OAuth2
+ */
+AuthUtil.handlers.oauth2 = function(grunt, service, options, cb) {
+  var slug = service.slug.toUpperCase();
+
+  var envs = [{
+    option: 'clientID',
+    key: slug + '_ID'
+  }, {
+    option: 'clientSecret',
+    key: slug + '_SECRET'
+  }];
+
+  var formatter = function(access_token, refresh_token, profile, done) {
+    done(null, {
+      access_token: access_token,
+      refresh_token: refresh_token,
+      user_profile: profile
+    });
+  };
+
+  AuthUtil.doOAuth(grunt, service, options, envs, formatter, cb);
+};
+
+/**
+ * Handler for basic Credentials
+ */
+AuthUtil.handlers.credentials = function(grunt, service, options, cb) {
+  CommonUtil.promptFields(service.auth.fields, { validateRequired: false }, function(err, credentials) {
+    if(err) { return cb(err); }
+
+    // Check the creds are valid
+    var runner = new ScriptRunner(service, {
+      credentials: credentials
+    });
+
+    runner.run('ping', function(err) {
+      if(err) { return cb(err); }
+      cb(null, credentials);
+    });
+  });
+};
+
+
+/**
+ * Handle OAuth flow
+ */
+AuthUtil.doOAuth = function(grunt, service, options, envs, formatCreds, cb) {
   if(!service.auth.strategy) {
     grunt.fail.fatal('Unable to load strategy - please check you have a valid' +
     ' strategy defined in your `index.js` file.');
   }
 
-  var options = cloneObject(service.auth.options);
+  var authOptions = cloneObject(service.auth.options);
 
   envs.forEach(function(env) {
-    if(!options[env.option]) {
+    if(!authOptions[env.option]) {
       grunt.fail.fatal('Unable to authenticate: no ' + env.option + ' defined. Did you remember to fill in your ' + env.key + ' in the .env file?');
     }
   });
@@ -54,7 +127,8 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
   var cbRoute = route + '/callback';
 
   // Calculate the callbackURL for the request
-  var OAUTH_SERVER_URL = process.env.OAUTH_SERVER_URL || 'http://flowxo-dev.cc';
+  var OAUTH_SERVER_URL = process.env.OAUTH_SERVER_URL ||
+    'http' + (options.sslOAuthCallback ? 's' : '') + '://flowxo-dev.cc';
 
   // Calculate the port to listen on
   // PORT env var for Cloud9 support
@@ -69,9 +143,9 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
     pathname: cbRoute
   });
 
-  options.callbackURL = callbackURL;
+  authOptions.callbackURL = callbackURL;
 
-  var strategy = new service.auth.strategy(options, formatCreds);
+  var strategy = new service.auth.strategy(authOptions, formatCreds);
   passport.use(name, strategy);
 
   var httpsServer;
@@ -95,9 +169,10 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
   if(OAUTH_SERVER_URL.indexOf('https://') === 0) {
     grunt.log.writeln(['Using SSL Server for Auth']);
 
+    var certsPath = path.join(__dirname, '..', '..', 'certs');
     var sslOptions = {
-      key: fs.readFileSync('key.pem'),
-      cert: fs.readFileSync('cert.pem'),
+      key: fs.readFileSync(path.join(certsPath, 'ssl.key')),
+      cert: fs.readFileSync(path.join(certsPath, 'ssl.cert')),
       requestCert: false,
       rejectUnauthorized: false
     };
@@ -120,77 +195,6 @@ AuthUtil.handlers.oauth = function(grunt, service, envs, formatCreds, cb) {
   grunt.log.writeln(['You can navigate manually to ' + userUrl + ' if a new window does not open.']);
 
   open(userUrl);
-};
-
-/**
- * Handler for OAuth1
- */
-AuthUtil.handlers.oauth1 = function(grunt, service, cb) {
-  var slug = service.slug.toUpperCase();
-
-  var envs = [{
-    option: 'consumerKey',
-    key: slug + '_KEY'
-  }, {
-    option: 'consumerSecret',
-    key: slug + '_SECRET'
-  }];
-
-  var formatter = function(token, token_secret, profile, done) {
-    done(null, {
-      token: token,
-      token_secret: token_secret,
-      consumer_key: service.auth.options.consumerKey,
-      consumer_secret: service.auth.options.consumerSecret,
-      user_profile: profile
-    });
-  };
-
-  AuthUtil.handlers.oauth(grunt, service, envs, formatter, cb);
-};
-
-/**
- * Handler for OAuth2
- */
-AuthUtil.handlers.oauth2 = function(grunt, service, cb) {
-  var slug = service.slug.toUpperCase();
-
-  var envs = [{
-    option: 'clientID',
-    key: slug + '_ID'
-  }, {
-    option: 'clientSecret',
-    key: slug + '_SECRET'
-  }];
-
-  var formatter = function(access_token, refresh_token, profile, done) {
-    done(null, {
-      access_token: access_token,
-      refresh_token: refresh_token,
-      user_profile: profile
-    });
-  };
-
-  AuthUtil.handlers.oauth(grunt, service, envs, formatter, cb);
-};
-
-/**
- * Handler for basic Credentials
- */
-AuthUtil.handlers.credentials = function(grunt, service, cb) {
-  CommonUtil.promptFields(service.auth.fields, { validateRequired: false }, function(err, credentials) {
-    if(err) { return cb(err); }
-
-    // Check the creds are valid
-    var runner = new ScriptRunner(service, {
-      credentials: credentials
-    });
-
-    runner.run('ping', function(err) {
-      if(err) { return cb(err); }
-      cb(null, credentials);
-    });
-  });
 };
 
 /**
@@ -240,7 +244,7 @@ AuthUtil.acquire = function(grunt, options, done) {
     grunt.fail.fatal('Cannot authorize: no handler found for type ' + service.auth.type + '. Are you sure this is an OAuth service?');
   }
 
-  hdlr(grunt, service, done);
+  hdlr(grunt, service, options, done);
 };
 
 AuthUtil.runTask = function(grunt, options) {
