@@ -1247,6 +1247,32 @@ _Note - you may be wondering why we don't just use `http://localhost:9000` or `h
 
 You can change the URL and port used for OAuth with the `OAUTH_SERVER_URL`, `OAUTH_SERVER_PORT` and `PORT` settings in your `.env` file.
 
+##### Callback URL for development
+
+The Callback URL or `redirect_uri` used for development is generated automatically. By default, it will take the form:
+
+```
+http://flowxo-dev.cc:9000/service/<name>/callback
+```
+
+You'll often need to add this to the OAuth provider's web portal, to allow access to their authentication server.
+
+Sometimes, the OAuth provider will enforce a `https://` callback URL. You can easily switch to SSL mode by changing the `sslOAuthCallback` option in your service's Gruntfile.js to `true`:
+
+``` js
+grunt.initConfig({
+  flowxo: {
+    auth: {
+      options: {
+        sslOAuthCallback: true
+      }
+    }
+  }
+})
+```
+
+Alternatively, if you want to have complete control of this URL, you can set the `OAUTH_SERVER_URL` and `OAUTH_SERVER_PORT` environment variables, as described above.
+
 ### Running Tests
 
 You run an integration test with
