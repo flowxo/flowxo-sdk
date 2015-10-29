@@ -11,58 +11,59 @@ An SDK to build services for the Flow XO platform.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Flow XO SDK](#flow-xo-sdk)
-  - [Introduction](#introduction)
-  - [Prerequisites](#prerequisites)
-  - [Scaffolding Your Service](#scaffolding-your-service)
-  - [Code Structure](#code-structure)
-  - [Requiring the SDK](#requiring-the-sdk)
-  - [Scripts](#scripts)
-  - [Service Index](#service-index)
-  - [Authorization](#authorization)
-    - [Credentials](#credentials)
-      - [ping.js](#pingjs)
-    - [OAuth](#oauth)
-  - [Creating Methods](#creating-methods)
-    - [config.js](#configjs)
-    - [Input Fields](#input-fields)
-      - [Text Areas](#text-areas)
-      - [Select Boxes](#select-boxes)
-      - [Date/Time Fields](#datetime-fields)
-      - [Boolean Fields](#boolean-fields)
-      - [Dictionary Fields](#dictionary-fields)
-    - [Output Fields](#output-fields)
-      - [Double Underscore Notation](#double-underscore-notation)
-    - [input.js](#inputjs)
-      - [Dependant Fields](#dependant-fields)
-    - [output.js](#outputjs)
-    - [run.js](#runjs)
-    - [Polling](#polling)
-    - [Webhooks](#webhooks)
-      - [Fields](#fields)
-      - [Handling The Webhook](#handling-the-webhook)
-        - [Help Instructions](#help-instructions)
-    - [Input Validation](#input-validation)
-      - [Validating Datetime and Boolean Fields](#validating-datetime-and-boolean-fields)
-    - [Handling Errors](#handling-errors)
-      - [Retryable Errors](#retryable-errors)
-      - [Service Errors](#service-errors)
-      - [Auth Errors](#auth-errors)
-  - [Testing & Environment](#testing-&-environment)
-    - [Setup](#setup)
-    - [Authentication](#authentication)
-      - [Basic Credentials](#basic-credentials)
-      - [OAuth](#oauth-1)
-    - [Running Tests](#running-tests)
-    - [Recording Tests](#recording-tests)
-    - [Test Documentation](#test-documentation)
-    - [Testing Pollers](#testing-pollers)
-  - [Examples](#examples)
-    - [Example Services](#example-services)
-    - [Code Sample Index](#code-sample-index)
-  - [Authorized Libraries](#authorized-libraries)
-  - [Updating a Method](#updating-a-method)
-  - [Submitting Your Service](#submitting-your-service)
+- [Introduction](#introduction)
+- [Prerequisites](#prerequisites)
+- [Scaffolding Your Service](#scaffolding-your-service)
+- [Code Structure](#code-structure)
+- [Requiring the SDK](#requiring-the-sdk)
+- [Scripts](#scripts)
+- [Service Index](#service-index)
+- [Authorization](#authorization)
+  - [Credentials](#credentials)
+    - [ping.js](#pingjs)
+  - [OAuth](#oauth)
+- [Creating Methods](#creating-methods)
+  - [config.js](#configjs)
+  - [Input Fields](#input-fields)
+    - [Text Areas](#text-areas)
+    - [Select Boxes](#select-boxes)
+    - [Date/Time Fields](#datetime-fields)
+    - [Boolean Fields](#boolean-fields)
+    - [Dictionary Fields](#dictionary-fields)
+  - [Output Fields](#output-fields)
+    - [Double Underscore Notation](#double-underscore-notation)
+  - [input.js](#inputjs)
+    - [Dependant Fields](#dependant-fields)
+  - [output.js](#outputjs)
+  - [run.js](#runjs)
+  - [Polling](#polling)
+  - [Webhooks](#webhooks)
+    - [Fields](#fields)
+    - [Handling The Webhook](#handling-the-webhook)
+      - [Help Instructions](#help-instructions)
+  - [Input Validation](#input-validation)
+    - [Validating Flow XO Datetime and Boolean Fields](#validating-flow-xo-datetime-and-boolean-fields)
+    - [Validating String Fields containing Dates](#validating-string-fields-containing-dates)
+  - [Handling Errors](#handling-errors)
+    - [Retryable Errors](#retryable-errors)
+    - [Service Errors](#service-errors)
+    - [Auth Errors](#auth-errors)
+- [Testing & Environment](#testing-&-environment)
+  - [Setup](#setup)
+  - [Authentication](#authentication)
+    - [Basic Credentials](#basic-credentials)
+    - [OAuth](#oauth-1)
+      - [Callback URL for development](#callback-url-for-development)
+  - [Running Tests](#running-tests)
+  - [Recording Tests](#recording-tests)
+  - [Test Documentation](#test-documentation)
+  - [Testing Pollers](#testing-pollers)
+- [Examples](#examples)
+  - [Example Services](#example-services)
+  - [Code Sample Index](#code-sample-index)
+- [Authorized Libraries](#authorized-libraries)
+- [Updating a Method](#updating-a-method)
+- [Submitting Your Service](#submitting-your-service)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -457,19 +458,21 @@ You can also use text areas, select boxes, special date/time fields and boolean 
   key: 'priority',
   label: 'Priority',
   type: 'select',
-  default: 1,
+  default: '1',
   input_options: [
     {
       label: 'Low',
-      value: 1
+      value: '1'
     },
     {
       label: 'Medium',
-      value: 2
+      value: '2'
     }
   ]
 }
 ```
+
+The `label` and `value` for each input option should be a __non-empty string__.
 
 Notice that the `default` field references the `value` of the matching `input_options`. So, in the example above, the select box will show the 'Low' item by default.
 
