@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.4.1] - 2015-10-29
+### Fixed
+- Rules on method input field structure have been tightened, in line with core platform requirements:
+  - `key` must be a non-empty string
+  - `label` must be a non-empty string
+  - `type` must be a valid type
+  - `input_options` must be an array of objects
+  - For each `input_option`:
+    - `label` must be a non-empty string
+    - `value` must be a non-empty string
+
 ## [3.4.0] - 2015-10-29
 ### Updated
 - It is now easier to setup an OAuth service to use an SSL-based callback.
@@ -153,6 +164,7 @@ This is a breaking change, hence the major version number bump.
 ### Added
 - Initial release of the SDK.
 
+[3.4.1]: https://github.com/flowxo/flowxo-sdk/compare/v3.4.0...v3.4.1
 [3.4.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.3.0...v3.4.0
 [3.3.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.2.2...v3.3.0
 [3.2.2]: https://github.com/flowxo/flowxo-sdk/compare/v3.2.1...v3.2.2
