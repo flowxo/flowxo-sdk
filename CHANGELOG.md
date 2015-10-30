@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.5.0] - 2015-10-30
+### Added
+- Allow `options.scriptStore` in method scripts.
+
 ## [3.4.1] - 2015-10-29
 ### Fixed
 - Rules on method input field structure have been tightened, in line with core platform requirements:
@@ -164,6 +168,7 @@ This is a breaking change, hence the major version number bump.
 ### Added
 - Initial release of the SDK.
 
+[3.5.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.4.1...v3.5.0
 [3.4.1]: https://github.com/flowxo/flowxo-sdk/compare/v3.4.0...v3.4.1
 [3.4.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.3.0...v3.4.0
 [3.3.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.2.2...v3.3.0
