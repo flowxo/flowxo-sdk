@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.5.1] - 2015-11-02
+### Fixed
+- Relaxed method field input_options value validation. Can now be a number or boolean as well as a non-empty string.
+
 ## [3.5.0] - 2015-10-30
 ### Added
 - Allow `options.scriptStore` in method scripts.
