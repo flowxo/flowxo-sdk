@@ -30,6 +30,71 @@ describe('Assertions', function() {
       expect(fn).to.throw('to have a property \'label\'');
     });
 
+    describe('Select Field: Input Options', function() {
+      beforeEach(function() {
+        field.type = 'select';
+        field.input_options = [{
+          label: 'Foo',
+          value: 'foo'
+        }];
+      });
+
+      it('should ensure an input option has a label', function() {
+        fn = function() {
+          delete field.input_options[0].label;
+          expect(field).to.be.input.field;
+        };
+        expect(fn).to.throw();
+      });
+
+      it('should ensure an input option has a value', function() {
+        fn = function() {
+          delete field.input_options[0].value;
+          expect(field).to.be.input.field;
+        };
+        expect(fn).to.throw();
+      });
+
+      it('should ensure an input option value is not undefined', function() {
+        fn = function() {
+          field.input_options[0].value = undefined;
+          expect(field).to.be.input.field;
+        };
+        expect(fn).to.throw();
+      });
+
+      it('should ensure an input option value is not null', function() {
+        fn = function() {
+          field.input_options[0].value = null;
+          expect(field).to.be.input.field;
+        };
+        expect(fn).to.throw();
+      });
+
+      it('should ensure an input option value is not an empty string', function() {
+        fn = function() {
+          field.input_options[0].value = '';
+          expect(field).to.be.input.field;
+        };
+        expect(fn).to.throw();
+      });
+
+      it('should ensure an input option value is not an array', function() {
+        fn = function() {
+          field.input_options[0].value = [];
+          expect(field).to.be.input.field;
+        };
+        expect(fn).to.throw();
+      });
+
+      it('should ensure an input option value is not an object', function() {
+        fn = function() {
+          field.input_options[0].value = {};
+          expect(field).to.be.input.field;
+        };
+        expect(fn).to.throw();
+      });
+    });
   });
 
   describe('Service Validation', function() {
