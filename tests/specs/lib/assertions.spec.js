@@ -39,12 +39,28 @@ describe('Assertions', function() {
         }];
       });
 
+      it('should ensure an input option is an object', function() {
+        fn = function() {
+          field.input_options[0] = 'string';
+          expect(field).to.be.input.field;
+        };
+        expect(fn).to.throw('Input option should be an object');
+      });
+
       it('should ensure an input option has a label', function() {
         fn = function() {
           delete field.input_options[0].label;
           expect(field).to.be.input.field;
         };
-        expect(fn).to.throw();
+        expect(fn).to.throw('Input option needs a label');
+      });
+
+      it('should ensure an input option has a non-empty string label', function() {
+        fn = function() {
+          field.input_options[0].label = '';
+          expect(field).to.be.input.field;
+        };
+        expect(fn).to.throw('Input option label should be a non-empty string');
       });
 
       it('should ensure an input option has a value', function() {
@@ -52,7 +68,7 @@ describe('Assertions', function() {
           delete field.input_options[0].value;
           expect(field).to.be.input.field;
         };
-        expect(fn).to.throw();
+        expect(fn).to.throw('Input option needs a value');
       });
 
       it('should ensure an input option value is not undefined', function() {
@@ -60,7 +76,7 @@ describe('Assertions', function() {
           field.input_options[0].value = undefined;
           expect(field).to.be.input.field;
         };
-        expect(fn).to.throw();
+        expect(fn).to.throw('Input option value should be a number, boolean or non-empty string');
       });
 
       it('should ensure an input option value is not null', function() {
@@ -68,7 +84,7 @@ describe('Assertions', function() {
           field.input_options[0].value = null;
           expect(field).to.be.input.field;
         };
-        expect(fn).to.throw();
+        expect(fn).to.throw('Input option value should be a number, boolean or non-empty string');
       });
 
       it('should ensure an input option value is not an empty string', function() {
@@ -76,7 +92,7 @@ describe('Assertions', function() {
           field.input_options[0].value = '';
           expect(field).to.be.input.field;
         };
-        expect(fn).to.throw();
+        expect(fn).to.throw('Input option value should be a number, boolean or non-empty string');
       });
 
       it('should ensure an input option value is not an array', function() {
@@ -84,7 +100,7 @@ describe('Assertions', function() {
           field.input_options[0].value = [];
           expect(field).to.be.input.field;
         };
-        expect(fn).to.throw();
+        expect(fn).to.throw('Input option value should be a number, boolean or non-empty string');
       });
 
       it('should ensure an input option value is not an object', function() {
@@ -92,7 +108,7 @@ describe('Assertions', function() {
           field.input_options[0].value = {};
           expect(field).to.be.input.field;
         };
-        expect(fn).to.throw();
+        expect(fn).to.throw('Input option value should be a number, boolean or non-empty string');
       });
     });
   });
