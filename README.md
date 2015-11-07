@@ -48,7 +48,7 @@ An SDK to build services for the Flow XO platform.
     - [Retryable Errors](#retryable-errors)
     - [Service Errors](#service-errors)
     - [Auth Errors](#auth-errors)
-- [Testing & Environment](#testing-&-environment)
+- [Testing & Environment](#testing--environment)
   - [Setup](#setup)
   - [Authentication](#authentication)
     - [Basic Credentials](#basic-credentials)
