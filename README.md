@@ -1255,7 +1255,7 @@ You can change the URL and port used for OAuth with the `OAUTH_SERVER_URL`, `OAU
 The Callback URL or `redirect_uri` used for development is generated automatically. By default, it will take the form:
 
 ```
-http://flowxo-dev.cc:9000/service/<name>/callback
+http://flowxo-dev.cc:9000/auth/service/<name>/callback
 ```
 
 You'll often need to add this to the OAuth provider's web portal, to allow access to their authentication server.
