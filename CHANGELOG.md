@@ -2,7 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.6.1] - 2015-12-08
+### Fixed
+- Method scripts not being jsonified correctly.
+
 ## [3.6.0] - 2015-12-08
+**Deprecation warning** - this release contains a bug and should not be used.
+
 ### Added
 - Ability to order methods.
 - `help` property is now allowed on service configuration.
@@ -185,6 +191,7 @@ This is a breaking change, hence the major version number bump.
 ### Added
 - Initial release of the SDK.
 
+[3.6.1]: https://github.com/flowxo/flowxo-sdk/compare/v3.6.0...v3.6.1
 [3.6.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.5.3...v3.6.0
 [3.5.3]: https://github.com/flowxo/flowxo-sdk/compare/v3.5.2...v3.5.3
 [3.5.2]: https://github.com/flowxo/flowxo-sdk/compare/v3.5.1...v3.5.2
