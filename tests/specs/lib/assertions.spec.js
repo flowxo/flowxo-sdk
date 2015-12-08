@@ -1,4 +1,6 @@
 'use strict';
+
+var path = require('path');
 var sdk = require('../../..');
 var chai = require('chai');
 
@@ -117,36 +119,13 @@ describe('Assertions', function() {
     var service;
     beforeEach(function() {
       service = new sdk.Service({
+        serviceRoot: path.resolve(__dirname + '../../../fixtures/test_service'),
         name: 'testname',
         slug: 'testslug',
         auth: {
           type: 'oauth1',
         },
-        methods: [{
-          name: 'Add Test',
-          slug: 'add_test',
-          type: 'action',
-          kind: 'task',
-          scripts: {
-            run: function(options, cb) {
-              // Echo back the options, for testing
-              cb(null, options);
-            }
-          },
-          fields: {
-            input: [{
-              key: 'test',
-              type: 'select',
-              label: 'Test',
-              input_options: []
-            }],
-            output: [{
-              key: 'output',
-              label: 'Output'
-            }]
-          }
-
-        }],
+        methods: ['dummy_method_1'],
         scripts: {
           ping: function(options, cb) {
             cb(null, options);

@@ -337,6 +337,32 @@ The [Flow XO Generator](https://github.com/flowxo/generator-flowxo) contains a g
 
 Methods are stored in the `lib/methods/` folder. Each method has its own folder with the name being the `slug` of the method. Inside each method folder you'll find `config.js`, `run.js`, and if you selected these during the scaffold, `input.js` and/or `output.js`.
 
+### Method Ordering
+
+By default, the SDK will load all methods contained in the `lib/methods/` folder. The order in which they are loaded is nondeterministic, that is, cannot be guaranteed.
+
+If you'd prefer the methods to be ordered in a particular way, you should add a `methods` property to the service's `config.js`. This property should contain an array of method slugs, in the order that you'd like the methods to be presented.
+
+For example:
+
+``` js
+var service = new sdk.Service({
+  serviceRoot: __dirname,
+  name: 'Your Service',
+  slug: 'your_service',
+  methods: [
+    'create_document',
+    'add_document',
+    'update_document',
+    'delete_document'
+  ]
+});
+
+module.exports = service;
+```
+
+Make sure you include all of your methods in this array, as any that are not defined will not be made available for use.
+
 ### config.js
 
 Each method has its own `config.js` file, which defines the method's name, what type of method it is, and describes its input/output fields.
