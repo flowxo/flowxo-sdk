@@ -4,7 +4,8 @@
   "description": "SDK for developing Flow XO Services.",
   "main": "index.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "update-toc": "node node_modules/doctoc/doctoc.js README.md"
   },
   "author": "Flow XO <support@flowxo.com>",
   "contributors": [
@@ -28,6 +29,7 @@
     "body-parser": "^1.14.1",
     "chai": "^3.4.0",
     "chalk": "^1.1.1",
+    "doctoc": "^0.15.0",
     "express": "^4.13.3",
     "express-session": "^1.12.0",
     "grunt": "^0.4.5",

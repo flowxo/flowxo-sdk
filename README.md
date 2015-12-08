@@ -23,6 +23,7 @@ An SDK to build services for the Flow XO platform.
     - [ping.js](#pingjs)
   - [OAuth](#oauth)
 - [Creating Methods](#creating-methods)
+  - [Method Ordering](#method-ordering)
   - [config.js](#configjs)
   - [Input Fields](#input-fields)
     - [Text Areas](#text-areas)
@@ -48,7 +49,8 @@ An SDK to build services for the Flow XO platform.
     - [Retryable Errors](#retryable-errors)
     - [Service Errors](#service-errors)
     - [Auth Errors](#auth-errors)
-- [Testing & Environment](#testing--environment)
+- [Help Docs](#help-docs)
+- [Testing and Environment](#testing-and-environment)
   - [Setup](#setup)
   - [Authentication](#authentication)
     - [Basic Credentials](#basic-credentials)
@@ -292,9 +294,9 @@ auth: {
 
 Make sure that if the strategy requires any extra configuration, you add it to either the `options` or the `params` object. Refer to the strategy's documentation for more details on this.
 
-_Note: you do not need to add a `callbackURL` to the options object, as the system will automatically generate a callbackURL for you. When testing the service, you'll need to setup your development machine so that the generated callback URL can be reached by the test runner. See the section Testing & Environment > Authentication for more details._
+_Note: you do not need to add a `callbackURL` to the options object, as the system will automatically generate a callbackURL for you. When testing the service, you'll need to setup your development machine so that the generated callback URL can be reached by the test runner. See the section Testing and Environment > Authentication for more details._
 
-You'll notice the use of [environment variables](https://nodejs.org/api/process.html#process_process_env) to prevent the hard coding of the key and secret. When configuring the service, we'll provide you with these details for connecting to the service, and you should enter the details into the `.env` file for integration testing purposes. For more details on setting environment variables, refer to the section _Testing & Environment > Authentication_.
+You'll notice the use of [environment variables](https://nodejs.org/api/process.html#process_process_env) to prevent the hard coding of the key and secret. When configuring the service, we'll provide you with these details for connecting to the service, and you should enter the details into the `.env` file for integration testing purposes. For more details on setting environment variables, refer to the section _Testing and Environment > Authentication_.
 
 When your scripts are run, you'll get the relevant credentials in the `options.credentials` object:
 
@@ -1211,7 +1213,25 @@ Use an instance of `AuthError`, which is very similar to `ServiceError`. If the 
 
 Take care with the tone and style of the message passed to your `AuthError`, as it will be displayed directly to the user.
 
-## Testing & Environment
+## Help Docs
+
+Each service has a corresponding help document. Add the help doc URL with the `help` property on the service's `config.js`.
+
+For example:
+
+
+``` js
+var service = new sdk.Service({
+  serviceRoot: __dirname,
+  name: 'Your Service',
+  slug: 'your_service',
+  help: 'http://support.flowxo.com/your_service'
+});
+
+module.exports = service;
+```
+
+## Testing and Environment
 
 Integration tests are mandatory. Unit tests are not required as essentially each service is a wrapper around http calls to an external API. The coverage provided by the integration tests provides sufficient confidence that the service is working correctly.
 
