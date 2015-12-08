@@ -40,10 +40,10 @@ describe('FlowXO SDK Service', function() {
       expect(service.methodsIndexed).to.eql({});
     });
 
-    it('should default scripts to an empty array', function() {
+    it('should default scripts to an empty object', function() {
       delete serviceConfig.scripts;
       var service = new sdk.Service(serviceConfig);
-      expect(service.scripts).to.eql([]);
+      expect(service.scripts).to.eql({});
     });
 
     it('should register methods in the defined order', function() {
