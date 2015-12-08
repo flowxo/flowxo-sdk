@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.6.0] - 2015-12-08
+### Added
+- Ability to order methods.
+- `help` property is now allowed on service configuration.
+
 ## [3.5.3] - 2015-11-03
 ### Fixed
 - `lodash` referenced incorrectly in assertions.
@@ -180,6 +185,7 @@ This is a breaking change, hence the major version number bump.
 ### Added
 - Initial release of the SDK.
 
+[3.6.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.5.3...v3.6.0
 [3.5.3]: https://github.com/flowxo/flowxo-sdk/compare/v3.5.2...v3.5.3
 [3.5.2]: https://github.com/flowxo/flowxo-sdk/compare/v3.5.1...v3.5.2
 [3.5.1]: https://github.com/flowxo/flowxo-sdk/compare/v3.5.0...v3.5.1
