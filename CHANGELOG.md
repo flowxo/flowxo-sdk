@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.6.2] - 2015-12-10
+### Fixed
+- `help` property not being jsonified.
+
 ## [3.6.1] - 2015-12-08
 ### Fixed
 - Method scripts not being jsonified correctly.
