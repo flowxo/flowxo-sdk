@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.7.0] - 2015-12-18
+### Added
+- Support for services that do not require any `auth`.
+
+### Fixed
+- OAuth1 services now conform to using `SERVICE_ID` instead of `SERVICE_KEY`, mimicking OAuth2.
+
 ## [3.6.2] - 2015-12-10
 ### Fixed
 - `help` property not being jsonified.
