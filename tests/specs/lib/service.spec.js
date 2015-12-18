@@ -12,9 +12,10 @@ describe('FlowXO SDK Service', function() {
       serviceRoot: testServiceRoot,
       name: 'Test Service',
       slug: 'test_service',
+      help: 'help_url',
       auth: {
         type: 'oauth',
-        authProvider: function() {}
+        strategy: 'strategy'
       },
       scripts: {
         ping: function(options, cb) {
@@ -38,6 +39,12 @@ describe('FlowXO SDK Service', function() {
       expect(service.methodOrder).to.eql([]);
       expect(service.methods).to.eql([]);
       expect(service.methodsIndexed).to.eql({});
+    });
+
+    it('should allow the auth property to be optional', function() {
+      delete serviceConfig.auth;
+      var service = new sdk.Service(serviceConfig);
+      expect(service.auth).to.be.undefined;
     });
 
     it('should default scripts to an empty object', function() {
@@ -156,6 +163,79 @@ describe('FlowXO SDK Service', function() {
       });
     });
 
+    describe('#toJSON', function() {
+      it('should convert a service to a JSON plain object', function() {
+        var json = service.toJSON();
+
+        expect(json).to.eql({
+          name: 'Test Service',
+          slug: 'test_service',
+          help: 'help_url',
+          auth: {
+            type: 'oauth'
+          },
+          scripts: {
+            ping: true
+          },
+          methods: [{
+            name: 'Dummy Method 1',
+            slug: 'dummy_method_1',
+            kind: 'task',
+            type: 'action',
+            fields: {
+              input: [{
+                input_options: [],
+                key: 'test',
+                label: 'Test',
+                type: 'select',
+              }],
+              output: [{
+                key: 'output',
+                label: 'Output',
+              }]
+            },
+            scripts: {
+              run: true
+            },
+          }]
+        });
+      });
+
+      it('should convert a service without an auth to a JSON plain object', function() {
+        delete service.auth;
+        var json = service.toJSON();
+
+        expect(json).to.eql({
+          name: 'Test Service',
+          slug: 'test_service',
+          help: 'help_url',
+          scripts: {
+            ping: true
+          },
+          methods: [{
+            name: 'Dummy Method 1',
+            slug: 'dummy_method_1',
+            kind: 'task',
+            type: 'action',
+            fields: {
+              input: [{
+                input_options: [],
+                key: 'test',
+                label: 'Test',
+                type: 'select',
+              }],
+              output: [{
+                key: 'output',
+                label: 'Output',
+              }]
+            },
+            scripts: {
+              run: true
+            },
+          }]
+        });
+      });
+    });
   });
 
 });

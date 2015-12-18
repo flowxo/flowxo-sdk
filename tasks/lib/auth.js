@@ -41,7 +41,7 @@ AuthUtil.handlers.oauth1 = function(grunt, service, options, cb) {
 
   var envs = [{
     option: 'consumerKey',
-    key: slug + '_KEY'
+    key: slug + '_ID'
   }, {
     option: 'consumerSecret',
     key: slug + '_SECRET'

@@ -1,6 +1,6 @@
 # Flow XO SDK
 
-An SDK to build services for the Flow XO platform.
+A SDK to build services for the Flow XO platform.
 
 [![Build Status](https://travis-ci.org/flowxo/flowxo-sdk.svg?branch=master)](https://travis-ci.org/flowxo/flowxo-sdk)
 [![npm version](https://badge.fury.io/js/flowxo-sdk.svg)](http://badge.fury.io/js/flowxo-sdk)

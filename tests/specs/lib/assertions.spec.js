@@ -156,6 +156,11 @@ describe('Assertions', function() {
 
     });
 
+    it('should allow no service auth', function() {
+      delete service.auth;
+      expect(service).to.be.a.flowxo.service;
+    });
+
     it('should validate output', function() {
       var input = [{
         key: 'bob',
