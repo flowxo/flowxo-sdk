@@ -237,9 +237,16 @@ AuthUtil.refresh = function(grunt, options, cb) {
 };
 
 AuthUtil.acquire = function(grunt, options, done) {
-  var service = options.getService();
+  var service = options.getService(),
+      auth = service && service.auth,
+      type = auth && auth.type;
 
-  var hdlr = AuthUtil.handlers[service.auth.type];
+  if(!auth) {
+    grunt.log.ok('No authorization required.');
+    return done();
+  }
+
+  var hdlr = AuthUtil.handlers[type];
   if(!hdlr) {
     grunt.fail.fatal('Cannot authorize: no handler found for type ' + service.auth.type + '. Are you sure this is an OAuth service?');
   }
