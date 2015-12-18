@@ -2,7 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.7.1] - 2015-12-18
+### Fixed
+- Allow `grunt run` to work correctly when there is no `auth` property on the service.
+
 ## [3.7.0] - 2015-12-18
+**Deprecation warning** - this release contains a bug and should not be used.
+
 ### Added
 - Support for services that do not require any `auth`.
 
