@@ -41,10 +41,16 @@ describe('FlowXO SDK Service', function() {
       expect(service.methodsIndexed).to.eql({});
     });
 
+    it('should allow the help property to be optional', function() {
+      delete serviceConfig.help;
+      var service = new sdk.Service(serviceConfig);
+      expect(service).to.not.have.ownProperty('help');
+    });
+
     it('should allow the auth property to be optional', function() {
       delete serviceConfig.auth;
       var service = new sdk.Service(serviceConfig);
-      expect(service.auth).to.be.undefined;
+      expect(service).to.not.have.ownProperty('auth');
     });
 
     it('should default scripts to an empty object', function() {
