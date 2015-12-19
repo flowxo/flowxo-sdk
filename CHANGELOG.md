@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.8.0] - 2015-12-19
+### Added
+- Support for XML parsing when using a webhook trigger.
+
+### Changed
+- Removed ngrok in favour of localtunnel.
+
+### Updated
+- Updated dependencies.
+
 ## [3.7.1] - 2015-12-18
 ### Fixed
 - Allow `grunt run` to work correctly when there is no `auth` property on the service.
@@ -208,6 +218,7 @@ This is a breaking change, hence the major version number bump.
 ### Added
 - Initial release of the SDK.
 
+[3.8.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.7.1...v3.8.0
 [3.7.1]: https://github.com/flowxo/flowxo-sdk/compare/v3.7.0...v3.7.1
 [3.7.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.6.2...v3.7.0
 [3.6.2]: https://github.com/flowxo/flowxo-sdk/compare/v3.6.1...v3.6.2
