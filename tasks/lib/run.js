@@ -12,9 +12,12 @@ var util = require('util'),
   FxoUtils = require('flowxo-utils'),
   Assertions = require('../../lib/assertions.js'),
   ScriptRunner = require('../../lib/scriptRunner.js'),
-  ngrok = require('ngrok'),
+  localtunnel = require('localtunnel'),
   express = require('express'),
   bodyParser = require('body-parser');
+
+// Add XML parsing support
+require('body-parser-xml')(bodyParser);
 
 chai.use(Assertions);
 
@@ -653,7 +656,7 @@ RunUtil.runReplayed = function(grunt, options, cb) {
 RunUtil.runWebhook = function(grunt, options, method, callback) {
 
   // First get a URL
-  ngrok.connect(options.webhookPort, function(err, url) {
+  localtunnel(options.webhookPort, function(err, tunnel) {
     if(err) {
       return callback('Failed to get URL for Webhook: ' + err);
     }
@@ -667,7 +670,7 @@ RunUtil.runWebhook = function(grunt, options, method, callback) {
 
     // URL
     CommonUtil.header(grunt, 'Webhook URL');
-    grunt.log.writeln(chalk.cyan(url));
+    grunt.log.writeln(chalk.cyan(tunnel.url));
 
     // Text text
     if(method.help && method.help.webhook && method.help.webhook.test && method.help.webhook.test.length > 0) {
@@ -685,8 +688,22 @@ RunUtil.runWebhook = function(grunt, options, method, callback) {
       extended: true
     }));
 
+    // These are the same options as used
+    // by the Flow XO core platform.
+    app.use(bodyParser.xml({
+      explicitArray: false,
+      trim: true,
+      normalize: true,
+      normalizeTags: true,
+      mergeAttrs: true,
+      charkey: 'value',
+      attrNameProcessors: [function(attr) {
+        return '@' + attr;
+      }]
+    }));
+
     app.post('/', function(req, res) {
-      res.status(200).send();
+      res.status(200).send('OK');
       options.runner.run(method.slug, 'run', { input: req.body }, callback);
     });
     app.listen(options.webhookPort);
