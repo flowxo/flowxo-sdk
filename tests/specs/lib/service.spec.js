@@ -35,7 +35,7 @@ describe('FlowXO SDK Service', function() {
       expect(service.slug).to.eql('test_service');
       expect(service.auth).to.eql(serviceConfig.auth);
       expect(service.scripts).to.eql(serviceConfig.scripts);
-      expect(service.methodDir).to.eql(testServiceRoot + '/methods');
+      expect(service.methodDir).to.eql(path.join(testServiceRoot, 'methods'));
       expect(service.methodOrder).to.eql([]);
       expect(service.methods).to.eql([]);
       expect(service.methodsIndexed).to.eql({});
