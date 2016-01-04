@@ -1,5 +1,7 @@
 'use strict';
 
+var sdk = require('../../../');
+
 var RunUtil = require('../../../tasks/lib/run.js');
 
 describe('RunUtil', function() {
@@ -271,6 +273,29 @@ describe('RunUtil', function() {
         type: 'text'
       });
       expect(processed).not.to.equal(input);
+    });
+  });
+
+  describe('#getNormalizedErrorMessage', function() {
+    it('should return a generic error message for retryable errors', function() {
+      var err = new Error('test');
+      var message = RunUtil.getNormalizedErrorMessage(err);
+
+      message.should.eql('The request failed because something unexpected happened.');
+    });
+
+    it('should return a message for non-retryable errors', function() {
+      var err = new sdk.Error.ServiceError('test');
+      var message = RunUtil.getNormalizedErrorMessage(err);
+
+      message.should.eql('test');
+    });
+
+    it('should return a fallback message for non-retryable errors if there is none', function() {
+      var err = new sdk.Error.ServiceError();
+      var message = RunUtil.getNormalizedErrorMessage(err);
+
+      message.should.eql('There was an error with your task, please contact support.');
     });
   });
 });

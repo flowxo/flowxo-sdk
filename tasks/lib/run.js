@@ -11,6 +11,7 @@ var util = require('util'),
   chai = require('chai'),
   FxoUtils = require('flowxo-utils'),
   Assertions = require('../../lib/assertions.js'),
+  SdkError = require('../../lib/error.js'),
   ScriptRunner = require('../../lib/scriptRunner.js'),
   localtunnel = require('localtunnel'),
   express = require('express'),
@@ -104,9 +105,79 @@ RunUtil.displayScriptOutput = function(grunt, outputs, data) {
   }
 };
 
+function getConstructorName(value) {
+  if(value == null) { // is it undefined or null
+    return String(value);
+  }
+
+  return value.constructor.name;
+}
+
+function getFallbackErrorMessage(err) {
+  switch(err.__fxotype__) {
+    case 'AuthError':
+      return 'The request failed because of an authorization problem.';
+    case 'ServiceError':
+      return 'There was an error with your task, please contact support.';
+    case 'WebhookIgnoreError':
+      return 'The data received by the webhook was ignored.';
+    default:
+      return 'The request failed because something unexpected happened.';
+  }
+}
+
+RunUtil.getNormalizedErrorMessage = function(err) {
+  if(!(err instanceof SdkError.BaseError)) {
+    return getFallbackErrorMessage(err);
+  }
+
+  if(err.message) {
+    return err.message;
+  }
+
+  // Try and get the message from the embedded error.
+  if(err.err) {
+    if(err.err.message) {
+      return err.err.message;
+    }
+
+    if(_.isFunction(err.err.toString)) {
+      return err.err.toString();
+    }
+  }
+
+  // No message? Use the fallback.
+  return getFallbackErrorMessage(err);
+}
+
 RunUtil.displayScriptError = function(grunt, err) {
-  CommonUtil.header(grunt, 'Script Error', 'red');
-  grunt.log.writeln(chalk.red(err.message || err));
+  /**
+   * The color of the error messages is red, except for the WebhookIgnoreError,
+   * when the color is yellow to show that this isn't really an error.
+   *
+   * The info contains the error type in the header, and a message, which is
+   * the same as it would have been in the core.
+   *
+   * If the process was ran with the `stack` option enabled (grunt run --stack),
+   * then additional stack trace will be printed.
+   */
+
+  var color = err instanceof SdkError.WebhookIgnoreError ? 'yellow' : 'red';
+  var errorType = getConstructorName(err);
+  // The same message will be used in the core
+  var message = RunUtil.getNormalizedErrorMessage(err);
+
+  CommonUtil.header(grunt, 'Script Error (type: ' + errorType + ')', color);
+  grunt.log.writeln(chalk[color](message));
+
+  if(grunt.option('stack')) {
+    CommonUtil.header(grunt, 'Stack Trace', color);
+    if(err.stack) {
+      grunt.log.writeln(chalk[color](err.stack));
+    } else {
+      grunt.log.writeln(chalk.gray(err.stack));
+    }
+  }
 };
 
 RunUtil.promptScript = function(method, cb) {
