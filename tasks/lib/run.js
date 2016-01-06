@@ -119,8 +119,6 @@ function getFallbackErrorMessage(err) {
       return 'The request failed because of an authorization problem.';
     case 'ServiceError':
       return 'There was an error with your task, please contact support.';
-    case 'WebhookIgnoreError':
-      return 'The data received by the webhook was ignored.';
     default:
       return 'The request failed because something unexpected happened.';
   }
@@ -135,7 +133,7 @@ RunUtil.getNormalizedErrorMessage = function(err) {
     return err.message;
   }
 
-  // Try and get the message from the embedded error.
+  // Try and get the message from the embedded exception.
   if(err.err) {
     if(err.err.message) {
       return err.err.message;
@@ -152,28 +150,24 @@ RunUtil.getNormalizedErrorMessage = function(err) {
 
 RunUtil.displayScriptError = function(grunt, err) {
   /**
-   * The color of the error messages is red, except for the WebhookIgnoreError,
-   * when the color is yellow to show that this isn't really an error.
-   *
-   * The info contains the error type in the header, and a message, which is
-   * the same as it would have been in the core.
+   * The info contains the exception type in the header, and a message, which
+   * is the same as it would have been in the core.
    *
    * If the process was ran with the `stack` option enabled (grunt run --stack),
    * then additional stack trace will be printed.
    */
 
-  var color = err instanceof SdkError.WebhookIgnoreError ? 'yellow' : 'red';
   var errorType = getConstructorName(err);
   // The same message will be used in the core
   var message = RunUtil.getNormalizedErrorMessage(err);
 
-  CommonUtil.header(grunt, 'Script Error (type: ' + errorType + ')', color);
-  grunt.log.writeln(chalk[color](message));
+  CommonUtil.header(grunt, 'Script Error (type: ' + errorType + ')', 'red');
+  grunt.log.writeln(chalk.red(message));
 
   if(grunt.option('stack')) {
-    CommonUtil.header(grunt, 'Stack Trace', color);
+    CommonUtil.header(grunt, 'Stack Trace', 'red');
     if(err.stack) {
-      grunt.log.writeln(chalk[color](err.stack));
+      grunt.log.writeln(chalk.red(err.stack));
     } else {
       grunt.log.writeln(chalk.gray(err.stack));
     }
@@ -775,7 +769,13 @@ RunUtil.runWebhook = function(grunt, options, method, callback) {
 
     app.post('/', function(req, res) {
       res.status(200).send('OK');
-      options.runner.run(method.slug, 'run', { input: req.body }, callback);
+      options.runner.run(method.slug, 'run', { input: req.body }, function(err) {
+        // If the exception is SdkError.WebhookIgnoreError then behave as if
+        // there was no data.
+        if(!(err instanceof SdkError.WebhookIgnoreError)) {
+          callback.apply(this, arguments);
+        }
+      });
     });
     app.listen(options.webhookPort);
 
