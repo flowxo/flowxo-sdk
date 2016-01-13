@@ -243,6 +243,8 @@ RunUtil.harvestInputs = function(grunt, runner, method, inputs, callback) {
     var extraSet = [];
 
     inputSet = inputSet.map(function(input) {
+      var optionsIdx, repeatedOptions;
+
       input = _.cloneDeep(input);
 
       if(input.dependants) {
@@ -297,6 +299,28 @@ RunUtil.harvestInputs = function(grunt, runner, method, inputs, callback) {
             done();
           });
         };
+      }
+
+      // We need to ensure that there aren't any repeated options here,
+      // as this is not supported by the core.
+      if(input.input_options) {
+        optionsIdx = {};
+        repeatedOptions = '';
+        input.input_options.forEach(function(opt) {
+          optionsIdx[opt.value] = optionsIdx[opt.value] || [];
+          optionsIdx[opt.value].push(opt.label);
+        });
+
+        _.forOwn(optionsIdx, function(val, key) {
+          if(val.length > 1) {
+            // Repeated option alert.
+            repeatedOptions += '\n - Labels ' + val.join(', ') + ' are linked to the value ' + key;
+          }
+        });
+
+        if(repeatedOptions.length) {
+          grunt.fail.fatal('Repeated option values detected for input field \'' + input.key + '\': ' + repeatedOptions + '\n\nOption values must be unique, please amend and try again.');
+        }
       }
 
       return input;
