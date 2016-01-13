@@ -18,27 +18,27 @@
     "Grzegorz Biziel"
   ],
   "dependencies": {
-    "cross-spawn-async": "^2.1.1",
-    "flowxo-utils": "^1.1.0",
+    "cross-spawn-async": "^2.1.6",
+    "flowxo-utils": "^1.1.1",
     "lodash": "^3.10.1",
     "validate.js": "^0.9.0",
     "winston": "^1.1.1"
   },
   "devDependencies": {
-    "async": "^1.5.0",
+    "async": "^1.5.2",
     "body-parser": "^1.14.2",
     "body-parser-xml": "^1.0.0",
     "chai": "^3.4.1",
     "chalk": "^1.1.1",
     "doctoc": "^0.15.0",
     "express": "^4.13.3",
-    "express-session": "^1.12.1",
+    "express-session": "^1.13.0",
     "grunt": "^0.4.5",
     "grunt-contrib-jshint": "^0.11.3",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-mocha-istanbul": "^3.0.1",
-    "inquirer": "^0.11.0",
-    "istanbul": "^0.4.1",
+    "inquirer": "^0.11.2",
+    "istanbul": "^0.4.2",
     "jshint-stylish": "^2.1.0",
     "load-grunt-tasks": "^3.4.0",
     "localtunnel": "^1.8.0",
@@ -46,7 +46,7 @@
     "open": "0.0.5",
     "passport": "^0.3.2",
     "passport-oauth2-refresh": "^1.0.0",
-    "time-grunt": "^1.2.2"
+    "time-grunt": "^1.3.0"
   },
   "repository": {
     "type": "git",
