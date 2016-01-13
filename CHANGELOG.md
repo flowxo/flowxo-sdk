@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.8.1] - 2016-01-13
+### Updated
+- Throw an error if multiple values are used in an `input_options` array for an input field. This provides better consistency with the core platform.
+- Updated dependencies, in particular `flowxo-utils` to support objects returned from a run script containing a `length` property.
+
+### Fixed
+- Fixed issue when running specs on Windows.
+
 ## [3.8.0] - 2015-12-19
 ### Added
 - Support for XML parsing when using a webhook trigger.
@@ -218,6 +226,7 @@ This is a breaking change, hence the major version number bump.
 ### Added
 - Initial release of the SDK.
 
+[3.8.1]: https://github.com/flowxo/flowxo-sdk/compare/v3.8.0...v3.8.1
 [3.8.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.7.1...v3.8.0
 [3.7.1]: https://github.com/flowxo/flowxo-sdk/compare/v3.7.0...v3.7.1
 [3.7.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.6.2...v3.7.0
