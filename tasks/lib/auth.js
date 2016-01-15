@@ -260,7 +260,7 @@ AuthUtil.runTask = function(grunt, options) {
 
   var storeCredentials = function(err, credentials) {
     if(!err) {
-      grunt.file.write(options.credentialsFile, JSON.stringify(credentials));
+      CommonUtil.saveCredentials(grunt, credentials);
     }
     done(err);
   };

@@ -40,8 +40,9 @@ A SDK to build services for the Flow XO platform.
   - [Polling](#polling)
   - [Webhooks](#webhooks)
     - [Fields](#fields)
-    - [Handling The Webhook](#handling-the-webhook)
-      - [Help Instructions](#help-instructions)
+    - [Running the Method](#running-the-method)
+    - [Handling the Webhook](#handling-the-webhook)
+    - [Help Instructions](#help-instructions)
   - [Input Validation](#input-validation)
     - [Validating Flow XO Datetime and Boolean Fields](#validating-flow-xo-datetime-and-boolean-fields)
     - [Validating String Fields containing Dates](#validating-string-fields-containing-dates)
@@ -1035,7 +1036,15 @@ This configuration will automatically be scaffolded when you choose a _Webhook T
 
 A webhook trigger cannot supply any input fields, but it should define its expected output fields in the configuration. This should match up with the format expected to be sent by the service.
 
-#### Handling The Webhook
+#### Running the Method
+
+The webhook trigger is run like any other method, using `grunt run`.
+
+The first time the trigger is run, a webhook URL will automatically be generated for you. This will be stored in a file `config.json` and will be used for every future trigger run.
+
+Make sure you check in `config.json` to source control, so that other developers who test the service will use the same webhook URL.
+
+#### Handling the Webhook
 
 Notice that a webhook trigger also has a `run.js` file, just like a poller trigger or an action. This allows you to manipulate the data received from the webhook before triggering a workflow, into the format defined by the output fields config.
 
@@ -1075,7 +1084,7 @@ module.exports = function(options, done) {
 };
 ```
 
-##### Help Instructions
+#### Help Instructions
 
 You should provide a `help` property to tell the user how to configure the webhook in your service. `help.webhook.config` and `help.webhook.test` accept an array of paragraphs which will be displayed to the user when the service is being set up.
 

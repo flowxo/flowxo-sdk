@@ -157,4 +157,36 @@ CommonUtil.promptFields = function(inputs, options, cb) {
   doPrompt();
 };
 
+CommonUtil.loadJSON = function(grunt, filename) {
+  try {
+    return grunt.file.readJSON(filename);
+  } catch(e) {
+    return {};
+  }
+};
+
+CommonUtil.saveJSON = function(grunt, filename, json) {
+  try {
+    grunt.file.write(filename, JSON.stringify(json, null, 2));
+  } catch(e) {
+    grunt.log.error('Warning: could not save prefs: ' + e);
+  }
+};
+
+CommonUtil.loadConfig = function(grunt) {
+  return CommonUtil.loadJSON(grunt, 'config.json');
+};
+
+CommonUtil.saveConfig = function(grunt, config) {
+  CommonUtil.saveJSON(grunt, 'config.json', config);
+};
+
+CommonUtil.loadCredentials = function(grunt) {
+  return CommonUtil.loadJSON(grunt, 'credentials.json');
+};
+
+CommonUtil.saveCredentials = function(grunt, credentials) {
+  return CommonUtil.saveJSON(grunt, 'credentials.json', credentials);
+};
+
 module.exports = CommonUtil;

@@ -678,9 +678,15 @@ RunUtil.runReplayed = function(grunt, options, cb) {
  * Run a Webhook method
  */
 RunUtil.runWebhook = function(grunt, options, method, callback) {
+  var localtunnelOpts = {};
+
+  var prefs = CommonUtil.loadConfig(grunt);
+  if(prefs.localtunnelSubdomain) {
+    localtunnelOpts.subdomain = prefs.localtunnelSubdomain;
+  }
 
   // First get a URL
-  localtunnel(options.webhookPort, function(err, tunnel) {
+  localtunnel(options.webhookPort, localtunnelOpts, function(err, tunnel) {
     if(err) {
       return callback('Failed to get URL for Webhook: ' + err);
     }
@@ -734,8 +740,14 @@ RunUtil.runWebhook = function(grunt, options, method, callback) {
 
     grunt.log.writeln('\n\rWaiting for webhook data...');
 
+    // If the subdomain is different, store it in the prefs file.
+    var subdomain = tunnel.url
+      .replace(/^https:\/\/(.*).localtunnel.me$/, '$1');
+    if(subdomain !== prefs.localtunnelSubdomain) {
+      prefs.localtunnelSubdomain = subdomain;
+      CommonUtil.saveConfig(grunt, prefs);
+    }
   });
-
 };
 
 RunUtil.runTask = function(grunt, options) {
@@ -746,7 +758,7 @@ RunUtil.runTask = function(grunt, options) {
   }
 
   var runner = new ScriptRunner(service, {
-    credentials: RunUtil.getCredentials(grunt, options.credentialsFile)
+    credentials: CommonUtil.loadCredentials(grunt)
   });
 
   var runOpts = {
