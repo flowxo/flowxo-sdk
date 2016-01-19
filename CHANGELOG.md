@@ -6,7 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Ability to reuse webhook URLs.
 
-## Fixed
+### Fixed
 - Warn when a script is run with inputs or outputs containing keys with prohibited characters (keys can't begin with a `$` or contain a `.`).
 
 ## [3.8.1] - 2016-01-13
