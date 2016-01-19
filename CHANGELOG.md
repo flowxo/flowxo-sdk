@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.9.0] - 2016-01-19
+### Added
+- Ability to reuse webhook URLs.
+
+## Fixed
+- Warn when a script is run with inputs or outputs containing keys with prohibited characters (keys can't begin with a `$` or contain a `.`).
+
 ## [3.8.1] - 2016-01-13
 ### Updated
 - Throw an error if multiple values are used in an `input_options` array for an input field. This provides better consistency with the core platform.
@@ -226,6 +233,7 @@ This is a breaking change, hence the major version number bump.
 ### Added
 - Initial release of the SDK.
 
+[3.9.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.8.1...v3.9.0
 [3.8.1]: https://github.com/flowxo/flowxo-sdk/compare/v3.8.0...v3.8.1
 [3.8.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.7.1...v3.8.0
 [3.7.1]: https://github.com/flowxo/flowxo-sdk/compare/v3.7.0...v3.7.1
