@@ -1,6 +1,6 @@
 {
   "name": "flowxo-sdk",
-  "version": "3.9.0",
+  "version": "3.9.1",
   "description": "SDK for developing Flow XO Services.",
   "main": "index.js",
   "scripts": {
@@ -15,6 +15,7 @@
     "John Byrne <john.byrne@interpos.co.uk>",
     "Roberto Oliveros <robertooliveros@mac.com>",
     "Mariano Pardo <marianomdq1@gmail.com>",
+    "Rafał Ruciński <fatfisz@gmail.com>",
     "Grzegorz Biziel"
   ],
   "dependencies": {
