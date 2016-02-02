@@ -728,6 +728,8 @@ RunUtil.runReplayed = function(grunt, options, cb) {
         return cb();
       }
 
+      grunt.log.writeln('');
+
       inquirer.prompt([{
         type: 'confirm',
         name: 'next',
