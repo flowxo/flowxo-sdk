@@ -20,7 +20,7 @@
   ],
   "dependencies": {
     "cross-spawn-async": "^2.1.6",
-    "flowxo-utils": "^1.1.1",
+    "flowxo-utils": "marian2js/flowxo-utils",
     "lodash": "^3.10.1",
     "validate.js": "^0.9.0",
     "winston": "^1.1.1"

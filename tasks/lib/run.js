@@ -46,8 +46,29 @@ RunUtil.displayScriptData = function(grunt, data) {
  * array of arrays if the incoming data
  */
 RunUtil.formatScriptOutput = function(outputs, data) {
+  var getValueFromKeys = function(keys, data) {
+    return _.reduce(keys, function(prev, key) {
+      if(prev) {
+        return prev[key];
+      }
+      return null;
+    }, data);
+  };
+
   return FxoUtils.annotateOutputData(data, outputs, {
-    includeEmptyFields: true
+    includeEmptyFields: true,
+    arrayFormatter: function(keys, data) {
+      if(!data) {
+        return '';
+      }
+      return data
+        .map(function(item) {
+          return getValueFromKeys(keys, item)
+        })
+        .filter(function(item) {
+          return item;
+        });
+    }
   });
 };
 
