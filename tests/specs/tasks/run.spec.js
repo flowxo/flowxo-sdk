@@ -72,6 +72,27 @@ describe('RunUtil', function() {
       expect(result[0].value).to.equal(nested_data.top);
       expect(result[1].value).to.equal(nested_data.nested.value);
     });
+
+    it('should handle collections',function(){
+      var collection_outputs = [{
+        key: 'key_+_id',
+        label: 'Collection'
+      }];
+
+      var collection_data = {
+        key: [{
+          id: 1
+        }, {
+          id: 2
+        }, {
+          id: 3
+        }]
+      };
+
+      var result = RunUtil.formatScriptOutput(collection_outputs,collection_data);
+      expect(result).to.be.an('array').length(1);
+      expect(result[0].value).to.eql([ 1, 2, 3 ]);
+    });
   });
 
   describe('#convertDictInputToObject', function() {
