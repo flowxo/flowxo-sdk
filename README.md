@@ -452,6 +452,7 @@ Fields can also have a default value:
   default: 'John'
 }
 ```
+Please note that the requirement for boolean field default values is different between the SDK and the App - The SDK requires a stringified eg default'false' value, but the app requires a boolean eg, default:false value to correctly diplay in the UI of the launched service.
 
 It's also helpful to provide some extra description to help the user understand how to use the field. Do that with a `description`:
 
