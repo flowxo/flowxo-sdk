@@ -119,7 +119,7 @@ describe('Assertions', function() {
     var service;
     beforeEach(function() {
       service = new sdk.Service({
-        serviceRoot: path.resolve(__dirname + '../../../fixtures/test_service'),
+        serviceRoot: path.resolve(__dirname + '/../../fixtures/test_service'),
         name: 'testname',
         slug: 'testslug',
         auth: {

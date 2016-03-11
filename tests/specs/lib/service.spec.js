@@ -3,7 +3,7 @@
 var path = require('path');
 
 var sdk = require('../../../');
-var testServiceRoot = path.resolve(__dirname + '../../../fixtures/test_service');
+var testServiceRoot = path.resolve(__dirname + '/../../fixtures/test_service');
 
 describe('FlowXO SDK Service', function() {
   var serviceConfig;
