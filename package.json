@@ -21,7 +21,7 @@
   "dependencies": {
     "cross-spawn-async": "^2.1.6",
     "flowxo-utils": "^1.1.1",
-    "lodash": "^3.10.1",
+    "lodash": "^4.6.1",
     "validate.js": "^0.9.0",
     "winston": "^1.1.1"
   },
