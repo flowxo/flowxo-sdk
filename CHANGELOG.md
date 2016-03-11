@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.0.0] - 2016-03-11
+### Added
+- Support for 'collections'.
+
+### Changed
+- Upgraded to lodash 4.
+
+### Removed
+- Removed dependency on winston, in favour of a lightweight, simple console logger. Note that this is considered a breaking change, since the console logger only exposes the methods `silly`, `debug`, `verbose`, `info`, `warn` and `error`. These should be enough for most logging needs.
+
 ## [3.9.1] - 2016-02-02
 ### Fixed
 - Error messages are correctly displayed when using `grunt run`, as they are for the core platform.
@@ -237,6 +247,7 @@ This is a breaking change, hence the major version number bump.
 ### Added
 - Initial release of the SDK.
 
+[4.0.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.9.1...v4.0.0
 [3.9.1]: https://github.com/flowxo/flowxo-sdk/compare/v3.9.0...v3.9.1
 [3.9.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.8.1...v3.9.0
 [3.8.1]: https://github.com/flowxo/flowxo-sdk/compare/v3.8.0...v3.8.1
