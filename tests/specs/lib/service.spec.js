@@ -11,6 +11,7 @@ describe('FlowXO SDK Service', function() {
     serviceConfig = {
       serviceRoot: testServiceRoot,
       name: 'Test Service',
+      description: 'Test description.',
       slug: 'test_service',
       help: 'help_url',
       auth: {
@@ -175,6 +176,7 @@ describe('FlowXO SDK Service', function() {
 
         expect(json).to.eql({
           name: 'Test Service',
+          description: 'Test description.',
           slug: 'test_service',
           help: 'help_url',
           auth: {
@@ -213,6 +215,7 @@ describe('FlowXO SDK Service', function() {
 
         expect(json).to.eql({
           name: 'Test Service',
+          description: 'Test description.',
           slug: 'test_service',
           help: 'help_url',
           scripts: {
