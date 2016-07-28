@@ -8,7 +8,7 @@
 // either node core modules, or included
 // in the `dependencies` map in the SDK's
 // `package.json`.
-var spawn = require('cross-spawn-async');
+var spawn = require('cross-spawn');
 
 var Init = {};
 

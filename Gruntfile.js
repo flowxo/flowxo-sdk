@@ -17,7 +17,7 @@ module.exports = function(grunt) {
           reporter: 'spec',
           quiet: false,
           clearRequireCache: false,
-          require: './tests/helpers/chai'
+          require: ['./tests/helpers/chai']
         }
       }
     },
