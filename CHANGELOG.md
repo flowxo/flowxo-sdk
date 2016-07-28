@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.1.0] - 2016-07-28
+### Added
+- `description` field for services.
+
+### Updated
+- Updated dependencies.
+- Moved back to `cross-spawn` as it no longer requires a build toolchain.
+
 ## [4.0.0] - 2016-03-11
 ### Added
 - Support for 'collections'.
@@ -247,6 +255,7 @@ This is a breaking change, hence the major version number bump.
 ### Added
 - Initial release of the SDK.
 
+[4.1.0]: https://github.com/flowxo/flowxo-sdk/compare/v4.0.0...v4.1.0
 [4.0.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.9.1...v4.0.0
 [3.9.1]: https://github.com/flowxo/flowxo-sdk/compare/v3.9.0...v3.9.1
 [3.9.0]: https://github.com/flowxo/flowxo-sdk/compare/v3.8.1...v3.9.0
