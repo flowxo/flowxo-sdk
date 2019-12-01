@@ -6,30 +6,35 @@ var RunUtil = require('../../../tasks/lib/run.js');
 
 describe('RunUtil', function() {
   describe('#formatScriptOutput', function() {
-
-    var outputs = [{
-      key: 'key1',
-      label: 'Key 1',
-    }, {
-      key: 'key2',
-      label: 'Key 2'
-    }, {
-      key: 'z_key',
-      label: 'A key with Z at the start'
-    }, {
-      key: 'a_key',
-      label: 'A Key with A at the start'
-    }];
+    var outputs = [
+      {
+        key: 'key1',
+        label: 'Key 1'
+      },
+      {
+        key: 'key2',
+        label: 'Key 2'
+      },
+      {
+        key: 'z_key',
+        label: 'A key with Z at the start'
+      },
+      {
+        key: 'a_key',
+        label: 'A Key with A at the start'
+      }
+    ];
 
     it('should work set outputs keys that are not defined', function() {
-
       var data = {
         key1: 'Some Key 1 Data',
         z_key: 'Some more data'
       };
 
       var result = RunUtil.formatScriptOutput(outputs, data);
-      expect(result).to.be.an('array').length(4);
+      expect(result)
+        .to.be.an('array')
+        .length(4);
       expect(result[0].value).to.equal(data.key1);
       expect(result[1].value).to.be.undefined;
       expect(result[2].value).to.equal(data.z_key);
@@ -51,47 +56,63 @@ describe('RunUtil', function() {
       expect(result[3].label).to.equal(outputs[3].label);
     });
 
-    it('should handle nested data',function(){
-      var nested_outputs = [{
-        key: 'top',
-        label: 'Top'
-      },{
-        key: 'nested__value',
-        label: 'Nested Value'
-      }];
+    it('should handle nested data', function() {
+      var nested_outputs = [
+        {
+          key: 'top',
+          label: 'Top'
+        },
+        {
+          key: 'nested__value',
+          label: 'Nested Value'
+        }
+      ];
 
       var nested_data = {
         top: 'Test Value',
-        nested:{
+        nested: {
           value: 'Nested Value'
         }
       };
 
-      var result = RunUtil.formatScriptOutput(nested_outputs,nested_data);
-      expect(result).to.be.an('array').length(2);
+      var result = RunUtil.formatScriptOutput(nested_outputs, nested_data);
+      expect(result)
+        .to.be.an('array')
+        .length(2);
       expect(result[0].value).to.equal(nested_data.top);
       expect(result[1].value).to.equal(nested_data.nested.value);
     });
 
-    it('should handle collections',function(){
-      var collection_outputs = [{
-        key: 'key_+_id',
-        label: 'Collection'
-      }];
+    it('should handle collections', function() {
+      var collection_outputs = [
+        {
+          key: 'key_+_id',
+          label: 'Collection'
+        }
+      ];
 
       var collection_data = {
-        key: [{
-          id: 1
-        }, {
-          id: 2
-        }, {
-          id: 3
-        }]
+        key: [
+          {
+            id: 1
+          },
+          {
+            id: 2
+          },
+          {
+            id: 3
+          }
+        ]
       };
 
-      var result = RunUtil.formatScriptOutput(collection_outputs,collection_data);
-      expect(result).to.be.an('array').length(1);
-      expect(result[0].value).to.eql([ 1, 2, 3 ]);
+      var result = RunUtil.formatScriptOutput(
+        collection_outputs,
+        collection_data
+      );
+      expect(result)
+        .to.be.an('array')
+        .length(1);
+      expect(result[0].value).to.eql([1, 2, 3]);
     });
   });
 
@@ -120,8 +141,8 @@ describe('RunUtil', function() {
       var obj = RunUtil.convertDictInputToObject(input);
 
       expect(obj).to.eql({
-        'key\&1': 'va\&l',
-        key2: 'val'
+        'key&1': 'va&l',
+        'key2': 'val'
       });
     });
 
@@ -130,15 +151,14 @@ describe('RunUtil', function() {
       var obj = RunUtil.convertDictInputToObject(input);
 
       expect(obj).to.eql({
-        'key\=1': 'va\=l',
-        key2: 'val'
+        'key=1': 'va=l',
+        'key2': 'val'
       });
     });
 
     it('should return an empty object if there are no key-val pairs', function() {
-      ['', 'key', null, undefined]
-        .forEach(function(input) {
-          expect(RunUtil.convertDictInputToObject(input)).to.eql({});
+      ['', 'key', null, undefined].forEach(function(input) {
+        expect(RunUtil.convertDictInputToObject(input)).to.eql({});
       });
     });
   });
@@ -187,7 +207,7 @@ describe('RunUtil', function() {
         type: 'text'
       };
       var answers = {
-        input: '\'\''
+        input: "''"
       };
 
       var processed = RunUtil.processInput(input, answers);
@@ -225,7 +245,7 @@ describe('RunUtil', function() {
         type: 'textarea'
       };
       var answers = {
-        input: '\'\''
+        input: "''"
       };
 
       var processed = RunUtil.processInput(input, answers);
@@ -302,7 +322,9 @@ describe('RunUtil', function() {
       var err = new Error('test');
       var message = RunUtil.getNormalizedErrorMessage(err);
 
-      message.should.eql('The request failed because something unexpected happened.');
+      message.should.eql(
+        'The request failed because something unexpected happened (test).'
+      );
     });
 
     it('should return a message for non-retryable errors', function() {
@@ -316,7 +338,9 @@ describe('RunUtil', function() {
       var err = new sdk.Error.ServiceError();
       var message = RunUtil.getNormalizedErrorMessage(err);
 
-      message.should.eql('There was an error with your task, please contact support.');
+      message.should.eql(
+        'There was an error with your task, please contact support.'
+      );
     });
   });
 });
