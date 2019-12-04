@@ -1,6 +1,6 @@
 {
   "name": "flowxo-sdk",
-  "version": "4.4.0",
+  "version": "4.5.0",
   "description": "SDK for developing Flow XO Services.",
   "main": "index.js",
   "scripts": {
@@ -20,7 +20,7 @@
     "Grzegorz Biziel"
   ],
   "dependencies": {
-    "cross-spawn": "^7.0.1",
+    "cross-spawn": "^4.0.0",
     "flowxo-utils": "^3.3.0",
     "lodash": "^4.17.15",
     "validate.js": "^0.13.1"
@@ -44,7 +44,7 @@
     "jshint-stylish": "^2.2.0",
     "load-grunt-tasks": "^3.5.0",
     "localtunnel": "^1.8.1",
-    "mocha": "^2.5.3",
+    "mocha": "^6.2.2",
     "open": "7.0.0",
     "passport": "^0.3.2",
     "passport-oauth2-refresh": "^1.0.0",
