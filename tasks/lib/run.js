@@ -557,6 +557,11 @@ RunUtil.run = function(grunt, options, cb) {
 
         // Otherwise, harvest the inputs.
         RunUtil.harvestInputs(grunt, runner, method, inputs, function(err) {
+          if (!err) {
+            if (method.systemInputs && method.systemInputs.length) {
+              inputs = inputs.concat(method.systemInputs);
+            }
+          }
           callback(err);
         });
       },
