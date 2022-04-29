@@ -26,7 +26,7 @@
     "validate.js": "^0.13.1"
   },
   "devDependencies": {
-    "async": "^1.5.2",
+    "async": "^2.6.4",
     "body-parser": "^1.15.2",
     "body-parser-xml": "^1.1.0",
     "chai": "^3.5.0",
