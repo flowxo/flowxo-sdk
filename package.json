@@ -44,7 +44,7 @@
     "jshint-stylish": "^2.2.0",
     "load-grunt-tasks": "^3.5.0",
     "localtunnel": "^1.8.1",
-    "mocha": "^6.2.2",
+    "mocha": "^10.2.0",
     "open": "7.0.0",
     "passport": "^0.3.2",
     "passport-oauth2-refresh": "^1.0.0",
